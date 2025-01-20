@@ -183,22 +183,37 @@ int main(int argc, char **argv)
     {
         read_twopt(infile, data[iconf], head);
     }
-    exit(1);
     //////////////////////////////////////////////////////////////
     // correcting w0
     //////////////////////////////////////////////////////////////
-    // for (int i =0 ;i<)
-
-
+    for (int i = 0; i < head_loops.ncorr; i++)
+    {
+        for (int j = 0; j < head.Njack; j++)
+        {
+            std::complex<double> bubble(0,0);
+            for (int t = 0; t < head_loops.T; t++){
+                bubble+=std::complex<double>( data_loop[j][i][t][0], data_loop[j][i][t][1]);
+            }
+            
+            for (int tf = 0; tf < head.T; tf++)
+            {
+                std::complex<double> Wt(data[j][6][tf][0], data[j][6][tf][1]);
+                Wt *=  bubble;
+                data[j][head.ncorr+i][tf][0] = Wt.real();
+                data[j][head.ncorr+i][tf][1] = Wt.imag();
+            }
+            
+        }
+    }
 
     //////////////////////////////////////////////////////////////
     // binning and resampling
     //////////////////////////////////////////////////////////////
-     //////////////////////////////////// setup jackboot and binning
+    //////////////////////////////////// setup jackboot and binning
     int confs = head.Njack;
     int bin = atoi(argv[5]);
-    int Neff = confs / bin; // standard binning
-    // int Neff = bin; // bin2N
+    // int Neff = confs / bin; // standard binning
+    int Neff = bin; // bin2N
     int Njack;
     if (strcmp(argv[6], "jack") == 0)
     {
@@ -229,9 +244,8 @@ int main(int argc, char **argv)
     // write_header_g2(jack_file, head);
     head.write_header(jack_file);
 
-
-    double ****data_bin = binning(confs, Max_corr, head.T, data, bin);
-    // double**** data_bin = binning_toNb(confs, Max_corr, head.T, data, bin);
+    // double ****data_bin = binning(confs, Max_corr, head.T, data, bin);
+    double**** data_bin = binning_toNb(confs, Max_corr, head.T, data, bin);
     free_corr(confs, Max_corr, head.T, data);
     double ****conf_jack = myres->create(Neff, Max_corr, head.T, data_bin);
     free_corr(Neff, Max_corr, head.T, data_bin);
