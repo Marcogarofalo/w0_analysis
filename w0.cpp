@@ -164,9 +164,9 @@ int main(int argc, char **argv)
     for (int iconf = 0; iconf < head_loops.Njack; iconf++)
     {
         read_twopt(infile_loop, data_loop[iconf], head_loops);
-        error(head.smearing[iconf].compare(head_loops.smearing[iconf]), 2, "main",
+        error(head.smearing[iconf].compare(head_loops.smearing[iconf]) != 0, 2, "main",
               "configuration order differ at %d\n flow file conf: %s\n loops conf: %s ", iconf,
-              head.smearing[iconf], head_loops.smearing[iconf]);
+              head.smearing[iconf].c_str(), head_loops.smearing[iconf].c_str());
     }
     //////////////////////////////////////////////////////////////
     // reading flow
@@ -190,19 +190,24 @@ int main(int argc, char **argv)
     {
         for (int j = 0; j < head.Njack; j++)
         {
-            std::complex<double> bubble(0,0);
-            for (int t = 0; t < head_loops.T; t++){
-                bubble+=std::complex<double>( data_loop[j][i][t][0], data_loop[j][i][t][1]);
+            std::complex<double> bubble(0, 0);
+            for (int t = 0; t < head_loops.T; t++)
+            {
+                bubble += std::complex<double>(data_loop[j][i][t][0], data_loop[j][i][t][1]);
             }
-            
+
             for (int tf = 0; tf < head.T; tf++)
             {
                 std::complex<double> Wt(data[j][6][tf][0], data[j][6][tf][1]);
-                Wt *=  bubble;
-                data[j][head.ncorr+i][tf][0] = Wt.real();
-                data[j][head.ncorr+i][tf][1] = Wt.imag();
+                Wt *= bubble;
+                data[j][head.ncorr + i][tf][0] = Wt.real();
+                data[j][head.ncorr + i][tf][1] = Wt.imag();
             }
-            
+            // at tf=0 we put <loop>
+            data[j][head.ncorr + i][0][0] = bubble.real();
+            data[j][head.ncorr + i][0][1] = bubble.imag();
+            // if (i == 27 && j == head.Njack - 1)
+            //     printf("bubble dmu = %g  %g       <W(0)*bubble>= %g %g\n", bubble.real(), bubble.imag(), data[j][head.ncorr + i][0][0], data[j][head.ncorr + i][0][1]);
         }
     }
 
@@ -245,7 +250,7 @@ int main(int argc, char **argv)
     head.write_header(jack_file);
 
     // double ****data_bin = binning(confs, Max_corr, head.T, data, bin);
-    double**** data_bin = binning_toNb(confs, Max_corr, head.T, data, bin);
+    double ****data_bin = binning_toNb(confs, Max_corr, head.T, data, bin);
     free_corr(confs, Max_corr, head.T, data);
     double ****conf_jack = myres->create(Neff, Max_corr, head.T, data_bin);
     free_corr(Neff, Max_corr, head.T, data_bin);
@@ -364,6 +369,10 @@ int main(int argc, char **argv)
     //         fit_info.ext_P[t][j] = conf_jack[Njack - 1][0][t][0];
     //     }
     // }
+    fit_info.function = poly3;
+    fit_info.linear_fit = true;
+    fit_info.T = head.T;
+    fit_info.corr_id = {6};
 
     for (int t = 0; t < head.T; t++)
     {
@@ -374,11 +383,6 @@ int main(int argc, char **argv)
             break;
         }
     }
-
-    fit_info.function = poly3;
-    fit_info.linear_fit = true;
-    fit_info.T = head.T;
-    fit_info.corr_id = {};
 
     // c++ 0 || r 1
     struct fit_result fit_W = fit_fun_to_fun_of_corr(
@@ -391,13 +395,12 @@ int main(int argc, char **argv)
     std::vector<double> swapped_x(fit_info.Nvar);
     std::vector<double> w0(Njack);
 
-    printf("fit:\n");
-    for (int i = 0; i < fit_info.Npar; i++)
-    {
-        printf("%g  %g\n", fit_W.P[i][Njack - 1], myres->comp_error(fit_W.P[0]));
-    }
-    swapped_x[0] = 226;
-    printf("%g  \n", fit_info.function(0, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[Njack - 1]));
+    // printf("fit:\n");
+    // for (int i = 0; i < fit_info.Npar; i++)
+    // {
+    //     printf("%g  %g\n", fit_W.P[i][Njack - 1], myres->comp_error(fit_W.P[0]));
+    // }
+    // printf("%g  \n", fit_info.function(0, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[Njack - 1]));
     for (size_t j = 0; j < Njack; j++)
     {
         w0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
@@ -406,5 +409,61 @@ int main(int argc, char **argv)
     }
     printf("w0 = %g  %g\n", w0[Njack - 1], myres->comp_error(w0.data()));
     // free_fit_result(fit_info, fit_out);
-    fit_info.restore_default();
+    // fit_info.restore_default();
+
+    print_result_in_file(outfile, w0.data(), "w0", 0.0, fit_info.tmin, fit_info.tmax );
+
+
+    free_2(Njack, tif);
+    //////////////////////////////////////////////////////////////
+    // light mass correction
+    //////////////////////////////////////////////////////////////
+
+    double mean, err;
+    int seed;
+    line_read_param(option, "mul", mean, err, seed, namefile_plateaux);
+    fit_info.n_ext_P = 1;
+    fit_info.ext_P = (double **)malloc(sizeof(double) * fit_info.n_ext_P);
+    fit_info.ext_P[0] = myres->create_fake(mean, err, seed);
+    myres->add(fit_info.ext_P[0], fit_info.ext_P[0], -head_loops.mus[0]); // dmu = mu_iso - mu_sea
+    printf("dmul= %g  %g\n", fit_info.ext_P[0][Njack - 1], myres->comp_error(fit_info.ext_P[0]));
+    // for (int i = 0; i<head_loops.gammas.size();i++){
+    //     if (strcmp(head_loops.gammas[i].c_str(),"std_g5")==0)
+    //         printf("id =%d %s %d\n", i,head_loops.gammas[i].c_str(), strcmp(head_loops.gammas[i].c_str(),"std_g5"));
+    // }
+
+    fit_info.corr_id = {6, head.ncorr + 27};
+    fit_info.myen = {1}; // reim of corr_id[1] (the correction)
+
+    for (int t = 0; t < head.T; t++)
+    {
+        if (lhs_function_Wt_p_dmcorr(Njack - 1, conf_jack, t, fit_info) > 0.3)
+        {
+            fit_info.tmin = t - 2;
+            fit_info.tmax = t + 1;
+            break;
+        }
+    }
+
+    struct fit_result fit_Wpdmu = fit_fun_to_fun_of_corr(
+        option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
+        outfile, lhs_function_Wt_p_dmcorr, "W+mul_correction(t)", fit_info,
+        jack_file);
+    check_correlatro_counter(1);
+
+    tif = swap_indices(fit_info.Npar, Njack, fit_Wpdmu.P);
+    std::vector<double> w0pdmu(Njack);
+
+    for (size_t j = 0; j < Njack; j++)
+    {
+        w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
+        w0pdmu[j] = int2flowt(w0pdmu[j]);
+        w0pdmu[j] = std::sqrt(w0pdmu[j]);
+    }
+    printf("w0+mul_correction = %g  %g\n", w0pdmu[Njack - 1], myres->comp_error(w0pdmu.data()));
+    print_result_in_file(outfile, w0.data(), "w0+mul_correction", 0.0, fit_info.tmin, fit_info.tmax );
+
+    double *Delta_mul_w0 = myres->create_copy(w0.data());
+    myres->sub(Delta_mul_w0, Delta_mul_w0, w0pdmu.data());
+    print_result_in_file(outfile, Delta_mul_w0, "Delta_mul_w0", 0.0, fit_info.tmin, fit_info.tmax );
 }
