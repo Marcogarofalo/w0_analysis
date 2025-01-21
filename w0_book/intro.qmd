@@ -1,0 +1,38 @@
+# w0
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+```
+
+
+```{r}
+mt<-read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_output")
+all_obs<-Rose::get_all_corr(mt)
+df<-NULL
+df<-add_corr_to_df("W(t)",all_obs ,mt,df,print_res = FALSE)
+df<-add_corr_to_df("W+mul_correction(t)",all_obs ,mt,df,print_res = FALSE)
+
+print_full_res("w0",all_obs,mt)
+print_full_res("w0+mul_correction",all_obs,mt)
+  
+gg<-plot_df_corr_ggplot(df)
+gg<- gg+ geom_hline(yintercept = 0.3)
+
+fig<-myplotly(gg, to_print = TRUE)
+```

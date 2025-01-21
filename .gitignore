@@ -70,3 +70,15 @@ eigen/
 Eigen/
 EIGEN3/
 gsl*
+.Rproj.user
+*.fls
+*.aux
+*.fdb_latexmk
+*.gz
+unnamed-chunk*
+*.js
+*.js.map
+cover.png
+w0_book/site_libs/jquery-3.5.1/jquery-AUTHORS.txt
+w0_book/site_libs/jquery-3.5.1/jquery.min.map
+w0_book/site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css
