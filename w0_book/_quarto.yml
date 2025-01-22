@@ -7,7 +7,8 @@ book:
   date: "1/21/2025"
   chapters:
     - index.qmd
-    - intro.qmd
+    - note_sea_corrections.qmd
+    - B64.qmd
     - summary.qmd
     - references.qmd
 
