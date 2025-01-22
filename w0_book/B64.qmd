@@ -1,0 +1,62 @@
+# B64
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+```
+
+## autocorrelation
+
+```{r, results='asis',echo=FALSE, dev='tikz'}
+gg <- myggplot(shape = FALSE,fill=FALSE)
+
+df <- read.table("/home/garofalo/analysis/flow/w0_analysis/build/w0_B64_autocorr_bintoNb.dat",
+                 header = TRUE,
+                 colClasses="numeric")
+gg <- gg + geom_pointrange(aes(
+  x = df[, 1], y = df[, 2],
+  ymin = df[, 2] - df[, 3],
+  ymax = df[, 2] + df[, 3],
+  color="not integer binning"
+))
+
+fig <- myplotly(gg)
+```
+
+## w0
+
+```{r, results='asis',echo=FALSE, dev='tikz'}
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- NULL
+df <- add_corr_to_df("W(t)", all_obs, mt, df, print_res = FALSE)
+df <- add_corr_to_df("W+mul_correction(t)", all_obs, mt, df, print_res = FALSE)
+df <- add_corr_to_df("W+mus_correction(t)", all_obs, mt, df, print_res = FALSE)
+df <- add_corr_to_df("W+muc_correction(t)", all_obs, mt, df, print_res = FALSE)
+df <- add_corr_to_df("W+all_mu_correction(t)", all_obs, mt, df, print_res = FALSE)
+
+print_full_res("w0", all_obs, mt)
+print_full_res("w0+mul_correction", all_obs, mt)
+print_full_res("w0+mus_correction", all_obs, mt)
+print_full_res("w0+muc_correction", all_obs, mt)
+
+gg <- plot_df_corr_ggplot(df)
+gg <- gg + geom_hline(yintercept = 0.3)
+
+fig <- myplotly(gg, to_print = TRUE)
+```
