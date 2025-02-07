@@ -1,4 +1,4 @@
-flow_B64.dat delta_amul  -0.0000525      1e-20  1
+flow_B64.dat delta_amul -0.0000525      1e-20  1
 flow_B64.dat delta_amus  0.00042039860  1e-20  1
 flow_B64.dat delta_amuc  0.00299149     1e-20  1
 flow_B64.dat mul  0.0006669  0.0000028  1

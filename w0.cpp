@@ -537,7 +537,7 @@ int main(int argc, char **argv)
 
     for (size_t j = 0; j < Njack; j++)
     {
-        w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin-1, fit_info.tmax+1, 1e-10, 2);
+        w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin - 1, fit_info.tmax + 1, 1e-10, 2);
         w0pdmu[j] = int2flowt(w0pdmu[j]);
         w0pdmu[j] = std::sqrt(w0pdmu[j]);
     }
@@ -554,5 +554,73 @@ int main(int argc, char **argv)
     free(Delta_mul_w0);
     fit_Wpdmu.clear();
 
+    fit_info.restore_default();
+
+    //////////////////////////////////////////////////////////////
+    //  mass derivate
+    //////////////////////////////////////////////////////////////
+
+    fit_info.Nvar = 1;
+    fit_info.Npar = 4;
+    fit_info.N = 1;
+    fit_info.Njack = Njack;
+    fit_info.codeplateaux = true;
+
+    fit_info.function = poly3;
+    fit_info.linear_fit = true;
+    fit_info.T = head.T;
+    fit_info.n_ext_P = 0;
+
+    // for (int i = 0; i<head_loops.gammas.size();i++){
+    //     if (strcmp(head_loops.gammas[i].c_str(),"std_g5")==0)
+    //         printf("id =%d %s %d\n", i,head_loops.gammas[i].c_str(), strcmp(head_loops.gammas[i].c_str(),"std_g5"));
+    // }
+    fit_info.tmin = 1;
+    fit_info.tmax = 2;
+    for (int iq = 0; iq < Nquark; iq++)
+    {
+
+        int Ng = head_loops.gammas.size();
+        fit_info.corr_id = {6, head.ncorr + 27 + iq * Ng};
+        fit_info.myen = {1}; // reim of corr_id[1] (the correction)
+
+        // for (int t = 1; t < head.T; t++)
+        // {
+        //     if (lhs_function_Wt_p_dmcorr(Njack - 1, conf_jack, t, fit_info) > 0.3)
+        //     {
+        //         fit_info.tmin = t - 2;
+        //         fit_info.tmax = t + 1;
+        //         break;
+        //     }
+        // }
+        char name[NAMESIZE];
+        mysprintf(name, NAMESIZE, "der_W_mu%s_correction(t)", q_name[iq].c_str());
+        struct fit_result fit_Wpdmu = fit_fun_to_fun_of_corr(
+            option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
+            outfile, lhs_function_Wt_der_mu, name, fit_info,
+            jack_file);
+        check_correlatro_counter(5 + iq);
+
+        // tif = swap_indices(fit_info.Npar, Njack, fit_Wpdmu.P);
+
+        // for (size_t j = 0; j < Njack; j++)
+        // {
+        //     w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
+        //     w0pdmu[j] = int2flowt(w0pdmu[j]);
+        //     w0pdmu[j] = std::sqrt(w0pdmu[j]);
+        // }
+        // mysprintf(name, NAMESIZE, "w0+mu%s_correction", q_name[iq].c_str());
+        // printf("%s = %g  %g\n", name, w0pdmu[Njack - 1], myres->comp_error(w0pdmu.data()));
+        // print_result_in_file(outfile, w0pdmu.data(), name, 0.0, fit_info.tmin, fit_info.tmax);
+
+        // double *Delta_mul_w0 = myres->create_copy(w0.data());
+        // myres->sub(Delta_mul_w0, Delta_mul_w0, w0pdmu.data());
+        // mysprintf(name, NAMESIZE, "Delta_mu%s_w0", q_name[iq].c_str());
+        // print_result_in_file(outfile, Delta_mul_w0, name, 0.0, fit_info.tmin, fit_info.tmax);
+
+        // free_2(Njack, tif);
+        // free(Delta_mul_w0);
+        // fit_Wpdmu.clear();
+    }
     fit_info.restore_default();
 }
