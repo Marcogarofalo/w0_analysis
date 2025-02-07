@@ -40,7 +40,7 @@ fig <- myplotly(gg)
 
 ## w0
 
-```{r, results='asis',echo=FALSE, dev='tikz'}
+```{r, results='asis',echo=FALSE}
 mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
 df <- NULL
@@ -54,9 +54,46 @@ print_full_res("w0", all_obs, mt)
 print_full_res("w0+mul_correction", all_obs, mt)
 print_full_res("w0+mus_correction", all_obs, mt)
 print_full_res("w0+muc_correction", all_obs, mt)
+#print_full_res("w0+all_mu_correction", all_obs, mt)
+df$x<-0.010000 + df$x * 0.02
+df$xfit<-0.010000 + df$xfit * 0.02
+df$tmin<-0.010000 + df$tmin * 0.02
+df$tmax<-0.010000 + df$tmax * 0.02
 
-gg <- plot_df_corr_ggplot(df)
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+# gg<-myggplot()
 gg <- gg + geom_hline(yintercept = 0.3)
 
-fig <- myplotly(gg, to_print = TRUE)
+fig <- myplotly(gg, "","$t/a^2$","$W(t)$", to_print = TRUE)
+```
+
+
+
+## w0 derivative
+
+```{r, results='asis',echo=FALSE}
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- NULL
+#df <- add_corr_to_df("W(t)", all_obs, mt, df, print_res = FALSE)
+df <- add_corr_to_df("der_W_mul_correction(t)", all_obs, mt, df, print_res = FALSE)
+df <- add_corr_to_df("der_W_mus_correction(t)", all_obs, mt, df, print_res = FALSE)
+df <- add_corr_to_df("der_W_muc_correction(t)", all_obs, mt, df, print_res = FALSE)
+# df <- add_corr_to_df("W+all_mu_correction(t)", all_obs, mt, df, print_res = FALSE)
+# 
+# print_full_res("w0", all_obs, mt)
+# print_full_res("w0+mul_correction", all_obs, mt)
+# print_full_res("w0+mus_correction", all_obs, mt)
+# print_full_res("w0+muc_correction", all_obs, mt)
+#print_full_res("w0+all_mu_correction", all_obs, mt)
+df$x<-0.010000 + df$x * 0.02
+df$xfit<-0.010000 + df$xfit * 0.02
+df$tmin<-0.010000 + df$tmin * 0.02
+df$tmax<-0.010000 + df$tmax * 0.02
+
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+# gg<-myggplot()
+#gg <- gg + geom_hline(yintercept = 0.3)
+
+fig <- myplotly(gg, "","$t/a^2$","$\\partial_\\mu W(t)$", to_print = TRUE)
 ```
