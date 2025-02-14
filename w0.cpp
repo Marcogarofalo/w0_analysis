@@ -385,6 +385,18 @@ int main(int argc, char **argv)
         }
     }
 
+    // print for frezzotti
+    {
+        double *tmp = (double *)malloc(sizeof(double) * Njack);
+        for (int j = 0; j < Njack; j++)
+        {
+            tmp[j] = lhs_function_w0_eg(j, conf_jack, 150, fit_info);
+        }
+        char name[NAMESIZE];
+        mysprintf(name, NAMESIZE, "%s/out/W_t150_jack.txt",option[3] );
+        myres->write_jack_in_file(tmp, name);
+        free(tmp);
+    }
     // c++ 0 || r 1
     struct fit_result fit_W = fit_fun_to_fun_of_corr(
         option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
@@ -577,12 +589,22 @@ int main(int argc, char **argv)
     // }
     fit_info.tmin = 1;
     fit_info.tmax = 2;
+    double *tmp = (double *)malloc(sizeof(double) * Njack);
     for (int iq = 0; iq < Nquark; iq++)
     {
 
         int Ng = head_loops.gammas.size();
         fit_info.corr_id = {6, head.ncorr + 27 + iq * Ng};
         fit_info.myen = {1}; // reim of corr_id[1] (the correction)
+        
+        // print for frezzotti
+        for (int j = 0; j < Njack; j++)
+        {
+            tmp[j] = lhs_function_Wt_der_mu(j, conf_jack, 150, fit_info);
+        }
+        char name[NAMESIZE];
+        mysprintf(name, NAMESIZE, "%s/out/der_W_mu%s_correction_t150_jack",option[3], q_name[iq].c_str());
+        myres->write_jack_in_file(tmp, name);
 
         // for (int t = 1; t < head.T; t++)
         // {
@@ -593,7 +615,6 @@ int main(int argc, char **argv)
         //         break;
         //     }
         // }
-        char name[NAMESIZE];
         mysprintf(name, NAMESIZE, "der_W_mu%s_correction(t)", q_name[iq].c_str());
         struct fit_result fit_Wpdmu = fit_fun_to_fun_of_corr(
             option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
@@ -622,5 +643,6 @@ int main(int argc, char **argv)
         // free(Delta_mul_w0);
         // fit_Wpdmu.clear();
     }
+    free(tmp);
     fit_info.restore_default();
 }

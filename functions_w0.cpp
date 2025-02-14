@@ -31,7 +31,7 @@ double lhs_function_Wt_der_mu(int j, double ****in, int t, struct fit_type fit_i
     int id = fit_info.corr_id[0];
     int id_cor = fit_info.corr_id[1];
     int reim = fit_info.myen[0];
-    double dmu = fit_info.ext_P[0][j];
+    // double dmu = fit_info.ext_P[0][j];
 
     double Wt = in[j][id][t][0];
     double loop = in[j][id_cor][0][reim];
