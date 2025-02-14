@@ -23,16 +23,17 @@ myplotly(ggplot())
 ## autocorrelation
 
 ```{r, results='asis',echo=FALSE, dev='tikz'}
-gg <- myggplot(shape = FALSE,fill=FALSE)
+gg <- myggplot(shape = FALSE, fill = FALSE)
 
 df <- read.table("/home/garofalo/analysis/flow/w0_analysis/build/w0_B64_autocorr_bintoNb.dat",
-                 header = TRUE,
-                 colClasses="numeric")
+  header = TRUE,
+  colClasses = "numeric"
+)
 gg <- gg + geom_pointrange(aes(
   x = df[, 1], y = df[, 2],
   ymin = df[, 2] - df[, 3],
   ymax = df[, 2] + df[, 3],
-  color="not integer binning"
+  color = "not integer binning"
 ))
 
 fig <- myplotly(gg)
@@ -54,17 +55,19 @@ print_full_res("w0", all_obs, mt)
 print_full_res("w0+mul_correction", all_obs, mt)
 print_full_res("w0+mus_correction", all_obs, mt)
 print_full_res("w0+muc_correction", all_obs, mt)
-#print_full_res("w0+all_mu_correction", all_obs, mt)
-df$x<-0.010000 + df$x * 0.02
-df$xfit<-0.010000 + df$xfit * 0.02
-df$tmin<-0.010000 + df$tmin * 0.02
-df$tmax<-0.010000 + df$tmax * 0.02
+l<-which(df$xfit==150 & df$label=="W(t)")
+save_res<-df[l,]
+# print_full_res("w0+all_mu_correction", all_obs, mt)
+df$x <- 0.010000 + df$x * 0.02
+df$xfit <- 0.010000 + df$xfit * 0.02
+df$tmin <- 0.010000 + df$tmin * 0.02
+df$tmax <- 0.010000 + df$tmax * 0.02
 
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 # gg<-myggplot()
 gg <- gg + geom_hline(yintercept = 0.3)
 
-fig <- myplotly(gg, "","$t/a^2$","$W(t)$", to_print = TRUE)
+fig <- myplotly(gg, "", "$t/a^2$", "$W(t)$", to_print = TRUE)
 ```
 
 
@@ -75,25 +78,91 @@ fig <- myplotly(gg, "","$t/a^2$","$W(t)$", to_print = TRUE)
 mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
 df <- NULL
-#df <- add_corr_to_df("W(t)", all_obs, mt, df, print_res = FALSE)
+# df <- add_corr_to_df("W(t)", all_obs, mt, df, print_res = FALSE)
 df <- add_corr_to_df("der_W_mul_correction(t)", all_obs, mt, df, print_res = FALSE)
 df <- add_corr_to_df("der_W_mus_correction(t)", all_obs, mt, df, print_res = FALSE)
 df <- add_corr_to_df("der_W_muc_correction(t)", all_obs, mt, df, print_res = FALSE)
 # df <- add_corr_to_df("W+all_mu_correction(t)", all_obs, mt, df, print_res = FALSE)
-# 
+#
 # print_full_res("w0", all_obs, mt)
 # print_full_res("w0+mul_correction", all_obs, mt)
 # print_full_res("w0+mus_correction", all_obs, mt)
 # print_full_res("w0+muc_correction", all_obs, mt)
-#print_full_res("w0+all_mu_correction", all_obs, mt)
-df$x<-0.010000 + df$x * 0.02
-df$xfit<-0.010000 + df$xfit * 0.02
-df$tmin<-0.010000 + df$tmin * 0.02
-df$tmax<-0.010000 + df$tmax * 0.02
+# print_full_res("w0+all_mu_correction", all_obs, mt)
+l<-which(df$xfit==150)
+save_res<-rbind(save_res,df[l,])
+df$x <- 0.010000 + df$x * 0.02
+df$xfit <- 0.010000 + df$xfit * 0.02
+df$tmin <- 0.010000 + df$tmin * 0.02
+df$tmax <- 0.010000 + df$tmax * 0.02
 
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 # gg<-myggplot()
-#gg <- gg + geom_hline(yintercept = 0.3)
+# gg <- gg + geom_hline(yintercept = 0.3)
 
-fig <- myplotly(gg, "","$t/a^2$","$\\partial_\\mu W(t)$", to_print = TRUE)
+fig <- myplotly(gg, "", "$t/a^2$", "$\\partial_\\mu W(t)$", to_print = TRUE)
+```
+
+## histogram
+
+histogram of the jackknifes at time $t/a^2=3$
+
+```{r, results='asis',echo=FALSE}
+kable(save_res[,c(2,3,7)],digits = 8)
+W <- read.table("/home/garofalo/analysis/flow/data/out/W_t150_jack.txt")
+W <- W[c(-1, -length(W)), ]
+
+gg<-ggplot( ) + xlab("W(0.3)") +
+    geom_histogram(aes(x = W, y =..density..),binwidth = -(min(W) -max(W))/7,
+                   #breaks = seq(min(W), max(W), by = 100), 
+                   colour = "black", 
+                   fill = "white") +theme_bw()
+gg<- gg +stat_function(fun = dnorm, args = list(mean = save_res$y[1], sd = (save_res$err[1])/sqrt(length(W)-1)))
+gg
+
+```
+
+```{r, results='asis',echo=FALSE}
+# kable(save_res[,c(2,3,7)],digits = 8)
+W <- read.table("/home/garofalo/analysis/flow/data/out/der_W_mul_correction_t150_jack")
+W <- W[c(-1, -length(W)), ]
+
+gg<-ggplot( ) + xlab("dW/dmul (0.3)") +
+    geom_histogram(aes(x = W, y =..density..),binwidth = -(min(W) -max(W))/7,
+                   #breaks = seq(min(W), max(W), by = 100), 
+                   colour = "black", 
+                   fill = "white") +theme_bw()
+gg<- gg +stat_function(fun = dnorm, args = list(mean = save_res$y[2], sd = (save_res$err[2])/sqrt(length(W)-1)))
+gg
+```
+
+
+```{r, results='asis',echo=FALSE}
+# kable(save_res[,c(2,3,7)],digits = 8)
+W <- read.table("/home/garofalo/analysis/flow/data/out/der_W_mus_correction_t150_jack")
+W <- W[c(-1, -length(W)), ]
+
+gg<-ggplot( ) + xlab("dW/dmus (0.3)") +
+    geom_histogram(aes(x = W, y =..density..),binwidth = -(min(W) -max(W))/7,
+                   #breaks = seq(min(W), max(W), by = 100), 
+                   colour = "black", 
+                   fill = "white") +theme_bw()
+gg<- gg +stat_function(fun = dnorm, args = list(mean = save_res$y[3], sd = (save_res$err[3])/sqrt(length(W)-1)))
+gg
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+# kable(save_res[,c(2,3,7)],digits = 8)
+W <- read.table("/home/garofalo/analysis/flow/data/out/der_W_muc_correction_t150_jack")
+W <- W[c(-1, -length(W)), ]
+
+gg<-ggplot( ) + xlab("dW/dmuc (0.3)") 
+ gg<- gg+    geom_histogram(aes(x = W, y =..density..),binwidth = -(min(W) -max(W))/7,
+                    #breaks = seq(min(W), max(W), by = 100), 
+                    colour = "black", 
+                    fill = "white") +theme_bw()
+gg<- gg +stat_function(fun = dnorm, args = list(mean = save_res$y[4], sd = (save_res$err[4])/sqrt(length(W)-1)))
+gg
 ```
