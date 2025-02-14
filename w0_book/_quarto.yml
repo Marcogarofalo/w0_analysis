@@ -17,6 +17,7 @@ bibliography: references.bib
 format:
   html:
     theme: cosmo
+    html-math-method: katex
   pdf:
     documentclass: scrreprt
 
