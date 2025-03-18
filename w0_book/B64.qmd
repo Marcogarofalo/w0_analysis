@@ -37,6 +37,12 @@ print_full_res("w0", all_obs, mt)
 print_full_res("w0+mul_correction", all_obs, mt)
 print_full_res("w0+mus_correction", all_obs, mt)
 print_full_res("w0+muc_correction", all_obs, mt)
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_light_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1)
+
+#########################
 l<-which(df$xfit==150 & df$label=="W(t)")
 save_res<-df[l,]
 # print_full_res("w0+all_mu_correction", all_obs, mt)
