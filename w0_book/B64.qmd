@@ -20,24 +20,6 @@ ggp # Let knit handle the plot
 myplotly(ggplot())
 ```
 
-## autocorrelation
-
-```{r, results='asis',echo=FALSE, dev='tikz'}
-gg <- myggplot(shape = FALSE, fill = FALSE)
-
-df <- read.table("/home/garofalo/analysis/flow/w0_analysis/build/w0_B64_autocorr_bintoNb.dat",
-  header = TRUE,
-  colClasses = "numeric"
-)
-gg <- gg + geom_pointrange(aes(
-  x = df[, 1], y = df[, 2],
-  ymin = df[, 2] - df[, 3],
-  ymax = df[, 2] + df[, 3],
-  color = "not integer binning"
-))
-
-fig <- myplotly(gg)
-```
 
 ## w0
 
@@ -165,4 +147,84 @@ gg<-ggplot( ) + xlab("dW/dmuc (0.3)")
                     fill = "white") +theme_bw()
 gg<- gg +stat_function(fun = dnorm, args = list(mean = save_res$y[4], sd = (save_res$err[4])/sqrt(length(W)-1)))
 gg
+```
+
+
+## autocorrelation
+
+binnins analysis fo w0
+
+```{r, results='asis',echo=FALSE, dev='tikz'}
+gg <- myggplot(shape = FALSE, fill = FALSE)
+
+df <- read.table("/home/garofalo/analysis/flow/w0_analysis/build/w0_B64_autocorr_bintoNb.dat",
+  header = TRUE,
+  colClasses = "numeric"
+)
+gg <- gg + geom_pointrange(aes(
+  x = df[, 1], y = df[, 2],
+  ymin = df[, 2] - df[, 3],
+  ymax = df[, 2] + df[, 3],
+  color = "not integer binning"
+))
+
+fig <- myplotly(gg,"","bin-size","w0")
+```
+
+
+
+
+```{r, results='asis',echo=FALSE, dev='tikz'}
+gg <- myggplot(shape = FALSE, fill = FALSE)
+
+df <- read.table("/home/garofalo/analysis/flow/w0_analysis/build/w0+mul_B64_autocorr_bintoNb.dat",
+  header = TRUE,
+  colClasses = "numeric"
+)
+gg <- gg + geom_pointrange(aes(
+  x = df[, 1], y = df[, 2],
+  ymin = df[, 2] - df[, 3],
+  ymax = df[, 2] + df[, 3],
+  color = "not integer binning"
+))
+
+fig <- myplotly(gg,"","bin-size","w0+mul_correction")
+```
+
+
+
+```{r, results='asis',echo=FALSE, dev='tikz'}
+gg <- myggplot(shape = FALSE, fill = FALSE)
+
+df <- read.table("/home/garofalo/analysis/flow/w0_analysis/build/w0+mus_B64_autocorr_bintoNb.dat",
+  header = TRUE,
+  colClasses = "numeric"
+)
+gg <- gg + geom_pointrange(aes(
+  x = df[, 1], y = df[, 2],
+  ymin = df[, 2] - df[, 3],
+  ymax = df[, 2] + df[, 3],
+  color = "not integer binning"
+))
+
+fig <- myplotly(gg,"","bin-size","w0+mus_correction")
+```
+
+
+
+```{r, results='asis',echo=FALSE, dev='tikz'}
+gg <- myggplot(shape = FALSE, fill = FALSE)
+
+df <- read.table("/home/garofalo/analysis/flow/w0_analysis/build/w0+muc_B64_autocorr_bintoNb.dat",
+  header = TRUE,
+  colClasses = "numeric"
+)
+gg <- gg + geom_pointrange(aes(
+  x = df[, 1], y = df[, 2],
+  ymin = df[, 2] - df[, 3],
+  ymax = df[, 2] + df[, 3],
+  color = "not integer binning"
+))
+
+fig <- myplotly(gg,"","bin-size","w0+muc_correction")
 ```
