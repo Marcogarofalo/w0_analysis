@@ -393,7 +393,7 @@ int main(int argc, char **argv)
             tmp[j] = lhs_function_w0_eg(j, conf_jack, 150, fit_info);
         }
         char name[NAMESIZE];
-        mysprintf(name, NAMESIZE, "%s/out/W_t150_jack.txt",option[3] );
+        mysprintf(name, NAMESIZE, "%s/out/W_t150_jack.txt", option[3]);
         myres->write_jack_in_file(tmp, name);
         free(tmp);
     }
@@ -483,12 +483,13 @@ int main(int argc, char **argv)
 
         for (size_t j = 0; j < Njack; j++)
         {
-            w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
+            w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin - 1, fit_info.tmax + 1, 1e-10, 2);
             w0pdmu[j] = int2flowt(w0pdmu[j]);
             w0pdmu[j] = std::sqrt(w0pdmu[j]);
         }
         mysprintf(name, NAMESIZE, "w0+mu%s_correction", q_name[iq].c_str());
         printf("%s = %g  %g\n", name, w0pdmu[Njack - 1], myres->comp_error(w0pdmu.data()));
+        printf("unbiased %s = %g  %g\n", name, myres->comp_mean_unbias(w0pdmu.data()), myres->comp_error(w0pdmu.data()));
         print_result_in_file(outfile, w0pdmu.data(), name, 0.0, fit_info.tmin, fit_info.tmax);
 
         double *Delta_mul_w0 = myres->create_copy(w0.data());
@@ -596,14 +597,14 @@ int main(int argc, char **argv)
         int Ng = head_loops.gammas.size();
         fit_info.corr_id = {6, head.ncorr + 27 + iq * Ng};
         fit_info.myen = {1}; // reim of corr_id[1] (the correction)
-        
+
         // print for frezzotti
         for (int j = 0; j < Njack; j++)
         {
             tmp[j] = lhs_function_Wt_der_mu(j, conf_jack, 150, fit_info);
         }
         char name[NAMESIZE];
-        mysprintf(name, NAMESIZE, "%s/out/der_W_mu%s_correction_t150_jack",option[3], q_name[iq].c_str());
+        mysprintf(name, NAMESIZE, "%s/out/der_W_mu%s_correction_t150_jack", option[3], q_name[iq].c_str());
         myres->write_jack_in_file(tmp, name);
 
         // for (int t = 1; t < head.T; t++)
