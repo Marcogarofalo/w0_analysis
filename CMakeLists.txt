@@ -54,3 +54,12 @@ IF(WITH_ARB)
   target_link_libraries(w0 PUBLIC flint-arb flint)
 ENDIF()
 target_link_libraries(w0 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+
+
+add_executable(w0_rew w0_rew.cpp)
+target_link_libraries(w0_rew PUBLIC functions_w0)
+IF(WITH_ARB)
+  set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")
+  target_link_libraries(w0_rew PUBLIC flint-arb flint)
+ENDIF()
+target_link_libraries(w0_rew PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})

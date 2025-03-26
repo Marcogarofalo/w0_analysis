@@ -235,6 +235,7 @@ int main(int argc, char **argv)
     // data = data_removed;
     // data_rew = rew_removed;
     // printf("removed %ld confs\n", to_remove.size());
+
     //////////////////////////////////////////////////////////////
     // correcting w0
     //////////////////////////////////////////////////////////////
@@ -250,7 +251,7 @@ int main(int argc, char **argv)
             }
             r = head.Njack / r;
             sum_r += r;
-            printf("rew %d  %g  %g\n",i, r,data_rew[j][0][0][1]);
+            // printf("rew %d  %g  %g    -  %g %g\n",i, r,data_rew[j][0][0][1],data_rew[j][0][0][0],exp(data_rew[j][0][0][0]));
             // r = data_rew[j][0][0][1]; // the im part had the normalized reweighting factor
             // printf("rew %d %d %g\n", i, j, r);
             for (int tf = 0; tf < head.T; tf++)
@@ -261,7 +262,7 @@ int main(int argc, char **argv)
         }
         printf("sum_r = %g\n",sum_r/head.Njack);
     }
-    free_corr(head_rew.Njack, head_rew.ncorr, head_rew.T, data_rew);
+    // free_corr(head_rew.Njack, head_rew.ncorr, head_rew.T, data_rew);
 
     //////////////////////////////////////////////////////////////
     // binning and resampling
@@ -302,10 +303,56 @@ int main(int argc, char **argv)
 
     // double ****data_bin = binning(confs, Max_corr, head.T, data, bin);
     // double ****data_bin = binning_toNb(confs, Max_corr, head.T, data, bin); // binning into N=bin, cutting out the reminder
+    // double ****data_bin = bin_intoN(data, Max_corr, head.T, confs, bin); // binning into N=bin with not integer
+    // free_corr(confs, Max_corr, head.T, data);
+    // double ****conf_jack = myres->create(Neff, Max_corr, head.T, data_bin);
+    // free_corr(Neff, Max_corr, head.T, data_bin);
+
+    //////////////////////////////////////////////////////////////
+    // making custom jackknifes
+    //////////////////////////////////////////////////////////////
     double ****data_bin = bin_intoN(data, Max_corr, head.T, confs, bin); // binning into N=bin with not integer
-    free_corr(confs, Max_corr, head.T, data);
     double ****conf_jack = myres->create(Neff, Max_corr, head.T, data_bin);
     free_corr(Neff, Max_corr, head.T, data_bin);
+
+    double ****conf_jack_Orew = calloc_corr(head.Njack, head_rew.ncorr, head.T);
+
+    double ****conf_jack_r = bin_intoN_exp(data_rew, 0, head_rew.T, confs, bin);
+    double ****conf_jack_rO = bin_intoN_exp1(data_rew, data, 0, 6, head.T, confs, bin);
+
+    free_corr(head.Njack, head_rew.ncorr, head_rew.T, data_rew);
+    free_corr(head.Njack, 6, head.T, data);
+
+    printf("Njack = %d  Nbins = %d  confs = %d\n", head.Njack, bin, confs);
+    for (int i = 0; i < head_rew.ncorr; i++)
+    {
+        // double sum_r = 0;
+        for (int j = 0; j < head.Njack; j++)
+        {
+            for (int tf = 0; tf < head.T; tf++)
+            {
+                for (int j1 = 0; j1 < bin; j1++)
+                {
+                    if (j1 == j)
+                        continue;
+                    double r = 0;
+                    for (int j2 = 0; j2 < bin; j2++)
+                    {
+                        if (j2 == j)
+                            continue;
+                        else
+                        {
+                            r += exp(conf_jack_r[j2][0][0][0] - conf_jack_rO[j1][0][tf][0]);
+                            // printf("r=%g   %g    %g \n", r, conf_jack_r[j2][0][0][0], conf_jack_rO[j1][0][tf][0]);
+                        }
+                    }
+                    conf_jack_Orew[j][i][tf][0] += 1.0 / r;
+                }
+            }
+        }
+    }
+    free_corr(bin, head_rew.ncorr, head_rew.T, conf_jack_r);
+    free_corr(bin, head_rew.ncorr, head.T, conf_jack_rO);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // print all the effective masses correlators
@@ -481,22 +528,22 @@ int main(int argc, char **argv)
                 printf("Warning: W(t) with charm reweighting never gets to 0.3\n");
         }
 
-        // print for frezzotti
-        {
-            double *tmp = (double *)malloc(sizeof(double) * Njack);
-            for (int j = 0; j < Njack; j++)
-            {
-                tmp[j] = lhs_function_w0_eg(j, conf_jack, 150, fit_info);
-            }
-            char name[NAMESIZE];
-            mysprintf(name, NAMESIZE, "%s/out/W_rew_charm_OS_t150_jack.txt", option[3]);
-            myres->write_jack_in_file(tmp, name);
-            free(tmp);
-        }
+        // // print for frezzotti
+        // {
+        //     double *tmp = (double *)malloc(sizeof(double) * Njack);
+        //     for (int j = 0; j < Njack; j++)
+        //     {
+        //         tmp[j] = lhs_function_w0_eg(j, conf_jack, 150, fit_info);
+        //     }
+        //     char name[NAMESIZE];
+        //     mysprintf(name, NAMESIZE, "%s/out/W_rew_charm_OS_t150_jack.txt", option[3]);
+        //     myres->write_jack_in_file(tmp, name);
+        //     free(tmp);
+        // }
 
         struct fit_result fit_W = fit_fun_to_fun_of_corr(
             option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
-            outfile, lhs_function_w0_eg, "W_rewcOS(t)", fit_info,
+            outfile, lhs_function_w0_eg, "W_rewcOS_only_mean(t)", fit_info,
             jack_file);
         check_correlatro_counter(1);
 
@@ -504,9 +551,63 @@ int main(int argc, char **argv)
         std::vector<double> swapped_x(fit_info.Nvar);
         std::vector<double> w0(Njack);
 
+        // for (size_t j = 0; j < Njack; j++)
+        // {
+        //     w0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin-30, fit_info.tmax+30, 1e-10, 2);
+        //     w0[j] = int2flowt(w0[j]);
+        //     w0[j] = std::sqrt(w0[j]);
+        // }
+        // printf("w0_rewcOS_meanonly = %g  %g\n", w0[Njack - 1], myres->comp_error(w0.data()));
+
+        // print_result_in_file(outfile, w0.data(), "w0_rewcOS_meanonly", 0.0, fit_info.tmin, fit_info.tmax);
+        free_2(Njack, tif);
+    }
+
+
+    //////////////////////////////////////////////////////////////
+    // charm reweighting
+    //////////////////////////////////////////////////////////////
+    {
+        fit_info.corr_id = {0};
+
+        for (int t = 1; t < head.T; t++)
+        {
+            if (lhs_function_w0_eg(Njack - 1, conf_jack_Orew, t, fit_info) > 0.3)
+            {
+                fit_info.tmin = t - 2;
+                fit_info.tmax = t + 1;
+                break;
+            }
+            if (t == head.T - 1)
+                printf("Warning: W(t) with charm reweighting never gets to 0.3\n");
+        }
+
+        // // print for frezzotti
+        // {
+        //     double *tmp = (double *)malloc(sizeof(double) * Njack);
+        //     for (int j = 0; j < Njack; j++)
+        //     {
+        //         tmp[j] = lhs_function_w0_eg(j, conf_jack_Orew, 150, fit_info);
+        //     }
+        //     char name[NAMESIZE];
+        //     mysprintf(name, NAMESIZE, "%s/out/W_rew_charm_OS_t150_jack.txt", option[3]);
+        //     myres->write_jack_in_file(tmp, name);
+        //     free(tmp);
+        // }
+
+        struct fit_result fit_W = fit_fun_to_fun_of_corr(
+            option, kinematic_2pt, (char *)"P5P5", conf_jack_Orew, namefile_plateaux,
+            outfile, lhs_function_w0_eg, "W_rewcOS(t)", fit_info,
+            jack_file);
+        check_correlatro_counter(2);
+
+        double **tif = swap_indices(fit_info.Npar, Njack, fit_W.P);
+        std::vector<double> swapped_x(fit_info.Nvar);
+        std::vector<double> w0(Njack);
+
         for (size_t j = 0; j < Njack; j++)
         {
-            w0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
+            w0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin-5, fit_info.tmax+5, 1e-10, 2);
             w0[j] = int2flowt(w0[j]);
             w0[j] = std::sqrt(w0[j]);
         }
@@ -515,6 +616,7 @@ int main(int argc, char **argv)
         print_result_in_file(outfile, w0.data(), "w0_rewcOS", 0.0, fit_info.tmin, fit_info.tmax);
         free_2(Njack, tif);
     }
+
 
     fit_info.restore_default();
 }
