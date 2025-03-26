@@ -8,6 +8,7 @@ book:
   chapters:
     - index.qmd
     - note_sea_corrections.qmd
+    - note_reweighting.qmd
     - B64.qmd
     - summary.qmd
     - references.qmd

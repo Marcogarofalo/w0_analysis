@@ -27,24 +27,36 @@ myplotly(ggplot())
 mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
 df <- NULL
-df <- add_corr_to_df("W(t)", all_obs, mt, df, print_res = FALSE)
-df <- add_corr_to_df("W+mul_correction(t)", all_obs, mt, df, print_res = FALSE)
-df <- add_corr_to_df("W+mus_correction(t)", all_obs, mt, df, print_res = FALSE)
-df <- add_corr_to_df("W+muc_correction(t)", all_obs, mt, df, print_res = FALSE)
-df <- add_corr_to_df("W+all_mu_correction(t)", all_obs, mt, df, print_res = FALSE)
+df <- add_corr_to_df("W(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
+df <- add_corr_to_df("W+mul_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
+df <- add_corr_to_df("W+mus_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
+df <- add_corr_to_df("W+muc_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
+df <- add_corr_to_df("W+all_mu_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
 
 print_full_res("w0", all_obs, mt)
 print_full_res("w0+mul_correction", all_obs, mt)
 print_full_res("w0+mus_correction", all_obs, mt)
 print_full_res("w0+muc_correction", all_obs, mt)
 ######################## rew
-mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_light_B64.dat_output")
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1)
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = FALSE)
+print_full_res("w0_rewcOS", all_obs, mt)
+######################## rew
+# this was wrong  just for checking the difference
+# mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_2_B64.dat_output")
+# all_obs <- Rose::get_all_corr(mt)
+# df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = FALSE,rename = "W2")
+# print_full_res("w0_rewcOS", all_obs, mt)
+######################## rew
+# mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64_half.dat_output")
+# all_obs <- Rose::get_all_corr(mt)
+# df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = FALSE,rename="W_rewcOS(t)_half_stat")
 
 #########################
-l<-which(df$xfit==150 & df$label=="W(t)")
-save_res<-df[l,]
+l <- which(df$x == 150 & df$label == "W(t)")
+save_res <- df[l, ]
+df <- df[seq(1, length(df$x), by = 3)   , ]
 # print_full_res("w0+all_mu_correction", all_obs, mt)
 df$x <- 0.010000 + df$x * 0.02
 df$xfit <- 0.010000 + df$xfit * 0.02
@@ -77,8 +89,8 @@ df <- add_corr_to_df("der_W_muc_correction(t)", all_obs, mt, df, print_res = FAL
 # print_full_res("w0+mus_correction", all_obs, mt)
 # print_full_res("w0+muc_correction", all_obs, mt)
 # print_full_res("w0+all_mu_correction", all_obs, mt)
-l<-which(df$xfit==150)
-save_res<-rbind(save_res,df[l,])
+l <- which(df$xfit == 150)
+save_res <- rbind(save_res, df[l, ])
 df$x <- 0.010000 + df$x * 0.02
 df$xfit <- 0.010000 + df$xfit * 0.02
 df$tmin <- 0.010000 + df$tmin * 0.02
@@ -96,18 +108,21 @@ fig <- myplotly(gg, "", "$t/a^2$", "$\\partial_\\mu W(t)$", to_print = TRUE)
 histogram of the jackknifes at time $t/a^2=3$
 
 ```{r, results='asis',echo=FALSE}
-kable(save_res[,c(2,3,7)],digits = 8)
+kable(save_res[, c(2, 3, 7)], digits = 8)
 W <- read.table("/home/garofalo/analysis/flow/data/out/W_t150_jack.txt")
 W <- W[c(-1, -length(W)), ]
 
-gg<-ggplot( ) + xlab("W(0.3)") +
-    geom_histogram(aes(x = W, y =..density..),binwidth = -(min(W) -max(W))/7,
-                   #breaks = seq(min(W), max(W), by = 100), 
-                   colour = "black", 
-                   fill = "white") +theme_bw()
-gg<- gg +stat_function(fun = dnorm, args = list(mean = save_res$y[1], sd = (save_res$err[1])/sqrt(length(W)-1)))
+gg <- ggplot() +
+  xlab("W(0.3)") +
+  geom_histogram(aes(x = W, y = after_stat(density)),
+    binwidth = -(min(W) - max(W)) / 7,
+    # breaks = seq(min(W), max(W), by = 100),
+    colour = "black",
+    fill = "white"
+  ) +
+  theme_bw()
+gg <- gg + stat_function(fun = dnorm, args = list(mean = save_res$y[1], sd = (save_res$err[1]) / sqrt(length(W) - 1)))
 gg
-
 ```
 
 ```{r, results='asis',echo=FALSE}
@@ -115,12 +130,16 @@ gg
 W <- read.table("/home/garofalo/analysis/flow/data/out/der_W_mul_correction_t150_jack")
 W <- W[c(-1, -length(W)), ]
 
-gg<-ggplot( ) + xlab("dW/dmul (0.3)") +
-    geom_histogram(aes(x = W, y =..density..),binwidth = -(min(W) -max(W))/7,
-                   #breaks = seq(min(W), max(W), by = 100), 
-                   colour = "black", 
-                   fill = "white") +theme_bw()
-gg<- gg +stat_function(fun = dnorm, args = list(mean = save_res$y[2], sd = (save_res$err[2])/sqrt(length(W)-1)))
+gg <- ggplot() +
+  xlab("dW/dmul (0.3)") +
+  geom_histogram(aes(x = W, y = after_stat(density)),
+    binwidth = -(min(W) - max(W)) / 7,
+    # breaks = seq(min(W), max(W), by = 100),
+    colour = "black",
+    fill = "white"
+  ) +
+  theme_bw()
+gg <- gg + stat_function(fun = dnorm, args = list(mean = save_res$y[2], sd = (save_res$err[2]) / sqrt(length(W) - 1)))
 gg
 ```
 
@@ -130,12 +149,16 @@ gg
 W <- read.table("/home/garofalo/analysis/flow/data/out/der_W_mus_correction_t150_jack")
 W <- W[c(-1, -length(W)), ]
 
-gg<-ggplot( ) + xlab("dW/dmus (0.3)") +
-    geom_histogram(aes(x = W, y =..density..),binwidth = -(min(W) -max(W))/7,
-                   #breaks = seq(min(W), max(W), by = 100), 
-                   colour = "black", 
-                   fill = "white") +theme_bw()
-gg<- gg +stat_function(fun = dnorm, args = list(mean = save_res$y[3], sd = (save_res$err[3])/sqrt(length(W)-1)))
+gg <- ggplot() +
+  xlab("dW/dmus (0.3)") +
+  geom_histogram(aes(x = W, y = after_stat(density)),
+    binwidth = -(min(W) - max(W)) / 7,
+    # breaks = seq(min(W), max(W), by = 100),
+    colour = "black",
+    fill = "white"
+  ) +
+  theme_bw()
+gg <- gg + stat_function(fun = dnorm, args = list(mean = save_res$y[3], sd = (save_res$err[3]) / sqrt(length(W) - 1)))
 gg
 ```
 
@@ -146,12 +169,15 @@ gg
 W <- read.table("/home/garofalo/analysis/flow/data/out/der_W_muc_correction_t150_jack")
 W <- W[c(-1, -length(W)), ]
 
-gg<-ggplot( ) + xlab("dW/dmuc (0.3)") 
- gg<- gg+    geom_histogram(aes(x = W, y =..density..),binwidth = -(min(W) -max(W))/7,
-                    #breaks = seq(min(W), max(W), by = 100), 
-                    colour = "black", 
-                    fill = "white") +theme_bw()
-gg<- gg +stat_function(fun = dnorm, args = list(mean = save_res$y[4], sd = (save_res$err[4])/sqrt(length(W)-1)))
+gg <- ggplot() +
+  xlab("dW/dmuc (0.3)")
+gg <- gg + geom_histogram(aes(x = W, y = after_stat(density)),
+  binwidth = -(min(W) - max(W)) / 10,
+  # breaks = seq(min(W), max(W), by = 100),
+  colour = "black",
+  fill = "white"
+) + theme_bw()
+gg <- gg + stat_function(fun = dnorm, args = list(mean = save_res$y[4], sd = (save_res$err[4]) / sqrt(length(W) - 1)))
 gg
 ```
 
@@ -174,7 +200,7 @@ gg <- gg + geom_pointrange(aes(
   color = "not integer binning"
 ))
 
-fig <- myplotly(gg,"","bin-size","w0")
+fig <- myplotly(gg, "", "bin-size", "w0")
 ```
 
 
@@ -194,7 +220,7 @@ gg <- gg + geom_pointrange(aes(
   color = "not integer binning"
 ))
 
-fig <- myplotly(gg,"","bin-size","w0+mul_correction")
+fig <- myplotly(gg, "", "bin-size", "w0+mul_correction")
 ```
 
 
@@ -213,7 +239,7 @@ gg <- gg + geom_pointrange(aes(
   color = "not integer binning"
 ))
 
-fig <- myplotly(gg,"","bin-size","w0+mus_correction")
+fig <- myplotly(gg, "", "bin-size", "w0+mus_correction")
 ```
 
 
@@ -232,5 +258,53 @@ gg <- gg + geom_pointrange(aes(
   color = "not integer binning"
 ))
 
-fig <- myplotly(gg,"","bin-size","w0+muc_correction")
+fig <- myplotly(gg, "", "bin-size", "w0+muc_correction")
+```
+
+
+## reweightig source noise
+
+
+```{r, results='asis',echo=FALSE}
+
+df <- NULL
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = FALSE,
+                     rename="W_rewcOS(t)_100sources")
+print_full_res("w0_rewcOS", all_obs, mt)
+######################## rew
+# this was wrong  just for checking the difference
+# mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_2_B64.dat_output")
+# all_obs <- Rose::get_all_corr(mt)
+# df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = FALSE,rename = "W2")
+# print_full_res("w0_rewcOS", all_obs, mt)
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64_half.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = FALSE,rename="W_rewcOS(t)_50sources")
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64_quarter.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.4, reshape = FALSE,rename="W_rewcOS(t)_25sources")
+
+#########################
+l <- which(df$x == 150 & df$label == "W(t)")
+df <- df[seq(1, length(df$x), by = 3)   , ]
+# print_full_res("w0+all_mu_correction", all_obs, mt)
+df$x <- 0.010000 + df$x * 0.02
+df$xfit <- 0.010000 + df$xfit * 0.02
+df$tmin <- 0.010000 + df$tmin * 0.02
+df$tmax <- 0.010000 + df$tmax * 0.02
+
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+# gg<-myggplot()
+gg <- gg + geom_hline(yintercept = 0.3)
+
+fig <- myplotly(gg, "", "$t/a^2$", "$W(t)$", to_print = TRUE)
+#### error
+df$y<-df$err
+gg1<- plot_df_corr_ggplot(df, width = 0.05,noerror = TRUE)
+fig <- myplotly(gg1, "", "$t/a^2$", "$\\mbox{Error}[W(t)]$", to_print = TRUE)
 ```
