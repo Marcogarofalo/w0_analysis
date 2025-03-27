@@ -27,10 +27,17 @@ $$
 \frac{\int dU e^{-S[U]} O(U) r(U)}{\int dU e^{-S[U]}r(U)}= \frac{\int dU e^{-S[U]} O(U) r(U)}{\int dU e^{-S[U]}r(U)} \frac{\int dU e^{-S[U]}}{\int dU e^{-S[U]}} = 
 \frac{\langle Or \rangle}{\langle r\rangle}\,.
 $$
-$r$ is computed stochastically as $r(U)= \langle r(U) \rangle_\phi= \det\left(D(\mu_f)/D(\mu_i)\right) = \int d\phi e^{w(U,\phi)}$
-with $w(U,\phi)=\phi^\dagger(D(\mu_i) D^{-1}(\mu_f))\phi$.
+$r$ is computed stochastically as 
+$$
+r(U)= \langle r(U) \rangle_\phi= \det\left(D(\mu_f)/D(\mu_i)\right) = \int d\phi e^{w(U,\phi)}
+$$
+with $w(U,\phi)=\phi^\dagger(1-D(\mu_i) D^{-1}(\mu_f))\phi$ and $\phi$ a gaussian noise $P(\phi)\propto e^{-\phi^2}$.
+
 Since $\det\left(D(\mu_f)/D(\mu_i)\right)$ may be complex we compute
-$\left| \det\left(D(\mu_f)/D(\mu_i)\right)\right|=\sqrt{\det\left(D^{-1}(\mu_i)D(\mu_f)D(-\mu_f)D^{-1}(-\mu_i)\right)}$ 
+$$
+\left| \det\left(D(\mu_f)/D(\mu_i)\right)\right|=\sqrt{\det\left(D^{-1}(\mu_i)D(\mu_f)D(-\mu_f)D^{-1}(-\mu_i)\right)}\\
+=\left(\int d\phi e^{\phi^\dagger(1-D(-\mu_i)D^{-1}(-\mu_f)D^{-1}(\mu_f)D(\mu_i))\phi}\right)^{\frac{1}{2}}
+$$ 
 , thus the observable to compute is 
 
 $$
