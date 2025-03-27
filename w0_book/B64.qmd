@@ -23,15 +23,58 @@ myplotly(ggplot())
 
 ## w0
 
+
+```{r, results='asis',echo=FALSE}
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- data.frame(
+  "w0" = c(0),
+  "dw0" = c(0),
+  "label" = c("")
+)
+df <- df[-1, ]
+res <- get_full_res("w0", all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "$   \\mbox{sim}$")
+res <- get_full_res("w0+mul_correction", all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "$  \\mbox{sim+loop l}$")
+res <- get_full_res("w0+mus_correction", all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "$ \\mbox{sim+loop s}$")
+res <- get_full_res("w0+muc_correction", all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "$\\mbox{sim+loop c}$")
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+# df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = FALSE)
+res <- get_full_res("w0_rewcOS", all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "$\\mbox{sim+rew c}$")
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_strange_OS_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+# df <- add_corr_to_df("W_rewsOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = FALSE)
+res <- get_full_res("w0_rewsOS", all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "$ \\mbox{sim+rew s}$")
+gg <- myggplot(fill=FALSE)
+gg <- gg + geom_pointrange(
+  data = df,
+  aes(x = label, y = w0, ymin = w0 - dw0, ymax = w0 + dw0, color = label, shape=label)
+)
+# gg <- plot_df_corr_ggplot(df, width = 0.05)
+# # gg<-myggplot()
+# gg <- gg + geom_hline(yintercept = 0.3)
+
+fig <- myplotly(gg, "", "", "$w_0/a$", to_print = TRUE)
+```
+
+
 ```{r, results='asis',echo=FALSE}
 mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
 df <- NULL
-df <- add_corr_to_df("W(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
-df <- add_corr_to_df("W+mul_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
-df <- add_corr_to_df("W+mus_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
-df <- add_corr_to_df("W+muc_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
-df <- add_corr_to_df("W+all_mu_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
+df <- add_corr_to_df("W(t)", all_obs, mt, df, print_res = FALSE, reshape = T)
+df <- add_corr_to_df("W+mul_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = T, nudge = 0.03)
+df <- add_corr_to_df("W+mus_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = T, nudge = 0.06)
+df <- add_corr_to_df("W+muc_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = T, nudge = 0.08)
+# df <- add_corr_to_df("W+all_mu_correction(t)", all_obs, mt, df, print_res = FALSE, reshape = FALSE)
 
 print_full_res("w0", all_obs, mt)
 print_full_res("w0+mul_correction", all_obs, mt)
@@ -40,23 +83,25 @@ print_full_res("w0+muc_correction", all_obs, mt)
 ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = FALSE)
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = T)
 print_full_res("w0_rewcOS", all_obs, mt)
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_strange_OS_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("W_rewsOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = T)
+print_full_res("w0_rewsOS", all_obs, mt)
+
 ######################## rew
 # this was wrong  just for checking the difference
 # mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_2_B64.dat_output")
 # all_obs <- Rose::get_all_corr(mt)
 # df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = FALSE,rename = "W2")
 # print_full_res("w0_rewcOS", all_obs, mt)
-######################## rew
-# mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64_half.dat_output")
-# all_obs <- Rose::get_all_corr(mt)
-# df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = FALSE,rename="W_rewcOS(t)_half_stat")
 
 #########################
 l <- which(df$x == 150 & df$label == "W(t)")
 save_res <- df[l, ]
-df <- df[seq(1, length(df$x), by = 3)   , ]
+# df <- df[seq(1, length(df$x), by = 3), ]
 # print_full_res("w0+all_mu_correction", all_obs, mt)
 df$x <- 0.010000 + df$x * 0.02
 df$xfit <- 0.010000 + df$xfit * 0.02
@@ -266,13 +311,14 @@ fig <- myplotly(gg, "", "bin-size", "w0+muc_correction")
 
 
 ```{r, results='asis',echo=FALSE}
-
 df <- NULL
 ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = FALSE,
-                     rename="W_rewcOS(t)_100sources")
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df,
+  print_res = FALSE, nudge = 0.1, reshape = FALSE,
+  rename = "W_rewcOS(t)_100sources"
+)
 print_full_res("w0_rewcOS", all_obs, mt)
 ######################## rew
 # this was wrong  just for checking the difference
@@ -283,15 +329,15 @@ print_full_res("w0_rewcOS", all_obs, mt)
 ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64_half.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = FALSE,rename="W_rewcOS(t)_50sources")
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = FALSE, rename = "W_rewcOS(t)_50sources")
 ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64_quarter.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.4, reshape = FALSE,rename="W_rewcOS(t)_25sources")
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.4, reshape = FALSE, rename = "W_rewcOS(t)_25sources")
 
 #########################
 l <- which(df$x == 150 & df$label == "W(t)")
-df <- df[seq(1, length(df$x), by = 3)   , ]
+df <- df[seq(1, length(df$x), by = 3), ]
 # print_full_res("w0+all_mu_correction", all_obs, mt)
 df$x <- 0.010000 + df$x * 0.02
 df$xfit <- 0.010000 + df$xfit * 0.02
@@ -304,7 +350,7 @@ gg <- gg + geom_hline(yintercept = 0.3)
 
 fig <- myplotly(gg, "", "$t/a^2$", "$W(t)$", to_print = TRUE)
 #### error
-df$y<-df$err
-gg1<- plot_df_corr_ggplot(df, width = 0.05,noerror = TRUE)
+df$y <- df$err
+gg1 <- plot_df_corr_ggplot(df, width = 0.05, noerror = TRUE)
 fig <- myplotly(gg1, "", "$t/a^2$", "$\\mbox{Error}[W(t)]$", to_print = TRUE)
 ```

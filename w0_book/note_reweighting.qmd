@@ -27,8 +27,10 @@ $$
 \frac{\int dU e^{-S[U]} O(U) r(U)}{\int dU e^{-S[U]}r(U)}= \frac{\int dU e^{-S[U]} O(U) r(U)}{\int dU e^{-S[U]}r(U)} \frac{\int dU e^{-S[U]}}{\int dU e^{-S[U]}} = 
 \frac{\langle Or \rangle}{\langle r\rangle}\,.
 $$
-$r$ is computed stochastically as $r(U)= \langle r(U) \rangle_\phi = \int d\phi e^{w(U,\phi)}$
-with $\phi^\dagger(1-D(\mu_i) D^{-1}(\mu_f))\phi=w(U,\phi)$
+$r$ is computed stochastically as $r(U)= \langle r(U) \rangle_\phi= \det\left(D(\mu_f)/D(\mu_i)\right) = \int d\phi e^{w(U,\phi)}$
+with $w(U,\phi)=\phi^\dagger(D(\mu_i) D^{-1}(\mu_f))\phi$.
+Since $\det\left(D(\mu_f)/D(\mu_i)\right)$ may be complex we compute
+$\left| \det\left(D(\mu_f)/D(\mu_i)\right)\right|=\sqrt{\det\left(D^{-1}(\mu_i)D(\mu_f)D(-\mu_f)D^{-1}(-\mu_i)\right)}$ 
 , thus the observable to compute is 
 
 $$
@@ -40,6 +42,7 @@ $$
    $$
   \bar r(U_i)=\frac{\sum_j r(U_i,\phi_{ij})}{\frac{1}{N_U}\sum_{i_1,j}    r(U_{i_1},\phi_{ij})}
    $$
+   we can compute the sum in the numerator and in the denominator as in (@eq-wu) and (@eq-wu-OS)
    then we can binning the data to  take into account for autocorrelation
    $$
 \tilde O_b=\frac{1}{N_b}\sum_{i=bN_b}^{bN_b+N_b} O(U_i)   \bar{r}(U_i)
@@ -57,8 +60,12 @@ Jack(O)_j=\frac{1}{N-1}\sum_{a\neq j} \tilde O_a
    we can not compute $r(U_i,\phi_{ij})$ with double precision, but we can compute
    the exponent of it and the exponent of a sum
    $$
-w(U_i)=\log \left(\frac{1}{N_j}\sum_j r(U_i,\phi_{ij})\right)= w(U_i,\phi_{i0})+\log\left(\frac{1}{N_j}\sum_j e^{w(U_i,\phi_{ij})- w(U_i,\phi_{i0})}\right)\,.
+w(U_i)=\log \left(\frac{1}{N_j}\sum_j r(U_i,\phi_{ij})\right)= w(U_i,\phi_{i0})+\log\left(\frac{1}{N_j}\sum_j e^{w(U_i,\phi_{ij})- w(U_i,\phi_{i0})}\right)\,.\\
+   $$ {#eq-wu}
+   For the case of an OS reweighting we need to take into account the square     root factor as
    $$
+w(U_i)=\frac{1}{2}\log \left(\frac{1}{N_j}\sum_j r(U_i,\phi_{ij})\right)= \frac{1}{2}w(U_i,\phi_{i0})+\frac{1}{2}\log\left(\frac{1}{N_j}\sum_j e^{w(U_i,\phi_{ij})- w(U_i,\phi_{i0})}\right)\,.\\
+   $$ {#eq-wu-OS}
    Then we compute the exponent of the binning.
    $P_b= \log([Or]_b)$ and $w_b=\log([r]_b)$
    $$
