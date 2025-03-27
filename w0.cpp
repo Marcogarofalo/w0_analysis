@@ -483,7 +483,7 @@ int main(int argc, char **argv)
 
         for (size_t j = 0; j < Njack; j++)
         {
-            w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin - 1, fit_info.tmax + 1, 1e-10, 2);
+            w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin - 2, fit_info.tmax + 2, 1e-10, 2);
             w0pdmu[j] = int2flowt(w0pdmu[j]);
             w0pdmu[j] = std::sqrt(w0pdmu[j]);
         }
