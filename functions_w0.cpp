@@ -2,6 +2,35 @@
 #include "functions_w0.hpp"
 #include "read.hpp"
 
+void make_ratio_of_jacks(double ****final, int Njack, int i, int T, double ****num, int i1, double ****den,  int i2)
+{
+
+    // double sum_r = 0;
+    for (int j = 0; j < Njack; j++)
+    {
+        for (int tf = 0; tf < T; tf++)
+        {
+            for (int j1 = 0; j1 < Njack-1; j1++)
+            {
+                if (j1 == j)
+                    continue;
+                double r = 0;
+                for (int j2 = 0; j2 < Njack-1; j2++)
+                {
+                    if (j2 == j)
+                        continue;
+                    else
+                    {
+                        r += exp(den[j2][i2][0][0] - num[j1][i1][tf][0]);
+                        // printf("r=%g   %g    %g \n", r, conf_jack_r[j2][0][0][0], conf_jack_rO[j1][0][tf][0]);
+                    }
+                }
+                final[j][i][tf][0] += 1.0 / r;
+            }
+        }
+    }
+}
+
 double ****bin_intoN_exp(double ****data, int ivar, int T, int Nconf_in, int Nb)
 {
 
@@ -124,7 +153,7 @@ double lhs_function_Wt_p_dmcorr(int j, double ****in, int t, struct fit_type fit
     double loop = in[j][id_cor][0][reim];
     double loop_Wt = in[j][id_cor][t][reim];
 
-    double r = Wt + dmu * (loop_Wt - loop * Wt);
+    double r = Wt - dmu * (loop_Wt - loop * Wt);
     // if(j==fit_info.Njack-1) printf("%d   %g\n",t,r);
     return r;
 }
@@ -140,7 +169,7 @@ double lhs_function_Wt_der_mu(int j, double ****in, int t, struct fit_type fit_i
     double loop = in[j][id_cor][0][reim];
     double loop_Wt = in[j][id_cor][t][reim];
 
-    double r = (loop_Wt - loop * Wt);
+    double r = - (loop_Wt - loop * Wt);
     // if(j==fit_info.Njack-1) printf("%d   %g\n",t,r);
     return r;
 }
@@ -167,8 +196,8 @@ double lhs_function_Wt_p_dm_all_corr(int j, double ****in, int t, struct fit_typ
     double loop_c = in[j][id_cor_l][0][reim];
     double loop_Wt_c = in[j][id_cor_l][t][reim];
 
-    double r = Wt + dmul * (loop_Wt_l - loop_l * Wt) +
-               dmus * (loop_Wt_s - loop_s * Wt) +
+    double r = Wt - dmul * (loop_Wt_l - loop_l * Wt) -
+               dmus * (loop_Wt_s - loop_s * Wt) -
                dmuc * (loop_Wt_c - loop_c * Wt);
     // if(j==fit_info.Njack-1) printf("%d   %g\n",t,r);
     return r;
