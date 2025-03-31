@@ -142,6 +142,15 @@ double lhs_function_w0_eg(int j, double ****in, int t, struct fit_type fit_info)
     return r;
 }
 
+double lhs_function_W_rew(int j, double ****in, int t, struct fit_type fit_info)
+{
+    int id = fit_info.corr_id[0];// <W(t)r>
+    int id1 = fit_info.corr_id[1]; // <r>
+    double r = in[j][id][t][0]/in[j][id1][0][0];
+    return r;
+}
+
+
 double lhs_function_Wt_p_dmcorr(int j, double ****in, int t, struct fit_type fit_info)
 {
     int id = fit_info.corr_id[0];
