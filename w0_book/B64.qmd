@@ -53,6 +53,13 @@ all_obs <- Rose::get_all_corr(mt)
 # df <- add_corr_to_df("W_rewsOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = FALSE)
 res <- get_full_res("w0_rewsOS", all_obs, mt)
 df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "$ \\mbox{sim+rew s}$")
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_light_TM_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+# df <- add_corr_to_df("W_rewsOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = FALSE)
+res <- get_full_res("w0_rewlTM", all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "$  \\mbox{sim+rew l}$")
+########## plot
 gg <- myggplot(fill=FALSE)
 gg <- gg + geom_pointrange(
   data = df,
@@ -81,15 +88,21 @@ print_full_res("w0+mul_correction", all_obs, mt)
 print_full_res("w0+mus_correction", all_obs, mt)
 print_full_res("w0+muc_correction", all_obs, mt)
 ######################## rew
-mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64.dat_output")
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_light_TM_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = T)
-print_full_res("w0_rewcOS", all_obs, mt)
+df <- add_corr_to_df("W_rewlTM(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = T)
+print_full_res("w0_rewlTM", all_obs, mt)
 ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_strange_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
 df <- add_corr_to_df("W_rewsOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = T)
 print_full_res("w0_rewsOS", all_obs, mt)
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.1, reshape = T)
+print_full_res("w0_rewcOS", all_obs, mt)
+
 
 ######################## rew
 # this was wrong  just for checking the difference
@@ -160,7 +173,7 @@ W <- W[c(-1, -length(W)), ]
 gg <- ggplot() +
   xlab("W(0.3)") +
   geom_histogram(aes(x = W, y = after_stat(density)),
-    binwidth = -(min(W) - max(W)) / 7,
+    binwidth = -(min(W) - max(W)) / 10,
     # breaks = seq(min(W), max(W), by = 100),
     colour = "black",
     fill = "white"
@@ -178,7 +191,7 @@ W <- W[c(-1, -length(W)), ]
 gg <- ggplot() +
   xlab("dW/dmul (0.3)") +
   geom_histogram(aes(x = W, y = after_stat(density)),
-    binwidth = -(min(W) - max(W)) / 7,
+    binwidth = -(min(W) - max(W)) / 10,
     # breaks = seq(min(W), max(W), by = 100),
     colour = "black",
     fill = "white"
@@ -197,7 +210,7 @@ W <- W[c(-1, -length(W)), ]
 gg <- ggplot() +
   xlab("dW/dmus (0.3)") +
   geom_histogram(aes(x = W, y = after_stat(density)),
-    binwidth = -(min(W) - max(W)) / 7,
+    binwidth = -(min(W) - max(W)) / 10,
     # breaks = seq(min(W), max(W), by = 100),
     colour = "black",
     fill = "white"
@@ -223,6 +236,72 @@ gg <- gg + geom_histogram(aes(x = W, y = after_stat(density)),
   fill = "white"
 ) + theme_bw()
 gg <- gg + stat_function(fun = dnorm, args = list(mean = save_res$y[4], sd = (save_res$err[4]) / sqrt(length(W) - 1)))
+gg
+```
+
+
+## histogram rew
+
+
+```{r, results='asis',echo=FALSE}
+# kable(save_res[, c(2, 3, 7)], digits = 8)
+
+name<- "W_rewlTM_t150"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+W <- W[c(-1, -length(W)), ]
+
+gg <- ggplot() +
+  xlab(name) +
+  geom_histogram(aes(x = W, y = after_stat(density)),
+    binwidth = -(min(W) - max(W)) / 10,
+    # breaks = seq(min(W), max(W), by = 100),
+    colour = "black",
+    fill = "white"
+  ) +
+  theme_bw()
+
+gg
+```
+
+
+```{r, results='asis',echo=FALSE}
+# kable(save_res[, c(2, 3, 7)], digits = 8)
+
+name<- "W_rewsOS_t150"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+W <- W[c(-1, -length(W)), ]
+
+gg <- ggplot() +
+  xlab(name) +
+  geom_histogram(aes(x = W, y = after_stat(density)),
+    binwidth = -(min(W) - max(W)) / 10,
+    # breaks = seq(min(W), max(W), by = 100),
+    colour = "black",
+    fill = "white"
+  ) +
+  theme_bw()
+
+gg
+```
+
+
+```{r, results='asis',echo=FALSE}
+# kable(save_res[, c(2, 3, 7)], digits = 8)
+
+name<- "W_rewcOS_t150"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+W <- W[c(-1, -length(W)), ]
+
+gg <- ggplot() +
+  xlab(name) +
+  geom_histogram(aes(x = W, y = after_stat(density)),
+    binwidth = -(min(W) - max(W)) / 10,
+    # breaks = seq(min(W), max(W), by = 100),
+    colour = "black",
+    fill = "white"
+  ) +
+  theme_bw()
+
 gg
 ```
 
@@ -305,6 +384,8 @@ gg <- gg + geom_pointrange(aes(
 
 fig <- myplotly(gg, "", "bin-size", "w0+muc_correction")
 ```
+
+
 
 
 ## reweightig source noise

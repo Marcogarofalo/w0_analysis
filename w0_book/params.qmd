@@ -1,0 +1,96 @@
+# ndg params
+
+A matching between the ndg parameter and the OS can be defined as
+
+$$
+\begin{cases}
+m_s = \mu_\sigma - \frac{Z_P}{Z_S}\mu_\delta \\
+m_c = \mu_\sigma + \frac{Z_P}{Z_S}\mu_\delta \\
+\end{cases}
+\quad\quad
+\begin{cases}
+\mu_\sigma =\frac{1}{2}(  m_s + m_c) \quad\,\,\,\,\\
+\mu_\sigma =\frac{1}{2}\frac{Z_S}{Z_P}(  m_c - m_s) \\
+\end{cases}
+\,.
+$$
+This matching scheme has the problem that $\frac{Z_P}{Z_S}$ needs to be know very
+precise to estimate well the cancellation in the $m_s$.
+
+An alternative scheme used in the gm2 strange and charm paper is 
+$$
+\begin{cases}
+m_c = \mu_\sigma + \frac{Z_P}{Z_S}\mu_\delta \\
+aM_K^{ndg}(\mu_\sigma,\mu_\delta) = aM_K^{OS}(m_s)= aM_K^{OS}(m_s^{ref}) +(m_s^{ref}-m_s)\frac{\partial M_K^{OS}}{\partial m_s}\Bigg|_{m_s}  \\
+\end{cases}
+$$
+where $m_s^{ref}$ is some value close enough to $m_s$ such higer order in the expansion
+are negligible. The derivative is splitted in sea and valence contribution
+$$
+\frac{\partial M_K^{OS}}{\partial m_s}=\frac{\partial^{val} M_K^{OS}}{\partial m_s} +
+\frac{\partial^{sea} M_K^{OS}}{\partial m_s}
+$$
+the derivative with respect to the valence is computed as finite difference and 
+the derivative with respect to the sea is computed with the scalar insertions.
+
+```{r}
+df <- data.frame(
+  "en" = c("B64"),
+  "kappa" = c(0.139426500000),
+  "mul_sim" = c(0.00072),
+  "musig_sim" = c(0.1246864),
+  "mudel_sim" = c(0.1315052),
+  "ms_sim" = c(0),
+  "mc_sim" = c(0),
+  "Zp_Zs" = c(0.79018),
+  "mul" = c(0.0006669),
+  "musig" = c(0),
+  "mudel" = c(0),
+  "ms" = c(0.018267),
+  "mc" = c(0.23134)
+)
+```
+
+```{r}
+library(dplyr)
+library(knitr)
+# df$ms_sim<- df$musig_sim- df$
+df <- mutate(df,
+  ms_sim = musig_sim - Zp_Zs * mudel_sim,
+  mc_sim = musig_sim + Zp_Zs * mudel_sim
+)
+
+df <- mutate(df,
+  musig = (ms + mc) / 2,
+  mudel = (mc - ms) / Zp_Zs / 2
+)
+
+kable(df[, c(1:7)])
+kable(df[, c(8:13)])
+```
+
+
+now we cange only the charm keeping the strange at the simulation point
+
+```{r}
+library(dplyr)
+library(knitr)
+
+df1 <- mutate(df,
+  musig = (ms_sim + mc) / 2,
+  mudel = (mc - ms_sim) / Zp_Zs / 2
+)
+  # musigma = 0.1260567
+  # mudelta = 0.1332397
+  # 2Kappamubar   = 0.0351512889651
+  # 2KappaEpsBar  = 0.0371542900641
+  # kappa = 0.1394265
+  # 
+  # #epsbar = 0.1394265
+  # 2Kappamubar2  = 0.034769065158
+  # 2KappaEpsBar2 = 0.036670563765
+  # kappa2 = 0.1394265
+
+
+kable(df1[, c(1, 2, 3, 4, 9, 10)], digits = 13)
+```

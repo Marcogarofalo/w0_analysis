@@ -43,76 +43,24 @@ $$
 $$
 \frac{\langle O \langle r\rangle_\phi \rangle_U}{\langle \langle r\rangle_\phi\rangle_{U}}\,.
 $$
-
-1. Ignoring the error on $r$ we can define 
-
-   $$
-  \bar r(U_i)=\frac{\sum_j r(U_i,\phi_{ij})}{\frac{1}{N_U}\sum_{i_1,j}    r(U_{i_1},\phi_{ij})}
-   $$
-   we can compute the sum in the numerator and in the denominator as in (@eq-wu) and (@eq-wu-OS)
-   then we can binning the data to  take into account for autocorrelation
-   $$
-\tilde O_b=\frac{1}{N_b}\sum_{i=bN_b}^{bN_b+N_b} O(U_i)   \bar{r}(U_i)
-   $$
-   and then the jackknifes as
-   $$
-Jack(O)_j=\frac{1}{N-1}\sum_{a\neq j} \tilde O_a
-   $$
-2. to fully propagate the error instead we have to 
-   first  to bin the data to take into account for autocorrelation
-   $$
-{ [Or]}_b=\frac{1}{N_b}\sum_{i=bN_b}^{bN_b+N_b} O(U_i)    \frac{1}{N_j}\sum_jr(U_i,\phi_{ij})\\
-[r]_b=\frac{1}{N_b}\sum_{i=bN_b}^{bN_b+N_b} \frac{1}{N_j}\sum_jr(U_i,\phi_{ij})
-   $$
-   we can not compute $r(U_i,\phi_{ij})$ with double precision, but we can compute
-   the exponent of it and the exponent of a sum
+we can not compute $r(U_i,\phi_{ij})$ with double precision, but we can compute
+the exponent of its sum over $\phi$ as $e^{w(U_i)}=\langle r(U_i,\phi)\rangle_\phi=\frac{1}{N_\phi}\sum_\phi r(U_i,\phi)+O\left(\frac{1}{N_\phi}\right)$
    $$
 w(U_i)=\log \left(\frac{1}{N_j}\sum_j r(U_i,\phi_{ij})\right)= w(U_i,\phi_{i0})+\log\left(\frac{1}{N_j}\sum_j e^{w(U_i,\phi_{ij})- w(U_i,\phi_{i0})}\right)\,.\\
    $$ {#eq-wu}
-   For the case of an OS reweighting we need to take into account the square     root factor as
+   For the case of an OS reweighting we need to take into account the square root factor 
+   $e^{w(U_i)}=\left(\langle r(U_i,\phi)\rangle_\phi\right)^{1/2}$ as
    $$
 w(U_i)=\frac{1}{2}\log \left(\frac{1}{N_j}\sum_j r(U_i,\phi_{ij})\right)= \frac{1}{2}w(U_i,\phi_{i0})+\frac{1}{2}\log\left(\frac{1}{N_j}\sum_j e^{w(U_i,\phi_{ij})- w(U_i,\phi_{i0})}\right)\,.\\
    $$ {#eq-wu-OS}
-   Then we compute the exponent of the binning.
-   $P_b= \log([Or]_b)$ and $w_b=\log([r]_b)$
-   $$
-P_b=w(U_{bN_b}) +\log\left(\frac{1}{N_b}\sum_{i=bN_b}^{bN_b+N_b}O(U_i) e^{w(U_i)- w(U_{bN_b})}\right)\\
-w_b=w(U_{bN_b}) +\log\left(\frac{1}{N_b}\sum_{i=bN_b}^{bN_b+N_b} e^{w(U_i)- w(U_{bN_b})}\right)
-   $$
-   After we can compute the jackknifes of the ratio
-   $$
-\frac{Jack(Or)_j}{Jack(r)_j}=\frac{\sum_{a\neq j} [O]_a  }{\sum_{b\neq j} [r]_b}=\frac{\sum_{a\neq j} e^{P_a}  }{\sum_{b\neq j} e^{w_{b}}}=\sum_{a\neq j}\frac{ 1  }{\sum_{b\neq j} e^{w_{b}-P_a}}
-   $$
-
-## comparison
-
-
-```{r, results='asis',echo=FALSE}
-df <- NULL
-
-######################## rew
-mt <- read_df("/home/garofalo/analysis/flow/data/out/flow_B64.dat_reweight_charm_OS_B64.dat_output")
-all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("W_rewcOS_only_mean(t)", all_obs, mt, df, print_res = FALSE, nudge = 0.0, rename ="W(t) method 1",reshape = FALSE)
-df <- add_corr_to_df("W_rewcOS(t)", all_obs, mt, df, print_res = FALSE,
-                     nudge = 0.3, rename = "W(t) method 2",reshape = FALSE)
-
-######################## rew
-df <- df[seq(1, length(df$x), by = 3)   , ]
-
-#########################
-# l<-which(df$xfit==150 & df$label=="W(t)")
-# save_res<-df[l,]
-# print_full_res("w0+all_mu_correction", all_obs, mt)
-
-# df$x <- 0.010000 + df$x * 0.02
-# df$xfit <- 0.010000 + df$xfit * 0.02
-# df$tmin <- 0.010000 + df$tmin * 0.02
-# df$tmax <- 0.010000 + df$tmax * 0.02
-
-gg <- plot_df_corr_ggplot(df, width = 0.05)
-# gg<-myggplot()
-gg <- gg + geom_hline(yintercept = 0.3)
-
-fig <- myplotly(gg, "", "$t/a^2$", "$W(t)$", to_print = TRUE)
-```
+   
+then we can multiply numerator and denominator by a factor to make the computation
+doable in double precision
+$$
+\frac{\langle O \langle r\rangle_\phi \rangle_U e^{-\bar w}}{\langle \langle r\rangle_\phi\rangle_{U}e^{-\bar w}}\,.
+$$
+with $\bar w = \sum_U w(U)$. At this stage $\langle \langle r\rangle_\phi\rangle_{U}e^{-\bar w}$
+can be computed as
+$$
+\langle \langle r\rangle_\phi\rangle_{U}e^{-\bar w} =\frac{1}{N_U} \sum_U e^{w(U)-\bar w}
+$$
