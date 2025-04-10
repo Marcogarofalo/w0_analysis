@@ -1,6 +1,7 @@
 #define functions_w0_C
 #include "functions_w0.hpp"
 #include "read.hpp"
+#include "correlators_analysis.hpp"
 
 void make_ratio_of_jacks(double ****final, int Njack, int i, int T, double ****num, int i1, double ****den,  int i2)
 {
@@ -167,6 +168,87 @@ double lhs_function_Wt_p_dmcorr(int j, double ****in, int t, struct fit_type fit
     return r;
 }
 
+double lhs_function_M_PS_p_dmcorr(int j, double ****in, int t, struct fit_type fit_info)
+{
+    int id = fit_info.corr_id[0];
+    int id_cor = fit_info.corr_id[1];
+    int reim = fit_info.myen[0];
+    double dmu = fit_info.ext_P[0][j];
+
+    double Ct = in[j][id][t][0];
+    double loop = in[j][id_cor][0][reim];
+    double loop_Ct = in[j][id_cor][t][reim];
+
+    double rt = Ct - dmu * (loop_Ct - loop * Ct);
+
+    Ct = in[j][id][t+1][0];
+    loop = in[j][id_cor][0][reim];
+    loop_Ct = in[j][id_cor][t+1][reim];
+
+    double rtp1 = Ct - dmu * (loop_Ct - loop * Ct);
+
+    double mass =  M_eff_T_ct_ctp1(t, fit_info.T, rt, rtp1);
+    
+    return mass;
+}
+
+double lhs_function_f_PS_p_dmcorr(int j, double ****in, int t, struct fit_type fit_info)
+{
+    int id = fit_info.corr_id[0];
+    int id_cor = fit_info.corr_id[1];
+    int reim = fit_info.myen[0];
+    double dmu = fit_info.ext_P[3][j];
+
+    double Ct = in[j][id][t][0];
+    double loop = in[j][id_cor][0][reim];
+    double loop_Ct = in[j][id_cor][t][reim];
+
+    double rt = Ct - dmu * (loop_Ct - loop * Ct);
+
+    double M = fit_info.ext_P[0][j];
+    double mu1 = fit_info.ext_P[1][j];
+    double mu2 = fit_info.ext_P[2][j];
+
+    double me = sqrt(rt * 2 * M / (exp(-t * M) + exp(-(fit_info.T - t) * M)));
+    return (mu1 + mu2) * me / (M * sinh(M));
+
+}
+
+
+double lhs_function_mpcac_p_dmcorr(int j, double ****in, int t, struct fit_type fit_info)
+{
+    int idV = fit_info.corr_id[0];
+    int idP = fit_info.corr_id[1];
+    int id_corV = fit_info.corr_id[2];
+    int id_corP = fit_info.corr_id[3];
+    int reim = fit_info.myen[0];
+    double dmu = fit_info.ext_P[0][j];
+
+    double Ct = in[j][idV][t][0];
+    double loop = in[j][id_corV][0][reim];
+    double loop_Ct = in[j][id_corV][t][reim];
+
+    double Vt = Ct - dmu * (loop_Ct - loop * Ct);
+
+    Ct = in[j][idV][t+1][0];
+    loop = in[j][id_corV][0][reim];
+    loop_Ct = in[j][id_corV][t+1][reim];
+
+    double Vtp1 = Ct - dmu * (loop_Ct - loop * Ct);
+
+    Ct = in[j][idP][t+1][0];
+    loop = in[j][id_corP][0][reim];
+    loop_Ct = in[j][id_corP][t+1][reim];
+
+    double PP = Ct - dmu * (loop_Ct - loop * Ct);
+
+
+    double mpcac = -( Vtp1 - Vt) / (2. * PP);  ;
+    
+    return mpcac;
+}
+
+
 double lhs_function_Wt_der_mu(int j, double ****in, int t, struct fit_type fit_info)
 {
     int id = fit_info.corr_id[0];
@@ -209,5 +291,16 @@ double lhs_function_Wt_p_dm_all_corr(int j, double ****in, int t, struct fit_typ
                dmus * (loop_Wt_s - loop_s * Wt) -
                dmuc * (loop_Wt_c - loop_c * Wt);
     // if(j==fit_info.Njack-1) printf("%d   %g\n",t,r);
+    return r;
+}
+
+
+double lhs_mpcac(int j, double ****in, int t, struct fit_type fit_info)
+{
+    int id_V = fit_info.corr_id[0];
+    int id_P = fit_info.corr_id[1];
+    // we should take -Im of V0P5 which is saved as real part in this data
+    double r = -(in[j][id_V][t + 1][0] - in[j][id_V][t][0]) / (2. * in[j][id_P][t][0]);
+
     return r;
 }
