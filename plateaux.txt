@@ -1,7 +1,69 @@
-flow_B64.dat delta_amul -0.0000525      1e-20  1
+#flow_B64.dat delta_amul -0.0000525      1e-20  1
+flow_B64.dat delta_amul -5.31e-05  1e-20  1
 flow_B64.dat delta_amus  0.00042039860  1e-20  1
 flow_B64.dat delta_amuc  0.00299149     1e-20  1
 flow_B64.dat mul  0.0006669  0.0000028  1
 flow_B64.dat mus  0.018267   0.000053   2
 flow_B64.dat muc  0.23134    0.00052    3
 flow_B64.dat m0  -0.4138934 0.0000046   4
+
+
+onlinemeas_B64.dat M_{PS}          20 60 1
+onlinemeas_B64.dat M_{PS}_rewcOS   20 60 1
+onlinemeas_B64.dat M_{PS}_rewsOS   20 60 1
+onlinemeas_B64.dat M_{PS}_rewlTM   20 60 1
+onlinemeas_B64.dat mpcac           20 60 1
+onlinemeas_B64.dat mpcac_rewcOS    20 60 1
+onlinemeas_B64.dat mpcac_rewsOS    20 60 1
+onlinemeas_B64.dat mpcac_rewlTM    20 60 1
+
+onlinemeas_B64.dat  M_{PS}+mul_correction 20 60 1
+onlinemeas_B64.dat  M_{PS}+mus_correction 20 60 1
+onlinemeas_B64.dat  M_{PS}+muc_correction 20 60 1
+
+onlinemeas_B64.dat  mpcac+mul_correction 20 60 1
+onlinemeas_B64.dat  mpcac+mus_correction 20 60 1
+onlinemeas_B64.dat  mpcac+muc_correction 20 60 1
+
+
+
+onlinemeas_B64.dat M_{PS}_rew_scndgTM   20 60 1
+onlinemeas_B64.dat mpcac_rew_scndgTM    20 60 1
+
+onlinemeas_B64.dat M_{PS}_rewcOS_0.25   20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.25    20 60 1
+
+onlinemeas_B64.dat M_{PS}_rewcOS_0.25_50s   20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.25_50s    20 60 1
+
+onlinemeas_B64.dat M_{PS}_rewcOS_0.25_25s   20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.25_25s    20 60 1
+
+
+onlinemeas_B64.dat M_{PS}_rewcOS_0.25_1s   20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.25_1s    20 60 1
+
+
+onlinemeas_B64.dat  f_{PS}+mul_correction 20 60 1
+onlinemeas_B64.dat  f_{PS}+mus_correction 20 60 1
+onlinemeas_B64.dat  f_{PS}+muc_correction 20 60 1
+
+onlinemeas_B64.dat f_{PS}                   20 60 1
+onlinemeas_B64.dat f_{PS}_rewcOS            20 60 1
+onlinemeas_B64.dat f_{PS}_rewsOS            20 60 1
+onlinemeas_B64.dat f_{PS}_rewlTM            20 60 1
+onlinemeas_B64.dat f_{PS}_rew_scndgTM       20 60 1
+onlinemeas_B64.dat f_{PS}_rewcOS_0.25       20 60 1
+onlinemeas_B64.dat f_{PS}_rewcOS_0.25_50s   20 60 1
+onlinemeas_B64.dat f_{PS}_rewcOS_0.25_25s   20 60 1
+onlinemeas_B64.dat f_{PS}_rewcOS_0.25_1s    20 60 1
+
+onlinemeas_B64.dat M_{PS}_rewlTM_1s    20 60 1 
+onlinemeas_B64.dat M_{PS}_rewlTM_25s   20 60 1 
+onlinemeas_B64.dat M_{PS}_rewlTM_50s   20 60 1
+onlinemeas_B64.dat mpcac_rewlTM_1s    20 60 1 
+onlinemeas_B64.dat mpcac_rewlTM_25s   20 60 1 
+onlinemeas_B64.dat mpcac_rewlTM_50s   20 60 1
+onlinemeas_B64.dat f_{PS}_rewlTM_1s    20 60 1 
+onlinemeas_B64.dat f_{PS}_rewlTM_25s   20 60 1 
+onlinemeas_B64.dat f_{PS}_rewlTM_50s   20 60 1

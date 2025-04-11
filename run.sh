@@ -20,3 +20,22 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0  -p ../../data/  flow_B64.dat  -bin 20 jack loop_B64.dat
 ./w0_rew  -p ../../data/  flow_B64.dat  -bin 20 jack reweight_charm_OS_B64.dat  rewcOS
 ./w0_rew  -p ../../data/  flow_B64.dat  -bin 20 jack reweight_strange_OS_B64.dat  rewsOS
+./w0_rew  -p ../../data/  flow_B64.dat  -bin 20 jack reweight_light_TM_B64.dat  rewlTM
+
+
+./pion  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack loop_B64.dat
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_OS_B64.dat rewcOS
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_strange_OS_B64.dat rewsOS
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_light_TM_B64.dat rewlTM
+
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_sc_ndg_TM_B64.dat rew_scndgTM
+
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.25_OS_B64.dat rewcOS_0.25
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.25_OS_50s_B64.dat rewcOS_0.25_50s
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.25_OS_25s_B64.dat rewcOS_0.25_25s
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.25_OS_1s_B64.dat rewcOS_0.25_1s
+
+
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_light_TM_B64_1s.dat rewlTM_1s
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_light_TM_B64_25s.dat rewlTM_25s
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_light_TM_B64_50s.dat rewlTM_50s
