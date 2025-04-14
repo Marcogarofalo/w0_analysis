@@ -18,6 +18,11 @@ f1 <- function(df) {
 res1 <- f1(df)
 ggp # Let knit handle the plot
 myplotly(ggplot())
+masses <- c(
+  0.0006669,
+  0.018267,
+  0.23134
+)
 ```
 
 
@@ -31,19 +36,19 @@ all_obs <- Rose::get_all_corr(mt)
 df <- add_corr_to_df("", all_obs, mt, df,
   print_res = FALSE, nudge = 0.4,
   reshape = T, number = 1 + 2 * (0),
-  rename = "P5P5",log = T
+  rename = "P5P5", log = T
 )
 df <- add_corr_to_df("", all_obs, mt, df,
   print_res = FALSE, nudge = 0.4,
   reshape = T, number = 1 + 2 * (3),
-  rename = "P5P5rewc",log = T
+  rename = "P5P5rewc", log = T
 )
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64.dat_raw_correlators")
 all_obs <- Rose::get_all_corr(mt)
 df <- add_corr_to_df("", all_obs, mt, df,
   print_res = FALSE, nudge = 0.4,
   reshape = T, number = 1 + 2 * (3),
-  rename = "P5P5rewl",log = T
+  rename = "P5P5rewl", log = T
 )
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 # gg<-myggplot()
@@ -163,46 +168,46 @@ df <- df[-1, ]
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"dM_{PS}/drewlTM"
-res <- get_full_res(name, all_obs, mt)/2
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("   ",name))
+name <- "dM_{PS}/drewlTM"
+res <- get_full_res(name, all_obs, mt) / 2
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("   ", name))
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_strange_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"dM_{PS}/drewsOS"
+name <- "dM_{PS}/drewsOS"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("  ",name))
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("  ", name))
 
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_0.25_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"dM_{PS}/drewcOS_0.25"
+name <- "dM_{PS}/drewcOS_0.25"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(" ",name))
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(" ", name))
 
 # ######################## loops
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"dM_{PS}/dmul_correction"
+name <- "dM_{PS}/dmul_correction"
+res <- get_full_res(name, all_obs, mt) / 2
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("     ", name))
+name <- "dM_{PS}/dmus_correction"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("     ",name))
-name<-"dM_{PS}/dmus_correction"
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("     ", name))
+name <- "dM_{PS}/dmuc_correction"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("     ",name))
-name<-"dM_{PS}/dmuc_correction"
-res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("    ",name))
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("    ", name))
 
 
 ## plot
-gg <- myggplot(fill=FALSE)
+gg <- myggplot(fill = FALSE)
 gg <- gg + geom_pointrange(
   data = df,
-  aes(x = label, y = dm, ymin = dm - ddm, ymax = dm + ddm, color = label, shape=label)
+  aes(x = label, y = dm, ymin = dm - ddm, ymax = dm + ddm, color = label, shape = label)
 )
-gg<- gg+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+gg <- gg + theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1))
 
-fig <- myplotly(gg, "", "", "$dM/d\\mu$", to_print = TRUE,legend_position = "right")
+fig <- myplotly(gg, "", "", "$dM/d\\mu$", to_print = TRUE, legend_position = "right")
 ```
 
 
@@ -211,52 +216,71 @@ fig <- myplotly(gg, "", "", "$dM/d\\mu$", to_print = TRUE,legend_position = "rig
 df <- data.frame(
   "dm" = c(0),
   "ddm" = c(0),
-  "label" = c("")
+  "label" = c(""),
+  "mass" = c(0),
+  "name" = c("")
 )
 df <- df[-1, ]
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"f_{PS}d(M_{PS}/f_{PS})/drewlTM"
-res <- get_full_res(name, all_obs, mt)/2
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("   ",name))
+name <- "f_{PS}d(M_{PS}/f_{PS})/drewlTM"
+res <- get_full_res(name, all_obs, mt) / 2
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "rew", masses[1], name)
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_strange_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"f_{PS}d(M_{PS}/f_{PS})/drewsOS"
+name <- "f_{PS}d(M_{PS}/f_{PS})/drewsOS"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("  ",name))
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "rew", masses[2], name)
 
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_0.25_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"f_{PS}d(M_{PS}/f_{PS})/drewcOS_0.25"
+name <- "f_{PS}d(M_{PS}/f_{PS})/drewcOS_0.25"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(" ",name))
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "rew", masses[3], name)
 
 # ######################## loops
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"f_{PS}d(M_{PS}/f_{PS})/dmul_correction"
+name <- "f_{PS}d(M_{PS}/f_{PS})/dmul_correction"
+res <- get_full_res(name, all_obs, mt) / 2
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "loop", masses[1],name)
+name <- "f_{PS}d(M_{PS}/f_{PS})/dmus_correction"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("     ",name))
-name<-"f_{PS}d(M_{PS}/f_{PS})/dmus_correction"
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "loop", masses[2],name)
+name <- "f_{PS}d(M_{PS}/f_{PS})/dmuc_correction"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("     ",name))
-name<-"f_{PS}d(M_{PS}/f_{PS})/dmuc_correction"
-res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("    ",name))
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "loop", masses[3],name)
 
 
 ## plot
-gg <- myggplot(fill=FALSE)
+gg <- ggplot() +
+  theme_bw() # myggplot(fill = FALSE)
 gg <- gg + geom_pointrange(
   data = df,
-  aes(x = label, y = dm, ymin = dm - ddm, ymax = dm + ddm, color = label, shape=label)
+  aes(x = 1 / mass, y = dm, ymin = dm - ddm, ymax = dm + ddm, color = label, shape = label)
 )
-gg<- gg+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=1))
+gg <- gg + theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1))
 
-fig <- myplotly(gg, "", "", "$f_{PS}d(M_{PS}/f_{PS})/d\\mu$", to_print = TRUE,legend_position = "right")
+fig <- myplotly(gg, "", "$1/am$", "$f_{PS}d(M_{PS}/f_{PS})/d\\mu$",
+  to_print = TRUE,
+  # legend_position = "right"
+)
+###
+gg <- ggplot() +
+  theme_bw() # myggplot(fill = FALSE)
+gg <- gg + geom_pointrange(
+  data = df,
+  aes(x = 1 / mass +10*runif(length(mass)) , y = dm, ymin = dm - ddm, ymax = dm + ddm, color = name, shape = name)
+)
+gg <- gg + theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1))
+
+fig <- myplotly(gg, "", "$1/am$", "$f_{PS}d(M_{PS}/f_{PS})/d\\mu$",
+  to_print = TRUE,
+  # legend_position = "right"
+)
 ```
 
 ## der correlator
@@ -271,22 +295,22 @@ df <- df[-1, ]
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"dC(t=20)/drewlTM"
-res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("   ",name))
+name <- "dC(t=20)/drewlTM"
+res <- get_full_res(name, all_obs, mt) / 2
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("   ", name))
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_strange_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"dC(t=20)/drewsOS"
+name <- "dC(t=20)/drewsOS"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("  ",name))
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("  ", name))
 
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_0.25_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-name<-"dC(t=20)/drewcOS_0.25"
+name <- "dC(t=20)/drewcOS_0.25"
 res <- get_full_res(name, all_obs, mt)
-df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(" ",name))
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(" ", name))
 
 # # ######################## rew
 # mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_OS_B64.dat_output")
@@ -297,10 +321,10 @@ df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(
 
 
 ## plot
-gg <- myggplot(fill=FALSE)
+gg <- myggplot(fill = FALSE)
 gg <- gg + geom_pointrange(
   data = df,
-  aes(x = label, y = dm, ymin = dm - ddm, ymax = dm + ddm, color = label, shape=label)
+  aes(x = label, y = dm, ymin = dm - ddm, ymax = dm + ddm, color = label, shape = label)
 )
 
 fig <- myplotly(gg, "", "", "$dC(t=20)/d\\mu$", to_print = TRUE)
@@ -364,12 +388,42 @@ fig <- myplotly(gg, "", "$t/a$", "$m_{pcac}(t)$", to_print = TRUE)
 # sources scaling
 
 ```{r, results='asis',echo=FALSE}
-df<-NULL
+df <- NULL
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("M_{PS}_rewlTM", all_obs, mt, df,
+  print_res = FALSE, nudge = 0.0, reshape = T,
+  rename = "M_{PS}_rewlTM_100s"
+)
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64_50s.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("M_{PS}_rewlTM_50s", all_obs, mt, df, print_res = FALSE, nudge = 0.2, reshape = T)
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64_25s.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("M_{PS}_rewlTM_25s", all_obs, mt, df, print_res = FALSE, nudge = 0.4, reshape = T)
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64_1s.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("M_{PS}_rewlTM_1s", all_obs, mt, df, print_res = FALSE, nudge = 0.6, reshape = T)
+
+###### plot
+gg <- plot_df_corr_ggplot(df, width = 0.05, noribbon = TRUE)
+
+fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
+```
+
+```{r, results='asis',echo=FALSE}
+df <- NULL
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_0.25_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("M_{PS}_rewcOS_0.25", all_obs, mt, df, print_res = FALSE, nudge = 0.0, reshape = T,
-                     rename = "M_{PS}_rewcOS_0.25_100s")
+df <- add_corr_to_df("M_{PS}_rewcOS_0.25", all_obs, mt, df,
+  print_res = FALSE, nudge = 0.0, reshape = T,
+  rename = "M_{PS}_rewcOS_0.25_100s"
+)
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_0.25_OS_50s_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
@@ -392,32 +446,32 @@ fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
 ## all rew history
 
 ```{r, results='asis',echo=FALSE}
-gg<- ggplot()
-dfU<-read.table("/home/garofalo/analysis/flow/data/all_rewU_c_0.25")
-dfUc<-read.table("/home/garofalo/analysis/flow/data/all_rewU_c")
+gg <- ggplot()
+dfU <- read.table("/home/garofalo/analysis/flow/data/all_rewU_c_0.25")
+dfUc <- read.table("/home/garofalo/analysis/flow/data/all_rewU_c")
 
-df<-read.table("/home/garofalo/analysis/flow/data/all_rew_c_0.25")
-a<-mean(df[,7])
-gg<-gg+geom_line(aes(x=!!seq_along(df[,1]), y =!!(exp(df[,7]-a)), color="charm0.25" ))
-df<-read.table("/home/garofalo/analysis/flow/data/all_rew_c")
-a<-mean(df[,7])
-gg<-gg+geom_line(aes(x=!!seq_along(df[,1]), y =!!exp(df[,7]-a), color="charm" ))
+df <- read.table("/home/garofalo/analysis/flow/data/all_rew_c_0.25")
+a <- mean(df[, 7])
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(exp(df[, 7] - a)), color = "charm0.25"))
+df <- read.table("/home/garofalo/analysis/flow/data/all_rew_c")
+a <- mean(df[, 7])
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!exp(df[, 7] - a), color = "charm"))
 
 # gg<-gg+geom_line(aes(x=seq_along(df1[,1])*100, y =df1[,6],color="ave_conf_U"))
 
-fig<-myplotly(gg,"", "hit+conf*100 ", "$e^{w(U,\\phi)-<w>}$",to_print = TRUE)
+fig <- myplotly(gg, "", "hit+conf*100 ", "$e^{w(U,\\phi)-<w>}$", to_print = TRUE)
 ```
 
 
 
 ```{r, results='asis',echo=FALSE}
-gg<- ggplot()
-dfU<-read.table("/home/garofalo/analysis/flow/data/all_rewU_c_0.25")
-gg<-gg+geom_line(aes(x=!!seq_along(dfU[,1]), y =!!dfU[,6],color="charm_0.25"))
-dfU<-read.table("/home/garofalo/analysis/flow/data/all_rewU_c")
-gg<-gg+geom_line(aes(x=!!seq_along(dfU[,1]), y =!!dfU[,6],color="charm"))
+gg <- ggplot()
+dfU <- read.table("/home/garofalo/analysis/flow/data/all_rewU_c_0.25")
+gg <- gg + geom_line(aes(x = !!seq_along(dfU[, 1]), y = !!dfU[, 6], color = "charm_0.25"))
+dfU <- read.table("/home/garofalo/analysis/flow/data/all_rewU_c")
+gg <- gg + geom_line(aes(x = !!seq_along(dfU[, 1]), y = !!dfU[, 6], color = "charm"))
 
-fig<-myplotly(gg,"", "conf ", "$e^{w(U)-<w>}$",to_print = TRUE)
+fig <- myplotly(gg, "", "conf ", "$e^{w(U)-<w>}$", to_print = TRUE)
 ```
 
 ## histogram jackknife distribution
@@ -427,8 +481,8 @@ The error is the width of the distribution multiplied by $\sqrt{N-1}$
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
-name<- "M_{PS}"
-W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+name <- "M_{PS}"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/", name, "_jack.txt"))
 W <- W[c(-1, -length(W)), ]
 
 gg <- ggplot() +
@@ -443,8 +497,8 @@ gg <- ggplot() +
 
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-fit<-get_full_res(name, all_obs, mt)
-gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1)))
+fit <- get_full_res(name, all_obs, mt)
+gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 gg
 ```
 
@@ -454,8 +508,8 @@ gg
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
-name<- "M_{PS}+mul_correction"
-W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+name <- "M_{PS}+mul_correction"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/", name, "_jack.txt"))
 W <- W[c(-1, -length(W)), ]
 
 gg <- ggplot() +
@@ -470,8 +524,8 @@ gg <- ggplot() +
 
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-fit<-get_full_res(name, all_obs, mt)
-gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1)))
+fit <- get_full_res(name, all_obs, mt)
+gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 gg
 ```
 
@@ -481,8 +535,8 @@ gg
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
-name<- "M_{PS}+mus_correction"
-W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+name <- "M_{PS}+mus_correction"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/", name, "_jack.txt"))
 W <- W[c(-1, -length(W)), ]
 
 gg <- ggplot() +
@@ -497,16 +551,16 @@ gg <- ggplot() +
 
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-fit<-get_full_res(name, all_obs, mt)
-gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1)))
+fit <- get_full_res(name, all_obs, mt)
+gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 gg
 ```
 
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
-name<- "M_{PS}+muc_correction"
-W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+name <- "M_{PS}+muc_correction"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/", name, "_jack.txt"))
 W <- W[c(-1, -length(W)), ]
 
 gg <- ggplot() +
@@ -521,8 +575,8 @@ gg <- ggplot() +
 
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-fit<-get_full_res(name, all_obs, mt)
-gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1)))
+fit <- get_full_res(name, all_obs, mt)
+gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 gg
 ```
 
@@ -533,8 +587,8 @@ gg
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
-name<- "M_{PS}_rewlTM"
-W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+name <- "M_{PS}_rewlTM"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/", name, "_jack.txt"))
 W <- W[c(-1, -length(W)), ]
 
 gg <- ggplot() +
@@ -549,8 +603,8 @@ gg <- ggplot() +
 
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-fit<-get_full_res(name, all_obs, mt)
-gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1)))
+fit <- get_full_res(name, all_obs, mt)
+gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 gg
 ```
 
@@ -559,8 +613,8 @@ gg
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
-name<- "M_{PS}_rewsOS"
-W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+name <- "M_{PS}_rewsOS"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/", name, "_jack.txt"))
 W <- W[c(-1, -length(W)), ]
 
 gg <- ggplot() +
@@ -575,10 +629,10 @@ gg <- ggplot() +
 
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_strange_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-fit<-get_full_res(name, all_obs, mt)
-gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1)))
+fit <- get_full_res(name, all_obs, mt)
+gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 
-gg+theme(legend.position = "inside")
+gg + theme(legend.position = "inside")
 ```
 
 
@@ -586,8 +640,8 @@ gg+theme(legend.position = "inside")
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
-name<- "M_{PS}_rewcOS"
-W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+name <- "M_{PS}_rewcOS"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/", name, "_jack.txt"))
 W <- W[c(-1, -length(W)), ]
 
 gg <- ggplot() +
@@ -602,35 +656,35 @@ gg <- ggplot() +
 
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-fit<-get_full_res(name, all_obs, mt)
-gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1)))
-### loop 
-# 
+fit <- get_full_res(name, all_obs, mt)
+gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
+### loop
+#
 # name<- "M_{PS}+muc_correction"
 # W1 <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
 # W1 <- W1[c(-1, -length(W1)), ]
-# 
+#
 # gg <- gg +
 #   geom_histogram(aes(x = W1, y = after_stat(density), colour=!!name),
 #     binwidth = -(min(W1) - max(W1)) / 7,
 #     # breaks = seq(min(W), max(W), by = 100),
 #     fill = "white"  ) +
 #   theme_bw()
-# 
+#
 # mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
 # all_obs <- Rose::get_all_corr(mt)
 # fit<-get_full_res(name, all_obs, mt)
 # gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1), mapping=aes(colour=!!name)))
 
-gg+theme(legend.position = "inside")
+gg + theme(legend.position = "inside")
 ```
 
 
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
-name<- "M_{PS}_rewcOS_0.25"
-W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+name <- "M_{PS}_rewcOS_0.25"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/", name, "_jack.txt"))
 W <- W[c(-1, -length(W)), ]
 
 gg <- ggplot() +
@@ -645,10 +699,10 @@ gg <- ggplot() +
 
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_0.25_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-fit<-get_full_res(name, all_obs, mt)
-gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1)))
+fit <- get_full_res(name, all_obs, mt)
+gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 
-gg+theme(legend.position = "inside")
+gg + theme(legend.position = "inside")
 ```
 
 
@@ -656,8 +710,8 @@ gg+theme(legend.position = "inside")
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
-name<- "M_{PS}_rew_scndgTM"
-W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/",name,"_jack.txt"))
+name <- "M_{PS}_rew_scndgTM"
+W <- read.table(paste0("/home/garofalo/analysis/flow/data/out/", name, "_jack.txt"))
 W <- W[c(-1, -length(W)), ]
 
 gg <- ggplot() +
@@ -672,8 +726,8 @@ gg <- ggplot() +
 
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_sc_ndg_TM_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
-fit<-get_full_res(name, all_obs, mt)
-gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1,1], sd = (fit[1,2]) / sqrt(length(W) - 1)))
+fit <- get_full_res(name, all_obs, mt)
+gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 
-gg+theme(legend.position = "inside")
+gg + theme(legend.position = "inside")
 ```
