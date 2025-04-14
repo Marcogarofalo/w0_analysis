@@ -67,3 +67,8 @@ onlinemeas_B64.dat mpcac_rewlTM_50s   20 60 1
 onlinemeas_B64.dat f_{PS}_rewlTM_1s    20 60 1 
 onlinemeas_B64.dat f_{PS}_rewlTM_25s   20 60 1 
 onlinemeas_B64.dat f_{PS}_rewlTM_50s   20 60 1
+
+
+onlinemeas_B64.dat M_{PS}_rewcOS_0.02   20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.02    20 60 1
+onlinemeas_B64.dat f_{PS}_rewcOS_0.02       20 60 1
