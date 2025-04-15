@@ -21,6 +21,7 @@
 #include "correlators_analysis.hpp"
 #include "functions_w0.hpp"
 struct kinematic kinematic_2pt;
+constexpr double hbarc = 1.97326979e-6; // GeV*fm
 
 generic_header read_head(FILE *stream)
 {
@@ -182,6 +183,20 @@ int main(int argc, char **argv)
     for (int iconf = 0; iconf < head.Njack; iconf++)
     {
         read_twopt(infile, data[iconf], head);
+    }
+    //////////////////////////////////////////////////////////////
+    // normalization of the correlator
+    //////////////////////////////////////////////////////////////
+    for (int i = 0; i < head.ncorr; i++)
+    {
+        for (int j = 0; j < head.Njack; j++)
+        {
+
+            for (int tf = 0; tf < head.T; tf++)
+            {
+                data[j][i][tf][0] = data[j][i][tf][0] * head.kappa * head.kappa * 2.0;
+            }
+        }
     }
     //////////////////////////////////////////////////////////////
     // correcting P5P5 and V0P5
@@ -396,6 +411,29 @@ int main(int argc, char **argv)
     // restore option[6]: data file name
     mysprintf(option[6], NAMESIZE, "%s", save_data_file_name.c_str());
 
+    //////////////////////////////////////////////////////////////
+    //  read m^iso
+    //////////////////////////////////////////////////////////////
+    std::vector<double *> amuiso(3);
+    line_read_param(option, "muliso", mean, err, seed, namefile_plateaux);
+    amuiso[0] = myres->create_fake(mean, err, seed);
+    line_read_param(option, "musiso", mean, err, seed, namefile_plateaux);
+    amuiso[1] = myres->create_fake(mean, err, seed);
+    line_read_param(option, "muciso", mean, err, seed, namefile_plateaux);
+    amuiso[2] = myres->create_fake(mean, err, seed);
+
+    std::vector<double *> amusim(3);
+    line_read_param(option, "mulsim", mean, err, seed, namefile_plateaux);
+    amusim[0] = myres->create_fake(mean, err, seed);
+    line_read_param(option, "mussim", mean, err, seed, namefile_plateaux);
+    amusim[1] = myres->create_fake(mean, err, seed);
+    line_read_param(option, "mucsim", mean, err, seed, namefile_plateaux);
+    amusim[2] = myres->create_fake(mean, err, seed);
+
+    line_read_param(option, "a", mean, err, seed, namefile_plateaux);
+    double *a_fm = myres->create_fake(mean, err, seed);
+    ////////////////////////////////////////////////////////////
+
     fit_info.n_ext_P = 1;
     fit_info.ext_P = (double **)malloc(sizeof(double) * fit_info.n_ext_P);
 
@@ -459,6 +497,7 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
     // fpi
     //////////////////////////////////////////////////////////////
+
     fit_info.Nvar = 1;
     fit_info.Npar = 1;
     fit_info.N = 1;
@@ -526,5 +565,27 @@ int main(int argc, char **argv)
         char name[NAMESIZE];
         mysprintf(name, NAMESIZE, "f_{PS}d(M_{PS}/f_{PS})/dmu%s_correction", q_name[iq].c_str());
         print_result_in_file(outfile, derM, name, 0, 0, 0);
+
+        for (int j = 0; j < Njack; j++)
+        {
+            double fr = fit_f_PSpdmu[iq].P[0][j];
+            double f = f_PS.P[0][j];
+            double dmu = delta_amul[iq][j];
+            derM[j] = (fr - f) / dmu;
+        }
+        mysprintf(name, NAMESIZE, "df_{PS}/dmu%s_correction", q_name[iq].c_str());
+        print_result_in_file(outfile, derM, name, 0, 0, 0);
+        printf("%s = %g +- %g\n", name, derM[Njack - 1], myres->comp_error(derM));
+
+        // for (int j = 0; j < fit_info.Njack; j++)
+        // {
+        //     double fr = fit_f_PSpdmu[iq].P[0][j];
+        //     double f = f_PS.P[0][j];
+        //     double dmu = delta_amul[iq][j];
+        //     derM[j] = f + derM[j] * dmu;
+        // }
+        // mysprintf(name, NAMESIZE, "f_{PS}(iso)_mu%s_correction", q_name[iq].c_str());
+        // print_result_in_file(outfile, derM, name, 0, 0, 0);
+        // printf("%s = %g +- %g\n", name, derM[Njack - 1], myres->comp_error(derM));
     }
 }
