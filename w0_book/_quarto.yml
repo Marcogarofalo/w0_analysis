@@ -11,6 +11,7 @@ book:
     - note_reweighting.qmd
     - B64.qmd
     - pion_B64.qmd
+    - fit_deriv_fpi.qmd
     - params.qmd
     - summary.qmd
     - references.qmd

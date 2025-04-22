@@ -1,0 +1,47 @@
+# Fit derivative B64
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+masses <- c(
+  0.0006669,
+  0.018267,
+  0.23134
+)
+```
+
+```{r,results='asis'}
+gg<-NULL
+basename="/home/garofalo/analysis/flow/data/fit_all/der_fpi_vs_mu"
+fit<-Rose::read_fit_P_file(paste0(basename,"_fit_P.dat"))
+make_table_fit_result(fit)
+gg<-plot_fit(basename,"amu",
+             gg=gg,
+             id_x = 1,
+             single_name_for_fit = "P[0]/amu")
+basename="/home/garofalo/analysis/flow/data/fit_all/der_fpi_vs_mu_mu2"
+fit<-Rose::read_fit_P_file(paste0(basename,"_fit_P.dat"))
+make_table_fit_result(fit)
+gg<-plot_fit(basename,"amu",
+             gg=gg,
+             id_x = 1,
+             single_name_for_fit = "P[0]/amu+P[1]/amu^2")
+
+myplotly(gg,"","$1/a\\mu$","$df_\\pi/d\\mu$", to_print = FALSE)
+```

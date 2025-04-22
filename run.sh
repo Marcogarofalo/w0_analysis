@@ -42,3 +42,9 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_light_TM_B64_50s.dat rewlTM_50s
 
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.02_OS_B64.dat rewcOS_0.02
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.1_OS_B64.dat rewcOS_0.1
+
+
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_step_0.1232229005_to_0.1234969805_OS_B64.dat rew_0.1232229005_to_0.1234969805_OS
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_step_0.03125_to_0.03152408_OS_B64.dat rew_0.03125_to_0.03152408_OS
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_step_0.01_to_0.01027408_OS_B64.dat rew_0.01_to_0.01027408_OS
