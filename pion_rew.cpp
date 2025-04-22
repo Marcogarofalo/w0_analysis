@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 
             for (int tf = 0; tf < head.T; tf++)
             {
-                data[j][i][tf][0] = data[j][i][tf][0] * head.kappa * head.kappa * 2.0 ;
+                data[j][i][tf][0] = data[j][i][tf][0] * head.kappa * head.kappa * 2.0;
             }
         }
     }
@@ -545,6 +545,8 @@ int main(int argc, char **argv)
     myres->div(derM, derM, dmu);
     mysprintf(name_rew, NAMESIZE, "dM_{PS}/d%s", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
+    write_jack(derM, Njack, jack_file);
+    check_correlatro_counter(4);
 
     /// correlator at time 20
     int tref = 20;
@@ -556,6 +558,8 @@ int main(int argc, char **argv)
     }
     mysprintf(name_rew, NAMESIZE, "dC(t=%d)/d%s", tref, argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
+    write_jack(derM, Njack, jack_file);
+    check_correlatro_counter(5);
 
     //////////////////////////////////////////////////////////////
     // fpi
@@ -581,7 +585,7 @@ int main(int argc, char **argv)
     struct fit_result f_PS = fit_fun_to_fun_of_corr(
         option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
         outfile, lhs_function_f_PS, "f_{PS}", fit_info, jack_file);
-
+    check_correlatro_counter(6);
     // with reweighting
     fit_info.corr_id = {head.ncorr + 0};
     for (int j = 0; j < fit_info.Njack; j++)
@@ -596,7 +600,7 @@ int main(int argc, char **argv)
     struct fit_result f_PS_rew = fit_fun_to_fun_of_corr(
         option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
         outfile, lhs_function_f_PS, name_rew, fit_info, jack_file);
-
+    check_correlatro_counter(7);
     // der mpi_fpi /dmu
     for (int j = 0; j < fit_info.Njack; j++)
     {
@@ -607,7 +611,8 @@ int main(int argc, char **argv)
     }
     mysprintf(name_rew, NAMESIZE, "f_{PS}d(M_{PS}/f_{PS})/d%s", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
-
+    write_jack(derM, Njack, jack_file);
+    check_correlatro_counter(8);
     // der mpi_fpi /dmu
     for (int j = 0; j < fit_info.Njack; j++)
     {
@@ -615,20 +620,36 @@ int main(int argc, char **argv)
     }
     mysprintf(name_rew, NAMESIZE, "df_{PS}/d%s", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
-    printf("%s = %g +- %g\n",name_rew, derM[Njack - 1] , myres->comp_error(derM));
+    write_jack(derM, Njack, jack_file);
+    check_correlatro_counter(9);
+    printf("%s = %g +- %g\n", name_rew, derM[Njack - 1], myres->comp_error(derM));
 
     // der mpi_fpi /dmu
     for (int j = 0; j < fit_info.Njack; j++)
     {
-        derM[j] = f_PS.P[0][j] + derM[j] * (amuiso[2][j]-amusim[2][j]);
+        derM[j] = f_PS.P[0][j] + derM[j] * (amuiso[2][j] - amusim[2][j]);
     }
     mysprintf(name_rew, NAMESIZE, "f_{PS}(mciso)_%s", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
-    printf("%s = %g +- %g\n",name_rew, derM[Njack - 1] , myres->comp_error(derM));
+    write_jack(derM, Njack, jack_file);
+    check_correlatro_counter(10);
+    printf("%s = %g +- %g\n", name_rew, derM[Njack - 1], myres->comp_error(derM));
 
     //////////////////////////////////////////////////////////////
     printf("Mpi = %g  MeV\n", M_PS[Njack - 1] / (a_fm[Njack - 1] / hbarc));
     printf("fpi = %g  MeV\n", f_PS.P[0][Njack - 1] / (a_fm[Njack - 1] / hbarc));
     printf("amu = %g  \n", amusim[0][Njack - 1]);
     printf("kappa = %.8g  \n", head.kappa);
+
+    ///
+    double *tmp = myres->create_fake(head_rew.mus[0], 1e-20, 1);
+    print_result_in_file(outfile, tmp, "mu_in", 0, 0, 0);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(11);
+    free(tmp);
+    tmp = myres->create_fake(head_rew.oranges[0], 1e-20, 1);
+    print_result_in_file(outfile, tmp, "mu_out", 0, 0, 0);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(12);
+    free(tmp);
 }
