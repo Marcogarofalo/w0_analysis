@@ -6,6 +6,17 @@ flow_B64.dat mul  0.0006669  0.0000028  1
 flow_B64.dat mus  0.018267   0.000053   2
 flow_B64.dat muc  0.23134    0.00052    3
 flow_B64.dat m0  -0.4138934 0.0000046   4
+flow_B64.dat a  0.07948    0.00011  5
+
+onlinemeas_B64.dat mulsim  0.00072    1e-20      1
+onlinemeas_B64.dat mussim  0.018267   0.000053   2
+onlinemeas_B64.dat mucsim  0.2285992  1e-20      3
+
+onlinemeas_B64.dat muliso  0.0006669  0.0000028  1
+onlinemeas_B64.dat musiso  0.018267   0.000053   2
+onlinemeas_B64.dat muciso  0.23134    0.00052    3
+onlinemeas_B64.dat m0  -0.4138934 0.0000046   4
+onlinemeas_B64.dat a   0.07948    0.00011  5
 
 
 onlinemeas_B64.dat M_{PS}          20 60 1
@@ -71,4 +82,24 @@ onlinemeas_B64.dat f_{PS}_rewlTM_50s   20 60 1
 
 onlinemeas_B64.dat M_{PS}_rewcOS_0.02   20 60 1
 onlinemeas_B64.dat mpcac_rewcOS_0.02    20 60 1
-onlinemeas_B64.dat f_{PS}_rewcOS_0.02       20 60 1
+onlinemeas_B64.dat f_{PS}_rewcOS_0.02   20 60 1
+
+onlinemeas_B64.dat M_{PS}_rewcOS_0.1    20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.1     20 60 1
+onlinemeas_B64.dat f_{PS}_rewcOS_0.1    20 60 1
+
+
+onlinemeas_B64.dat M_{PS}_rew_0.1232229005_to_0.1234969805_OS    20 60 1
+onlinemeas_B64.dat mpcac_rew_0.1232229005_to_0.1234969805_OS     20 60 1
+onlinemeas_B64.dat f_{PS}_rew_0.1232229005_to_0.1234969805_OS    20 60 1
+
+
+onlinemeas_B64.dat M_{PS}_rew_0.03125_to_0.03152408_OS    20 60 1
+onlinemeas_B64.dat mpcac_rew_0.03125_to_0.03152408_OS     20 60 1
+onlinemeas_B64.dat f_{PS}_rew_0.03125_to_0.03152408_OS    20 60 1
+
+
+onlinemeas_B64.dat M_{PS}_rew_0.01_to_0.01027408_OS    20 60 1
+onlinemeas_B64.dat mpcac_rew_0.01_to_0.01027408_OS     20 60 1
+onlinemeas_B64.dat f_{PS}_rew_0.01_to_0.01027408_OS    20 60 1
+
