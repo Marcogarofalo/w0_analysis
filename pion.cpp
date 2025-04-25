@@ -487,7 +487,7 @@ int main(int argc, char **argv)
             double m = M_PS[j];
             derM[j] = (mr - m) / delta_amul[iq][j];
             if (j == Njack - 1)
-                printf("dM_{PS}/dmu%s = %g   %g   %g   %g\n", q_name[iq].c_str(), derM[j], mr, m, delta_amul[iq][j]);
+                printf("dM_{PS}/dmu%s = %g   %g   \n", q_name[iq].c_str(), derM[j], myres->comp_error(derM));
         }
         char name[NAMESIZE];
         mysprintf(name, NAMESIZE, "dM_{PS}/dmu%s_correction", q_name[iq].c_str());
@@ -587,5 +587,60 @@ int main(int argc, char **argv)
         // mysprintf(name, NAMESIZE, "f_{PS}(iso)_mu%s_correction", q_name[iq].c_str());
         // print_result_in_file(outfile, derM, name, 0, 0, 0);
         // printf("%s = %g +- %g\n", name, derM[Njack - 1], myres->comp_error(derM));
+    }
+
+    fit_info.restore_default();
+    // compute derivative expanding
+    ////////////////////////////////////////////////////////////
+    //  mass correction
+    ////////////////////////////////////////////////////////////
+    std::vector<fit_result> Delta_M(Nquark);
+    fit_info.Nvar = 1;
+    fit_info.Npar = 1;
+    fit_info.N = 1;
+    fit_info.Njack = Njack;
+    fit_info.n_ext_P = 1;
+    fit_info.ext_P = (double **)malloc(sizeof(double *) * 5);
+    fit_info.ext_P[0] = M_PS;
+    fit_info.ext_P[1] = f_PS.P[0];
+    // fit_info.ext_P[2] = dM_PS;
+    fit_info.ext_P[3] = (double *)malloc(sizeof(double) * Njack);
+    fit_info.ext_P[4] = (double *)malloc(sizeof(double) * Njack);
+    for (int j = 0; j < Njack; j++)
+    {
+        fit_info.ext_P[3][j] = head.mus[0];
+        fit_info.ext_P[4][j] = head.mus[0];
+    }
+
+    fit_info.function = constant_fit;
+    fit_info.linear_fit = true;
+    fit_info.T = head.T;
+
+    for (int iq = 0; iq < Nquark; iq++)
+    {
+
+        fit_info.n_ext_P = 1;
+        //////////////////////////////////////////  up
+        fit_info.myen = {1}; // reim of corr_id[1] (the correction)
+        
+        int id_dmu_u_pi = head.ncorr + 0 + iq * head.ncorr;
+        int id_PS = 0;
+        fit_info.corr_id = {id_PS, id_dmu_u_pi };
+        char namefit[NAMESIZE];
+        mysprintf(namefit, NAMESIZE, "Delta_mu%s_M_{PS}", q_name[iq].c_str());
+
+        Delta_M[iq] = fit_fun_to_fun_of_corr(
+            option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
+            outfile, lhs_dM_sea, namefit, fit_info,
+            jack_file);
+
+        fit_info.n_ext_P = 5;
+        mysprintf(namefit, NAMESIZE, "Delta_mu%s_f_{PS}", q_name[iq].c_str());
+        // correction to fpi
+        fit_info.ext_P[2] = Delta_M[iq].P[0];
+        Delta_M[iq] = fit_fun_to_fun_of_corr(
+            option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
+            outfile, lhs_dfpi_sea, namefit, fit_info,
+            jack_file);
     }
 }

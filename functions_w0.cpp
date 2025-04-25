@@ -1,9 +1,9 @@
 #define functions_w0_C
 #include "functions_w0.hpp"
-#include "read.hpp"
 #include "correlators_analysis.hpp"
+#include "read.hpp"
 
-void make_ratio_of_jacks(double ****final, int Njack, int i, int T, double ****num, int i1, double ****den,  int i2)
+void make_ratio_of_jacks(double ****final, int Njack, int i, int T, double ****num, int i1, double ****den, int i2)
 {
 
     // double sum_r = 0;
@@ -11,12 +11,12 @@ void make_ratio_of_jacks(double ****final, int Njack, int i, int T, double ****n
     {
         for (int tf = 0; tf < T; tf++)
         {
-            for (int j1 = 0; j1 < Njack-1; j1++)
+            for (int j1 = 0; j1 < Njack - 1; j1++)
             {
                 if (j1 == j)
                     continue;
                 double r = 0;
-                for (int j2 = 0; j2 < Njack-1; j2++)
+                for (int j2 = 0; j2 < Njack - 1; j2++)
                 {
                     if (j2 == j)
                         continue;
@@ -145,12 +145,11 @@ double lhs_function_w0_eg(int j, double ****in, int t, struct fit_type fit_info)
 
 double lhs_function_W_rew(int j, double ****in, int t, struct fit_type fit_info)
 {
-    int id = fit_info.corr_id[0];// <W(t)r>
+    int id = fit_info.corr_id[0];  // <W(t)r>
     int id1 = fit_info.corr_id[1]; // <r>
-    double r = in[j][id][t][0]/in[j][id1][0][0];
+    double r = in[j][id][t][0] / in[j][id1][0][0];
     return r;
 }
-
 
 double lhs_function_Wt_p_dmcorr(int j, double ****in, int t, struct fit_type fit_info)
 {
@@ -181,14 +180,14 @@ double lhs_function_M_PS_p_dmcorr(int j, double ****in, int t, struct fit_type f
 
     double rt = Ct - dmu * (loop_Ct - loop * Ct);
 
-    Ct = in[j][id][t+1][0];
+    Ct = in[j][id][t + 1][0];
     loop = in[j][id_cor][0][reim];
-    loop_Ct = in[j][id_cor][t+1][reim];
+    loop_Ct = in[j][id_cor][t + 1][reim];
 
     double rtp1 = Ct - dmu * (loop_Ct - loop * Ct);
 
-    double mass =  M_eff_T_ct_ctp1(t, fit_info.T, rt, rtp1);
-    
+    double mass = M_eff_T_ct_ctp1(t, fit_info.T, rt, rtp1);
+
     return mass;
 }
 
@@ -211,9 +210,7 @@ double lhs_function_f_PS_p_dmcorr(int j, double ****in, int t, struct fit_type f
 
     double me = sqrt(rt * 2 * M / (exp(-t * M) + exp(-(fit_info.T - t) * M)));
     return (mu1 + mu2) * me / (M * sinh(M));
-
 }
-
 
 double lhs_function_mpcac_p_dmcorr(int j, double ****in, int t, struct fit_type fit_info)
 {
@@ -230,24 +227,23 @@ double lhs_function_mpcac_p_dmcorr(int j, double ****in, int t, struct fit_type 
 
     double Vt = Ct - dmu * (loop_Ct - loop * Ct);
 
-    Ct = in[j][idV][t+1][0];
+    Ct = in[j][idV][t + 1][0];
     loop = in[j][id_corV][0][reim];
-    loop_Ct = in[j][id_corV][t+1][reim];
+    loop_Ct = in[j][id_corV][t + 1][reim];
 
     double Vtp1 = Ct - dmu * (loop_Ct - loop * Ct);
 
-    Ct = in[j][idP][t+1][0];
+    Ct = in[j][idP][t + 1][0];
     loop = in[j][id_corP][0][reim];
-    loop_Ct = in[j][id_corP][t+1][reim];
+    loop_Ct = in[j][id_corP][t + 1][reim];
 
     double PP = Ct - dmu * (loop_Ct - loop * Ct);
 
+    double mpcac = -(Vtp1 - Vt) / (2. * PP);
+    ;
 
-    double mpcac = -( Vtp1 - Vt) / (2. * PP);  ;
-    
     return mpcac;
 }
-
 
 double lhs_function_Wt_der_mu(int j, double ****in, int t, struct fit_type fit_info)
 {
@@ -260,7 +256,7 @@ double lhs_function_Wt_der_mu(int j, double ****in, int t, struct fit_type fit_i
     double loop = in[j][id_cor][0][reim];
     double loop_Wt = in[j][id_cor][t][reim];
 
-    double r = - (loop_Wt - loop * Wt);
+    double r = -(loop_Wt - loop * Wt);
     // if(j==fit_info.Njack-1) printf("%d   %g\n",t,r);
     return r;
 }
@@ -294,7 +290,6 @@ double lhs_function_Wt_p_dm_all_corr(int j, double ****in, int t, struct fit_typ
     return r;
 }
 
-
 double lhs_mpcac(int j, double ****in, int t, struct fit_type fit_info)
 {
     int id_V = fit_info.corr_id[0];
@@ -303,4 +298,67 @@ double lhs_mpcac(int j, double ****in, int t, struct fit_type fit_info)
     double r = -(in[j][id_V][t + 1][0] - in[j][id_V][t][0]) / (2. * in[j][id_P][t][0]);
 
     return r;
+}
+
+double lhs_dM_sea(int j, double ****in, int t, struct fit_type fit_info)
+{
+    // fit_info.myen = { 1, 1 }; // sign , reim   for mass correction of the pion
+
+    int id = fit_info.corr_id[0];
+    int id_cor = fit_info.corr_id[1];
+    int reim = fit_info.myen[0];
+
+    double Ct = in[j][id][t][0];
+    double loop = in[j][id_cor][0][reim];
+    double loop_Ct = in[j][id_cor][t][reim];
+
+    double rt = -(loop_Ct - loop * Ct) / Ct;
+
+    Ct = in[j][id][t + 1][0];
+    loop = in[j][id_cor][0][reim];
+    loop_Ct = in[j][id_cor][t + 1][reim];
+
+    double rtp1 = -(loop_Ct - loop * Ct) / Ct;
+
+    int T = fit_info.T;
+    double M = fit_info.ext_P[0][j];
+
+    double den = (T / 2 - (t + 1)) * tanh(M * (T / 2 - (t + 1)));
+    den -= (T / 2 - (t)) * tanh(M * (T / 2 - (t)));
+    double r = (rtp1) - (rt);
+    r /= den;
+    return r;
+}
+double lhs_dfpi_sea(int j, double ****in, int t, struct fit_type fit_info)
+{
+    // fit_info.myen = { 1, 1 }; // sign , reim   for mass correction of the pion
+
+    int id = fit_info.corr_id[0];
+    int id_cor = fit_info.corr_id[1];
+    int reim = fit_info.myen[0];
+    int T = fit_info.T;
+    double M = fit_info.ext_P[0][j];
+
+    double fpi = fit_info.ext_P[1][j];
+    double dM = fit_info.ext_P[2][j];
+    double mu = fit_info.ext_P[3][j];
+
+    double G = fpi * (M * sinh(M)) / (2 * mu);
+    double A = G * G / 2 * M;
+
+    double Ct = in[j][id][t][0];
+    double loop = in[j][id_cor][0][reim];
+    double loop_Ct = in[j][id_cor][t][reim];
+
+    double dA = -(loop_Ct - loop * Ct) / Ct;
+    dA += dM * T / 2.0;
+    dA -= dM * (T / 2.0 - t) * tanh(M * (T / 2.0 - t));
+    dA *= A;
+
+    double dG = M * dA / G + G * dM / (2 * M);
+
+    // double df = (2 * mu) * dG / (M * M) + 2 * G / (M * M) - (4 * mu) * G * dM / (M * M * M);
+    double df = (2 * mu) * dG / (M * sinh(M)) + 2 * G / (M * sinh(M)) - (2 * mu) * G * dM * (sinh(M) + M * cosh(M)) / ((M * sinh(M)) * (M * sinh(M)));
+
+    return df;
 }
