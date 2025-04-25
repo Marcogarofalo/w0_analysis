@@ -94,3 +94,22 @@ df1 <- mutate(df,
 
 kable(df1[, c(1, 2, 3, 4, 9, 10)], digits = 13)
 ```
+```{r}
+library(dplyr)
+library(knitr)
+# keeping ms fixed and change mc form
+# mc_sim =0.2285992
+mc_targ =0.22887328 # 0.1 of the iso-sim step
+df1 <- mutate(df,
+  musig = (ms_sim + mc_targ) / 2,
+  mudel = (mc_targ - ms_sim) / Zp_Zs / 2
+)
+kable(df1[, c(1, 2, 3, 4,  10,11)], digits = 16)
+options(digits=16)
+cat("2*kap*mub = ", df1$kappa*2*df1$musig,"\n")
+cat("2*kap*epsb = ", df1$kappa*2*df1$mudel,"\n")
+cat("denominator\n")
+cat("2*kap*mub = ", df1$kappa*2*df1$musig_sim,"\n")
+cat("2*kap*epsb = ", df1$kappa*2*df1$mudel_sim,"\n")
+
+```

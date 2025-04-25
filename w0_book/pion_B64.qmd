@@ -173,6 +173,24 @@ gg <- plot_df_corr_ggplot(df, width = 0.05)
 fig <- myplotly(gg, "", "$t/a$", "$af_{PS}(t)$", to_print = TRUE)
 ```
 
+
+## Analytic derivative
+
+
+```{r, results='asis',echo=FALSE}
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- NULL
+df <- add_corr_to_df("Delta_mul_f_{PS}", all_obs, mt, df, print_res = T, reshape = T)
+
+
+df$y<- df$y
+df$fit<- df$fit
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+
+fig <- myplotly(gg, "", "$t/a$", "$af_{PS}(t)$", to_print = TRUE)
+```
+
 ## derivative
 
 ```{r, results='asis',echo=FALSE}

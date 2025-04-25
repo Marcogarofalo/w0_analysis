@@ -209,6 +209,9 @@ double lhs_function_f_PS_p_dmcorr(int j, double ****in, int t, struct fit_type f
     double mu2 = fit_info.ext_P[2][j];
 
     double me = sqrt(rt * 2 * M / (exp(-t * M) + exp(-(fit_info.T - t) * M)));
+
+    if (t == fit_info.T / 2 - 1 && j == fit_info.Njack - 1)
+        printf("t=%d  fpi=%g   G=%g   A=%g\n", t, (mu1 + mu2) * me / (M * sinh(M)), me, (rt / (exp(-t * M) + exp(-(fit_info.T - t) * M))));
     return (mu1 + mu2) * me / (M * sinh(M));
 }
 
@@ -338,13 +341,12 @@ double lhs_dfpi_sea(int j, double ****in, int t, struct fit_type fit_info)
     int reim = fit_info.myen[0];
     int T = fit_info.T;
     double M = fit_info.ext_P[0][j];
-
     double fpi = fit_info.ext_P[1][j];
     double dM = fit_info.ext_P[2][j];
     double mu = fit_info.ext_P[3][j];
 
     double G = fpi * (M * sinh(M)) / (2 * mu);
-    double A = G * G / 2 * M;
+    double A = G * G / (2 * M);
 
     double Ct = in[j][id][t][0];
     double loop = in[j][id_cor][0][reim];
@@ -358,7 +360,11 @@ double lhs_dfpi_sea(int j, double ****in, int t, struct fit_type fit_info)
     double dG = M * dA / G + G * dM / (2 * M);
 
     // double df = (2 * mu) * dG / (M * M) + 2 * G / (M * M) - (4 * mu) * G * dM / (M * M * M);
-    double df = (2 * mu) * dG / (M * sinh(M)) + 2 * G / (M * sinh(M)) - (2 * mu) * G * dM * (sinh(M) + M * cosh(M)) / ((M * sinh(M)) * (M * sinh(M)));
+    double df = (2 * mu) * dG / (M * sinh(M));
+    // df += 2 * G / (M * sinh(M)); // do not know why this is not here, maybe it is a valence term
+    df -= (2 * mu) * G * dM * (sinh(M) + M * cosh(M)) / ((M * sinh(M)) * (M * sinh(M)));
 
+    if (t == T / 2 - 1 && j == fit_info.Njack - 1)
+        printf("dM=%g  df=%g  fpi=%g  G=%g  A=%g\n", dM, df, fpi, G, A);
     return df;
 }
