@@ -29,7 +29,6 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_strange_OS_B64.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_light_TM_B64.dat rewlTM
 
-./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_sc_ndg_TM_B64.dat rew_scndgTM
 
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.25_OS_B64.dat rewcOS_0.25
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.25_OS_50s_B64.dat rewcOS_0.25_50s
@@ -49,4 +48,27 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_step_0.03125_to_0.03152408_OS_B64.dat rew_0.03125_to_0.03152408_OS
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_step_0.01_to_0.01027408_OS_B64.dat rew_0.01_to_0.01027408_OS
 
-./fit_all_rew_der  jack ../../data/jackknife/  ../../data/fit_all
+# ./fit_all_rew_der  jack ../../data/jackknife/  ../../data/fit_all
+./fit_all_rew_der  jack ../../data/jackknife/  ../../data/fit_all_B64  ../fit_files_B64
+
+## ndg
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_sc_ndg_TM_B64.dat rew_scndgTM
+./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_ndg_charm0.1_strange0_TM_B64.dat rew_charm0.1_strange0_ndgTM
+
+### LMA
+
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_charm_0.1_OS_B64_LMA.dat rewcOS_0.1
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_strange_OS_B64_LMA.dat rewsOS
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_step_0.1232229005_to_0.1234969805_OS_B64_LMA.dat rew_0.1232229005_to_0.1234969805_OS
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_step_0.03125_to_0.03152408_OS_B64_LMA.dat rew_0.03125_to_0.03152408_OS
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_step_0.01_to_0.01027408_OS_B64_LMA.dat rew_0.01_to_0.01027408_OS
+#./fit_all_rew_der_LMA   jack ../../data/jackknife/  ../../data/fit_all_LMA
+./fit_all_rew_der  jack ../../data/jackknife/  ../../data/fit_all_B64_LMA  ../fit_files_B64_LMA
+## C80
+./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_charm_0.1_OS_C80_LMA.dat rewcOS_0.1
+./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_strange_OS_C80_LMA.dat rewsOS
+./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_strange_pdmu_OS_C80_LMA.dat rewsOS_pdmu
+
+# ./fit_all_rew_der_C80_LMA   jack ../../data/jackknife/  ../../data/fit_all_C80_LMA
+./fit_all_rew_der  jack ../../data/jackknife/  ../../data/fit_all_C80_LMA  ../fit_files_C80_LMA
+

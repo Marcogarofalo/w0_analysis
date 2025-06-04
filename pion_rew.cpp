@@ -1,10 +1,10 @@
 #define CONTROL
-#include <math.h>
+#include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
 // #include <time.h>
 // #include <complex.h>
-#include <cstring>
+#include <string>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -102,7 +102,7 @@ void read_twopt(FILE *stream, double ***to_write, generic_header head)
     //// binary
     int fi = 0;
     int id;
-    int i = fread(&id, sizeof(int), 1, stream);
+    fi = fread(&id, sizeof(int), 1, stream);
     for (int k = 0; k < head.ncorr; k++)
     {
         for (int t = 0; t < head.T; t++)
@@ -129,7 +129,7 @@ double int2flowt(double i)
 
 double poly3(int n, int Nvar, double *x, int Npar, double *P)
 {
-    double it = x[0];
+    // double it = x[0];
     double tf = int2flowt(x[0]);
     return P[0] + P[1] * tf + P[2] * tf * tf + P[3] * tf * tf * tf;
 }
@@ -652,4 +652,24 @@ int main(int argc, char **argv)
     write_jack(tmp, Njack, jack_file);
     check_correlatro_counter(12);
     free(tmp);
+
+
+    for (int j = 0; j < fit_info.Njack; j++)
+    {
+        derM[j] =   derM[j] * (amuiso[2][j] - amusim[2][j])/f_PS.P[0][j];
+    }
+    mysprintf(name_rew, NAMESIZE, "(df_{PS}/d%s)(mciso-mcsim)/f_{PS}", argv[8]);
+    print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
+    for (int j = 0; j < fit_info.Njack; j++)
+    {
+        derM[j] =   derM[j] * (amuiso[1][j] - amusim[1][j])/f_PS.P[0][j];
+    }
+    mysprintf(name_rew, NAMESIZE, "(df_{PS}/d%s)(msiso-mssim)/f_{PS}", argv[8]);
+    print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
+    for (int j = 0; j < fit_info.Njack; j++)
+    {
+        derM[j] =   derM[j] * (amuiso[0][j] - amusim[0][j])/f_PS.P[0][j];
+    }
+    mysprintf(name_rew, NAMESIZE, "(df_{PS}/d%s)(mliso-mlsim)/f_{PS}", argv[8]);
+    print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
 }

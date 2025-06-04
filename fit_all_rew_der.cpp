@@ -11,7 +11,6 @@
 // #include "m_eff.hpp"
 // #include "gnuplot.hpp"
 #include "eigensystem.hpp"
-
 #include "linear_fit.hpp"
 #include "mutils.hpp"
 #include "various_fits.hpp"
@@ -176,19 +175,20 @@ struct file_out_name
         mysprintf(this->basename, NAMESIZE, "%s", path);
         mysprintf(this->namefile, NAMESIZE, "%s/%s_fit_extra.txt", path, label);
     }
-    file_out_name(const file_out_name & other)
+    file_out_name(const file_out_name &other)
     {
         mysprintf(this->path, NAMESIZE, "%s", other.path);
         mysprintf(this->basename, NAMESIZE, "%s", other.basename);
         mysprintf(this->namefile, NAMESIZE, "%s", other.namefile);
     }
-    file_out_name& operator=(const file_out_name &other){
+    file_out_name &operator=(const file_out_name &other)
+    {
         mysprintf(this->path, NAMESIZE, "%s", other.path);
         mysprintf(this->basename, NAMESIZE, "%s", other.basename);
         mysprintf(this->namefile, NAMESIZE, "%s", other.namefile);
         return *this;
     }
-    
+
     ~file_out_name()
     {
         // free(this->namefile);
@@ -227,21 +227,49 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
 
 int main(int argc, char **argv)
 {
-    error(argc != 4, 1, "main ",
-          "usage:./fit_all_phi4  jack/boot   path_to_jack   output_dir");
+    error(argc != 5, 1, "main ",
+          "usage:./fit_all_phi4  jack/boot   path_to_jack   output_dir file_inputs");
     char namefile[NAMESIZE];
 
     std::vector<std::string> files;
-    mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_charm_0.1_OS_B64.dat", argv[2], argv[1]);
-    files.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_step_0.1232229005_to_0.1234969805_OS_B64.dat", argv[2], argv[1]);
-    files.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_step_0.03125_to_0.03152408_OS_B64.dat", argv[2], argv[1]);
-    files.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_strange_OS_B64.dat", argv[2], argv[1]);
-    files.emplace_back(namefile);
-    mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_step_0.01_to_0.01027408_OS_B64.dat", argv[2], argv[1]);
-    files.emplace_back(namefile);
+    std::ifstream file(argv[4]);
+    if (!file.is_open())
+    {
+        error(1, 1, "main", "Could not open file with input files: %s", argv[4]);
+    }
+    std::string line;
+    std::string basename;
+    while (std::getline(file, line))
+    {
+        if (!line.empty() && line[0] != '#') // skip empty lines and comments
+        {
+
+            std::vector<std::string> word = split(line, ' ');
+
+            if (word.size() == 2)
+            {
+                basename = word[0];
+                mysprintf(namefile, NAMESIZE, "%s/%s_%s_%s", argv[2], argv[1], word[0].c_str(), word[1].c_str());
+                printf("adding file %s\n", namefile);
+                files.emplace_back(namefile);
+            }
+            else
+            {
+                error(1, 1, "main", "Invalid line in input file: %s", line.c_str());
+            }
+        }
+    }
+
+    // mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_charm_0.1_OS_B64.dat", argv[2], argv[1]);
+    // files.emplace_back(namefile);
+    // mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_step_0.1232229005_to_0.1234969805_OS_B64.dat", argv[2], argv[1]);
+    // files.emplace_back(namefile);
+    // mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_step_0.03125_to_0.03152408_OS_B64.dat", argv[2], argv[1]);
+    // files.emplace_back(namefile);
+    // mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_strange_OS_B64.dat", argv[2], argv[1]);
+    // files.emplace_back(namefile);
+    // mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_step_0.01_to_0.01027408_OS_B64.dat", argv[2], argv[1]);
+    // files.emplace_back(namefile);
 
     std::vector<int> myen(files.size());
     for (int e = 0; e < files.size(); e++)
@@ -277,12 +305,12 @@ int main(int argc, char **argv)
     option_read[5] = (char *)malloc(sizeof(char) * NAMESIZE);
     option_read[6] = (char *)malloc(sizeof(char) * NAMESIZE);
 
-    mysprintf(option_read[1], NAMESIZE, "read_plateaux");      // blind/see/read_plateaux
-    mysprintf(option_read[2], NAMESIZE, "-p");                 // -p
-    mysprintf(option_read[3], NAMESIZE, "../../data/");        // path
-    mysprintf(option_read[4], NAMESIZE, argv[1]);              // resampling
-    mysprintf(option_read[5], NAMESIZE, "no");                 // pdf
-    mysprintf(option_read[6], NAMESIZE, "onlinemeas_B64.dat"); // infile
+    mysprintf(option_read[1], NAMESIZE, "read_plateaux");        // blind/see/read_plateaux
+    mysprintf(option_read[2], NAMESIZE, "-p");                   // -p
+    mysprintf(option_read[3], NAMESIZE, "../../data/");          // path
+    mysprintf(option_read[4], NAMESIZE, argv[1]);                // resampling
+    mysprintf(option_read[5], NAMESIZE, "no");                   // pdf
+    mysprintf(option_read[6], NAMESIZE, "%s", basename.c_str()); // infile
 
     char namefile_plateaux[NAMESIZE];
     mysprintf(namefile_plateaux, NAMESIZE, "plateaux.txt");
@@ -312,7 +340,11 @@ int main(int argc, char **argv)
     fit_type fit_info;
 
     fit_info.corr_id = {id_dfpi_dmu};
-    fit_info.Nxen = {{0, 1, 2, 3, 4}};
+    fit_info.Nxen.resize(1, std::vector<int>(files.size()));
+    for (int e = 0; e < files.size(); e++)
+    {
+        fit_info.Nxen[0][e] = e;
+    }
     fit_info.N = fit_info.Nxen.size();
     fit_info.Npar = 1;
     fit_info.function = rhs_1overamu;
@@ -335,16 +367,16 @@ int main(int argc, char **argv)
             count++;
         }
     }
-    fit_info.linear_fit = true;
+    fit_info.linear_fit = false;
     // fit_info.verbosity = 1;
-    fit_info.covariancey = false;
+    fit_info.covariancey = true;
     fit_info.compute_cov_fit(argv, jackall, lhs_fun);
     fit_info.compute_cov1_fit();
     std::string namefit("der_fpi_vs_mu");
 
     fit_result der_fpi = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
     fit_info.band_range = {0.005, 0.4};
-    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi, der_fpi, 0, fit_info.Nxen[0].size() - 1, 0.002, {});
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi, der_fpi, 0, fit_info.Nxen[0].size() - 1, 0.001, {});
 
     // compute fpi at the charm point
     file_out_name f_name(argv[3], namefit.c_str());
@@ -358,7 +390,7 @@ int main(int argc, char **argv)
     namefit = "der_fpi_vs_mu_mu2";
 
     fit_result der_fpi_mu_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2, der_fpi_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 0.002, {});
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2, der_fpi_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 0.001, {});
     f_name = file_out_name(argv[3], namefit.c_str());
     compute_fpi_at_mciso(jackall, fit_info, der_fpi_mu_mu2, amusim, amuiso, id_dfpi, f_name);
     free_fit_result(fit_info, der_fpi_mu_mu2);
@@ -369,31 +401,41 @@ int main(int argc, char **argv)
     namefit = "der_fpi_vs_mu_mu2_mu3";
 
     fit_result der_fpi_mu_mu2_mu3 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2_mu3, der_fpi_mu_mu2_mu3, 0, fit_info.Nxen[0].size() - 1, 0.002, {});
-    f_name= file_out_name(argv[3], namefit.c_str());
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2_mu3, der_fpi_mu_mu2_mu3, 0, fit_info.Nxen[0].size() - 1, 0.001, {});
+    f_name = file_out_name(argv[3], namefit.c_str());
     compute_fpi_at_mciso(jackall, fit_info, der_fpi_mu_mu2_mu3, amusim, amuiso, id_dfpi, f_name);
     free_fit_result(fit_info, der_fpi_mu_mu2_mu3);
 
     // add 1/amu^2
-    fit_info.Nxen = {{0, 1, 2, 3}};
+    fit_info.Nxen.resize(1, std::vector<int>(files.size()));
+    for (int e = 0; e < files.size() - 1; e++)
+    {
+        fit_info.Nxen[0][e] = e;
+    }
     fit_info.Npar = 2;
     fit_info.function = rhs_1overamu_1overamu2;
+    fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+    fit_info.compute_cov1_fit();
     namefit = "der_fpi_0123_vs_mu_mu2";
 
     fit_result der_fpi_0123_mu_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_0123_mu_mu2, der_fpi_0123_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 0.002, {});
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_0123_mu_mu2, der_fpi_0123_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 0.001, {});
     f_name = file_out_name(argv[3], namefit.c_str());
     compute_fpi_at_mciso(jackall, fit_info, der_fpi_0123_mu_mu2, amusim, amuiso, id_dfpi, f_name);
     free_fit_result(fit_info, der_fpi_0123_mu_mu2);
 
     // add 1/amu^2
-    fit_info.Nxen = {{0, 1, 2}};
+    fit_info.Nxen.resize(1, std::vector<int>(files.size()));
+    for (int e = 0; e < files.size()-2; e++)
+    {
+        fit_info.Nxen[0][e] = e;
+    }
     fit_info.Npar = 2;
     fit_info.function = rhs_1overamu_1overamu2;
     namefit = "der_fpi_012_vs_mu_mu2";
 
     fit_result der_fpi_012_mu_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_012_mu_mu2, der_fpi_012_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 0.002, {});
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_012_mu_mu2, der_fpi_012_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 0.001, {});
     f_name = file_out_name(argv[3], namefit.c_str());
     compute_fpi_at_mciso(jackall, fit_info, der_fpi_012_mu_mu2, amusim, amuiso, id_dfpi, f_name);
     free_fit_result(fit_info, der_fpi_012_mu_mu2);
