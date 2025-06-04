@@ -28,34 +28,6 @@ masses <- c(
 
 ## Pion only sea corrections
 
-```{r,results='asis', echo=FALSE, eval=FALSE}
-df <- NULL
-# ######################## rew
-mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_OS_B64.dat_raw_correlators")
-all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("", all_obs, mt, df,
-  print_res = FALSE, nudge = 0.4,
-  reshape = T, number = 1 + 2 * (0),
-  rename = "P5P5", log = T
-)
-df <- add_corr_to_df("", all_obs, mt, df,
-  print_res = FALSE, nudge = 0.4,
-  reshape = T, number = 1 + 2 * (3),
-  rename = "P5P5rewc", log = T
-)
-mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_light_TM_B64.dat_raw_correlators")
-all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df("", all_obs, mt, df,
-  print_res = FALSE, nudge = 0.4,
-  reshape = T, number = 1 + 2 * (3),
-  rename = "P5P5rewl", log = T
-)
-gg <- plot_df_corr_ggplot(df, width = 0.05)
-# gg<-myggplot()
-# gg <- gg + geom_hline(yintercept = 0.3)
-
-fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
-```
 
 ```{r, results='asis',echo=FALSE}
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
@@ -98,6 +70,11 @@ df <- add_corr_to_df("M_{PS}_rewcOS_0.25", all_obs, mt, df, print_res = FALSE, n
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_0.02_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
 df <- add_corr_to_df("M_{PS}_rewcOS_0.02", all_obs, mt, df, print_res = FALSE, nudge = 0.4, reshape = T)
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_ndg_charm0.1_strange0_TM_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("M_{PS}_rew_charm0.1_strange0_ndgTM", all_obs, mt, df, print_res = FALSE, nudge = 0.4, reshape = T)
+
 
 ### plot
 gg <- plot_df_corr_ggplot(df, width = 0.05)
@@ -163,6 +140,19 @@ all_obs <- Rose::get_all_corr(mt)
 #df <- add_corr_to_df("f_{PS}_rewcOS_0.1", all_obs, mt, df, print_res = T, nudge = 0.4, reshape = T)
 print_full_res("df_{PS}/drewcOS_0.1",all_obs ,mt)
 print_full_res("f_{PS}(mciso)_rewcOS_0.1",all_obs ,mt)
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64_LMA.dat_reweight_charm_0.1_OS_B64_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+print("same statistic of gm2 LMA")
+#df <- add_corr_to_df("f_{PS}_rewcOS_0.1", all_obs, mt, df, print_res = T, nudge = 0.4, reshape = T)
+print_full_res("df_{PS}/drewcOS_0.1",all_obs ,mt)
+print_full_res("f_{PS}(mciso)_rewcOS_0.1",all_obs ,mt)
+print("---")
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_ndg_charm0.1_strange0_TM_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+print_full_res("df_{PS}/drew_charm0.1_strange0_ndgTM",all_obs ,mt)
+print_full_res("f_{PS}(mciso)_rew_charm0.1_strange0_ndgTM",all_obs ,mt)
 
 
 
@@ -223,6 +213,12 @@ df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_0.02_OS_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
 name <- "dM_{PS}/drewcOS_0.02"
+res <- get_full_res(name, all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(" ", name))
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_ndg_charm0.1_strange0_TM_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+name <- "dM_{PS}/drew_charm0.1_strange0_ndgTM"
 res <- get_full_res(name, all_obs, mt)
 df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(" ", name))
 
@@ -313,6 +309,12 @@ all_obs <- Rose::get_all_corr(mt)
 name <- "df_{PS}/drew_0.1232229005_to_0.1234969805_OS"
 res <- get_full_res(name, all_obs, mt)
 mass <- get_full_res("mu_in", all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "rew", mass[1,1], name)
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_ndg_charm0.1_strange0_TM_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+name <- "df_{PS}/drew_charm0.1_strange0_ndgTM"
+res <- get_full_res(name, all_obs, mt)
 df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "rew", mass[1,1], name)
 
 

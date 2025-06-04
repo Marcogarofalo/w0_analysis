@@ -1,0 +1,97 @@
+# Pion C80
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+masses <- c(
+  0.0005864,
+  0.016053,
+  0.19849
+)
+```
+
+
+
+## $f_\pi$
+
+```{r, results='asis',echo=FALSE}
+df <- NULL
+# mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80.dat_output")
+# all_obs <- Rose::get_all_corr(mt)
+# df <- add_corr_to_df("f_{PS}", all_obs, mt, df, print_res = T, reshape = T)
+# df <- add_corr_to_df("f_{PS}+mul_correction", all_obs, mt, df, print_res = T, reshape = T, nudge = 0.1)
+# df <- add_corr_to_df("f_{PS}+mus_correction", all_obs, mt, df, print_res = T, reshape = T, nudge = 0.2)
+# df <- add_corr_to_df("f_{PS}+muc_correction", all_obs, mt, df, print_res = T, reshape = T, nudge = 0.3)
+# print_full_res("df_{PS}/dmuc_correction",all_obs ,mt)
+# # print_full_res("f_{PS}(iso)_muc_correction",all_obs ,mt)
+# print_full_res("f_{PS}+muc_correction",all_obs ,mt)
+
+# ######################## rew
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("f_{PS}", all_obs, mt, df, print_res = T, nudge = 0.5, reshape = T)
+df <- add_corr_to_df("f_{PS}_rewsOS", all_obs, mt, df, print_res = T, nudge = 0.5, reshape = T)
+print_full_res("df_{PS}/drewsOS",all_obs ,mt)
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("f_{PS}_rewsOS_pdmu", all_obs, mt, df, print_res = T, nudge = 0.5, reshape = T)
+print_full_res("df_{PS}/drewsOS_pdmu",all_obs ,mt)
+
+# ######################## rew
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_charm_0.1_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+print("same statistic of gm2 LMA")
+df <- add_corr_to_df("f_{PS}_rewcOS_0.1", all_obs, mt, df, print_res = T, nudge = 0.4, reshape = T)
+print_full_res("df_{PS}/drewcOS_0.1",all_obs ,mt)
+print_full_res("f_{PS}(mciso)_rewcOS_0.1",all_obs ,mt)
+print("---")
+######################## rew
+
+
+
+df$y<- df$y
+df$fit<- df$fit
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+
+fig <- myplotly(gg, "", "$t/a$", "$af_{PS}(t)$", to_print = TRUE)
+```
+
+
+
+
+
+##  rew history
+
+the step in strange is dmu=-5.942533e-4 while in all the other is set to 0.1 the 
+step for the charm dmu=2.35147398e-4
+
+```{r, results='asis',echo=FALSE}
+gg <- ggplot()
+
+df <- read.table("/home/garofalo/analysis/flow/data/rewU_s_pdmu_C80.txt")
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,6]) , color = "s+dmu"))
+df <- read.table("/home/garofalo/analysis/flow/data/rewU_s_C80.txt")
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,6]) , color = "s"))
+df <- read.table("/home/garofalo/analysis/flow/data/rewU_c_0.1_C80.txt")
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,6]) , color = "c"))
+
+fig <- myplotly(gg, "", "hit+conf*100 ", "$e^{w(U,\\phi)-<w>}$", to_print = TRUE)
+```

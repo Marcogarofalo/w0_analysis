@@ -35,19 +35,19 @@ the derivative with respect to the sea is computed with the scalar insertions.
 
 ```{r}
 df <- data.frame(
-  "en" = c("B64"),
-  "kappa" = c(0.139426500000),
-  "mul_sim" = c(0.00072),
-  "musig_sim" = c(0.1246864),
-  "mudel_sim" = c(0.1315052),
-  "ms_sim" = c(0),
-  "mc_sim" = c(0),
-  "Zp_Zs" = c(0.79018),
-  "mul" = c(0.0006669),
-  "musig" = c(0),
-  "mudel" = c(0),
-  "ms" = c(0.018267),
-  "mc" = c(0.23134)
+  "en" = c("B64", "C80"),
+  "kappa" = c(0.139426500000, 0.138752850000),
+  "mul_sim" = c(0.00072, 0.0006),
+  "musig_sim" = c(0.1246864, 0.106585999855),
+  "mudel_sim" = c(0.1315052, 0.107146000965),
+  "ms_sim" = c(0,0),
+  "mc_sim" = c(0,0),
+  "Zp_Zs" = c(0.79018,  0.82308),
+  "mul" = c(0.0006669, 0.0005864),
+  "musig" = c(0,0),
+  "mudel" = c(0,0),
+  "ms" = c(0.018267,  0.016053),
+  "mc" = c(0.23134,   0.19849)
 )
 ```
 
@@ -64,9 +64,9 @@ df <- mutate(df,
   musig = (ms + mc) / 2,
   mudel = (mc - ms) / Zp_Zs / 2
 )
-
-kable(df[, c(1:7)])
-kable(df[, c(8:13)])
+print(df$mc_sim,digits = 12)
+kable(df[, c(1:7)], digits = 20)
+kable(df[, c(8:13)], digits = 20)
 ```
 
 
