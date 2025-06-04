@@ -118,6 +118,7 @@ gg <- plot_fit(basename, "amu",
 df<-read.table(paste0(basename, "_fit_extra.txt"))
 cat("fpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
 cat("fpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
 ###########################
 basename <- "/home/garofalo/analysis/flow/data/fit_all_B64_LMA/der_fpi_vs_mu_mu2"
 print(basename)
@@ -132,6 +133,7 @@ gg <- plot_fit(basename, "amu",
 df<-read.table(paste0(basename, "_fit_extra.txt"))
 cat("fpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
 cat("fpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
 #########################################################
 basename <- "/home/garofalo/analysis/flow/data/fit_all_B64_LMA/der_fpi_vs_mu_mu2_mu3"
 print(basename)
@@ -146,6 +148,7 @@ gg <- plot_fit(basename, "amu",
 df<-read.table(paste0(basename, "_fit_extra.txt"))
 cat("fpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
 cat("fpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
 ###############################################################
 basename <- "/home/garofalo/analysis/flow/data/fit_all_B64_LMA/der_fpi_0123_vs_mu_mu2"
 print(basename)
@@ -160,6 +163,7 @@ gg <- plot_fit(basename, "amu",
 df<-read.table(paste0(basename, "_fit_extra.txt"))
 cat("fpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
 cat("fpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
 ######################################################
 basename <- "/home/garofalo/analysis/flow/data/fit_all_B64_LMA/der_fpi_012_vs_mu_mu2"
 print(basename)
@@ -174,6 +178,7 @@ gg <- plot_fit(basename, "amu",
 df<-read.table(paste0(basename, "_fit_extra.txt"))
 cat("fpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
 cat("fpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
 
 gg <- gg + geom_vline(xintercept = masses[2], linetype = "dashed")
 gg <- gg + geom_vline(xintercept = masses[3], linetype = "dashed")

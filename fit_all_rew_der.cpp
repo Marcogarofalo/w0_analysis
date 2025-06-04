@@ -203,6 +203,7 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
     error(fit_info.Njack != jackall.en[0].Njack, 1, "compute_fpi_at_mciso", "fit_info.Njack != jackall.en[0].Njack");
     error(fit_info.Njack != myres->Njack, 1, "compute_fpi_at_mciso", "fit_info.Njack != myres->Njack");
     double *fpi_mciso = (double *)malloc(sizeof(double) * Njack);
+    double *relative_error = (double *)malloc(sizeof(double) * Njack);
     double *tmp_x = (double *)malloc(sizeof(double) * fit_info.Nvar);
     double *tif = (double *)malloc(sizeof(double) * fit_info.Npar);
     for (int j = 0; j < Njack; j++)
@@ -212,6 +213,7 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
             tif[p] = fit_res.P[p][j];
         double der = fit_info.function(0, fit_info.Nvar, tmp_x, fit_info.Npar, tif);
         fpi_mciso[j] = jackall.en[0].jack[id_dfpi][j] + (amuiso[2][j] - amusim[2][j]) * der;
+        relative_error[j] = der* (amuiso[2][j] - amusim[2][j]) /jackall.en[0].jack[id_dfpi][j] ;
     }
     free(tmp_x);
     free(tif);
@@ -222,6 +224,7 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
     FILE *f = open_file(f_name.namefile, "w+");
     fprintf(f, "%-20.12g %-20.12g\n", jackall.en[0].jack[id_dfpi][Njack - 1], myres->comp_error(jackall.en[0].jack[id_dfpi]));
     fprintf(f, "%-20.12g %-20.12g\n", fpi_mciso[Njack - 1], myres->comp_error(fpi_mciso));
+    fprintf(f, "%-20.12g %-20.12g\n", relative_error[Njack - 1], myres->comp_error(relative_error));
     fclose(f);
 }
 
