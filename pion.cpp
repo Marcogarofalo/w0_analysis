@@ -207,6 +207,9 @@ int main(int argc, char **argv)
         for (int iq = 0; iq < 3; iq++)
         {
             int idloop_q = 27 + iq * Ng;
+            // printf("iq=%d  idloop_q=%d    gamma=%s\n", iq, idloop_q, head_loops.gammas[27].c_str());
+            // printf("conf %s  quark %d   bubble0  %g   %g\n", head_loops.smearing[0].c_str(), iq,
+            //        data_loop[0][idloop_q][0][0],  data_loop[0][idloop_q][0][1]);
             int id_final = head.ncorr + i + iq * head.ncorr;
 
             for (int j = 0; j < head.Njack; j++)
