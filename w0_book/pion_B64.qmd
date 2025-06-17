@@ -25,9 +25,7 @@ masses <- c(
 )
 ```
 
-
 ## Pion only sea corrections
-
 
 ```{r, results='asis',echo=FALSE}
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
@@ -80,6 +78,21 @@ df <- add_corr_to_df("M_{PS}_rew_charm0.1_strange0_ndgTM", all_obs, mt, df, prin
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 
 fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
+```
+
+```{r, results='asis',echo=FALSE}
+
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- NULL
+df <- add_corr_to_df("Delta_mul_M_{PS}", all_obs, mt, df, print_res = TRUE, reshape = T)
+df <- add_corr_to_df("Delta_mus_M_{PS}", all_obs, mt, df, print_res = TRUE, reshape = T, nudge = 0.1)
+df <- add_corr_to_df("Delta_muc_M_{PS}", all_obs, mt, df, print_res = TRUE, reshape = T, nudge = 0.2)
+
+### plot
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+
+fig <- myplotly(gg, "", "$t/a$", "$dm_{eff}(t)/d\\mu$", to_print = TRUE)
 ```
 
 ## $f_\pi$
@@ -163,9 +176,7 @@ gg <- plot_df_corr_ggplot(df, width = 0.05)
 fig <- myplotly(gg, "", "$t/a$", "$af_{PS}(t)$", to_print = TRUE)
 ```
 
-
 ## Analytic derivative
-
 
 ```{r, results='asis',echo=FALSE}
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
@@ -247,7 +258,6 @@ gg<- gg + theme(legend.position = "none")
 
 fig <- myplotly(gg, "", "", "$dM/d\\mu$", to_print = TRUE, legend_position =  NULL)
 ```
-
 
 ```{r, results='asis',echo=FALSE}
 df <- data.frame(
@@ -493,8 +503,6 @@ fig <- myplotly(gg, "", "", "$dC(t=20)/d\\mu$", to_print = TRUE)
 
 ## mpcac sea corrections
 
-
-
 ```{r, results='asis',echo=FALSE}
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_output")
 all_obs <- Rose::get_all_corr(mt)
@@ -606,11 +614,9 @@ gg <- plot_df_corr_ggplot(df, width = 0.05, noribbon = TRUE)
 fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
 ```
 
+## rew history
 
-##  rew history
-
-the step in strange is dmu=-5.942533e-4 while in all the other is set to 0.1 the 
-step for the charm dmu=2.35147398e-4
+the step in strange is dmu=-5.942533e-4 while in all the other is set to 0.1 the step for the charm dmu=2.35147398e-4
 
 ```{r, results='asis',echo=FALSE}
 gg <-ggplot()+theme_bw()# myggplot(fill = FALSE,shape = FALSE)
@@ -641,17 +647,20 @@ gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "0.0
 fig <- myplotly(gg, "", "conf", "$e^{w(U)-<w>}$", to_print = TRUE)
 ```
 
-
-
-
 <!-- ```{r, results='asis',echo=FALSE} -->
+
 <!-- gg <- ggplot() -->
+
 <!-- dfU <- read.table("/home/garofalo/analysis/flow/data/all_rewU_c_0.25") -->
+
 <!-- gg <- gg + geom_line(aes(x = !!seq_along(dfU[, 1]), y = !!dfU[, 6], color = "charm_0.25")) -->
+
 <!-- dfU <- read.table("/home/garofalo/analysis/flow/data/all_rewU_c") -->
+
 <!-- gg <- gg + geom_line(aes(x = !!seq_along(dfU[, 1]), y = !!dfU[, 6], color = "charm")) -->
 
 <!-- fig <- myplotly(gg, "", "conf ", "$e^{w(U)-<w>}$", to_print = TRUE) -->
+
 <!-- ``` -->
 
 ## histogram jackknife distribution
@@ -684,7 +693,6 @@ gg
 
 ## histogram loop
 
-
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
@@ -708,9 +716,6 @@ fit <- get_full_res(name, all_obs, mt)
 gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 gg
 ```
-
-
-
 
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
@@ -760,9 +765,7 @@ gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1,
 gg
 ```
 
-
 ## histogram rew
-
 
 ```{r, results='asis',echo=FALSE}
 name <- "df_{PS}/drewcOS_0.1"
@@ -788,8 +791,6 @@ gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1,
 gg
 ```
 
-
-
 ```{r, results='asis',echo=FALSE}
 name <- "df_{PS}/drewsOS"
 file<-"/home/garofalo/analysis/flow/data/out/onlinemeas_B64_LMA.dat_reweight_strange_OS_B64_LMA.dat"
@@ -813,7 +814,6 @@ fit <- get_full_res(name, all_obs, mt)
 gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1, 2]) / sqrt(length(W) - 1)))
 gg
 ```
-
 
 ```{r, results='asis',echo=FALSE}
 name <- "df_{PS}/drew_0.1232229005_to_0.1234969805_OS"
@@ -889,7 +889,6 @@ gg
 
 ### M
 
-
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
@@ -932,7 +931,6 @@ gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1,
 gg + theme(legend.position = "inside")
 ```
 
-
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
 
@@ -957,8 +955,6 @@ gg <- gg + stat_function(fun = dnorm, args = list(mean = fit[1, 1], sd = (fit[1,
 
 gg + theme(legend.position = "inside")
 ```
-
-
 
 ```{r, results='asis',echo=FALSE}
 # kable(save_res[, c(2, 3, 7)], digits = 8)
