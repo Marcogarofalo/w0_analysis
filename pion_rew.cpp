@@ -4,7 +4,6 @@
 #include <stdlib.h>
 // #include <time.h>
 // #include <complex.h>
-#include <string>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -171,13 +170,20 @@ int main(int argc, char **argv)
     head_rew.read_header_debug(infile_rew);
     error(head.Njack != head_rew.Njack, 1, "main", "Najck w0 = %d   while Njack rew  = %d", head.Njack, head_rew.Njack);
     double ****data_rew = calloc_corr(head_rew.Njack, head_rew.ncorr, head_rew.T);
+    mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_history.txt", option[3], option[6], argv[7]);
+    printf("writing reweighting history in :\n %s \n", namefile);
+    FILE *outfile_r_history = open_file(namefile, "w+");
+    fprintf(outfile_r_history, " conf_name conf_id r\n");
     for (int iconf = 0; iconf < head_rew.Njack; iconf++)
     {
         read_twopt(infile_rew, data_rew[iconf], head_rew);
         error(head.smearing[iconf].compare(head_rew.smearing[iconf]) != 0, 2, "main",
               "configuration order differ at %d\n flow file conf: %s\n loops conf: %s ", iconf,
               head.smearing[iconf].c_str(), head_rew.smearing[iconf].c_str());
+        fprintf(outfile_r_history, "%s %d %.12g\n", head_rew.smearing[iconf].c_str(), iconf,
+                data_rew[iconf][0][0][1]);
     }
+    fclose(outfile_r_history);
 
     //////////////////////////////////////////////////////////////
     // reading flow
@@ -545,6 +551,11 @@ int main(int argc, char **argv)
     myres->div(derM, derM, dmu);
     mysprintf(name_rew, NAMESIZE, "dM_{PS}/d%s", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
+    printf("////////////////////////////\n");
+    printf("M_PS_fin = %-15g  M_PS_in =%-15g\n", M_PS_rew[Njack - 1], M_PS[Njack - 1]);
+    printf("mu_fin   = %-15g  mu_in   =%-15g\n", head_rew.oranges[0], head_rew.mus[0]);
+    printf("dM_PS/d%s = %g +- %g\n", argv[8], derM[Njack - 1], myres->comp_error(derM));
+    printf("////////////////////////////\n");
     write_jack(derM, Njack, jack_file);
     check_correlatro_counter(4);
 
@@ -621,6 +632,9 @@ int main(int argc, char **argv)
     mysprintf(name_rew, NAMESIZE, "df_{PS}/d%s", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
     write_jack(derM, Njack, jack_file);
+    mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_df_{PS}_dmu_jack.txt", option[3], option[6], argv[7]);
+    myres->write_jack_in_file(derM, namefile);
+
     check_correlatro_counter(9);
     printf("%s = %g +- %g\n", name_rew, derM[Njack - 1], myres->comp_error(derM));
 
@@ -653,22 +667,21 @@ int main(int argc, char **argv)
     check_correlatro_counter(12);
     free(tmp);
 
-
     for (int j = 0; j < fit_info.Njack; j++)
     {
-        derM[j] =   derM[j] * (amuiso[2][j] - amusim[2][j])/f_PS.P[0][j];
+        derM[j] = derM[j] * (amuiso[2][j] - amusim[2][j]) / f_PS.P[0][j];
     }
     mysprintf(name_rew, NAMESIZE, "(df_{PS}/d%s)(mciso-mcsim)/f_{PS}", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
     for (int j = 0; j < fit_info.Njack; j++)
     {
-        derM[j] =   derM[j] * (amuiso[1][j] - amusim[1][j])/f_PS.P[0][j];
+        derM[j] = derM[j] * (amuiso[1][j] - amusim[1][j]) / f_PS.P[0][j];
     }
     mysprintf(name_rew, NAMESIZE, "(df_{PS}/d%s)(msiso-mssim)/f_{PS}", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
     for (int j = 0; j < fit_info.Njack; j++)
     {
-        derM[j] =   derM[j] * (amuiso[0][j] - amusim[0][j])/f_PS.P[0][j];
+        derM[j] = derM[j] * (amuiso[0][j] - amusim[0][j]) / f_PS.P[0][j];
     }
     mysprintf(name_rew, NAMESIZE, "(df_{PS}/d%s)(mliso-mlsim)/f_{PS}", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
