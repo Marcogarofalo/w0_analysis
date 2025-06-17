@@ -162,7 +162,7 @@ double lhs_function_Wt_p_dmcorr(int j, double ****in, int t, struct fit_type fit
     double loop = in[j][id_cor][0][reim];
     double loop_Wt = in[j][id_cor][t][reim];
 
-    double r = Wt - dmu * (loop_Wt - loop * Wt);
+    double r = Wt + dmu * (loop_Wt - loop * Wt);
     // if(j==fit_info.Njack-1) printf("%d   %g\n",t,r);
     return r;
 }
@@ -178,13 +178,13 @@ double lhs_function_M_PS_p_dmcorr(int j, double ****in, int t, struct fit_type f
     double loop = in[j][id_cor][0][reim];
     double loop_Ct = in[j][id_cor][t][reim];
 
-    double rt = Ct - dmu * (loop_Ct - loop * Ct);
+    double rt = Ct + dmu * (loop_Ct - loop * Ct);
 
     Ct = in[j][id][t + 1][0];
     loop = in[j][id_cor][0][reim];
     loop_Ct = in[j][id_cor][t + 1][reim];
 
-    double rtp1 = Ct - dmu * (loop_Ct - loop * Ct);
+    double rtp1 = Ct + dmu * (loop_Ct - loop * Ct);
 
     double mass = M_eff_T_ct_ctp1(t, fit_info.T, rt, rtp1);
 
@@ -202,7 +202,7 @@ double lhs_function_f_PS_p_dmcorr(int j, double ****in, int t, struct fit_type f
     double loop = in[j][id_cor][0][reim];
     double loop_Ct = in[j][id_cor][t][reim];
 
-    double rt = Ct - dmu * (loop_Ct - loop * Ct);
+    double rt = Ct + dmu * (loop_Ct - loop * Ct);
 
     double M = fit_info.ext_P[0][j];
     double mu1 = fit_info.ext_P[1][j];
@@ -228,19 +228,19 @@ double lhs_function_mpcac_p_dmcorr(int j, double ****in, int t, struct fit_type 
     double loop = in[j][id_corV][0][reim];
     double loop_Ct = in[j][id_corV][t][reim];
 
-    double Vt = Ct - dmu * (loop_Ct - loop * Ct);
+    double Vt = Ct + dmu * (loop_Ct - loop * Ct);
 
     Ct = in[j][idV][t + 1][0];
     loop = in[j][id_corV][0][reim];
     loop_Ct = in[j][id_corV][t + 1][reim];
 
-    double Vtp1 = Ct - dmu * (loop_Ct - loop * Ct);
+    double Vtp1 = Ct + dmu * (loop_Ct - loop * Ct);
 
     Ct = in[j][idP][t + 1][0];
     loop = in[j][id_corP][0][reim];
     loop_Ct = in[j][id_corP][t + 1][reim];
 
-    double PP = Ct - dmu * (loop_Ct - loop * Ct);
+    double PP = Ct + dmu * (loop_Ct - loop * Ct);
 
     double mpcac = -(Vtp1 - Vt) / (2. * PP);
     ;
@@ -315,13 +315,13 @@ double lhs_dM_sea(int j, double ****in, int t, struct fit_type fit_info)
     double loop = in[j][id_cor][0][reim];
     double loop_Ct = in[j][id_cor][t][reim];
 
-    double rt = -(loop_Ct - loop * Ct) / Ct;
+    double rt = (loop_Ct - loop * Ct) / Ct;
 
     Ct = in[j][id][t + 1][0];
     loop = in[j][id_cor][0][reim];
     loop_Ct = in[j][id_cor][t + 1][reim];
 
-    double rtp1 = -(loop_Ct - loop * Ct) / Ct;
+    double rtp1 = (loop_Ct - loop * Ct) / Ct;
 
     int T = fit_info.T;
     double M = fit_info.ext_P[0][j];
@@ -352,7 +352,7 @@ double lhs_dfpi_sea(int j, double ****in, int t, struct fit_type fit_info)
     double loop = in[j][id_cor][0][reim];
     double loop_Ct = in[j][id_cor][t][reim];
 
-    double dA = -(loop_Ct - loop * Ct) / Ct;
+    double dA = (loop_Ct - loop * Ct) / Ct;
     dA += dM * T / 2.0;
     dA -= dM * (T / 2.0 - t) * tanh(M * (T / 2.0 - t));
     dA *= A;
