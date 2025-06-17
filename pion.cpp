@@ -216,7 +216,7 @@ int main(int argc, char **argv)
                 {
                     bubble += std::complex<double>(data_loop[j][idloop_q][t][0], data_loop[j][idloop_q][t][1]);
                 }
-
+                // printf("conf %s  quark %d bubble =%.12g  %.12g\n",head_loops.smearing[j].c_str(),iq , bubble.real(), bubble.imag());
                 for (int tf = 0; tf < head.T; tf++)
                 {
                     std::complex<double> Wt(data[j][i][tf][0], data[j][i][tf][1]);
