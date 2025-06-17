@@ -44,6 +44,21 @@ df<-read.table(paste0(basename, "_fit_extra.txt"))
 cat("fpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
 cat("fpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
 cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
+###########################
+basename <- paste0("/home/garofalo/analysis/flow/data/",dir,"/der_fpi_vs_mu2")
+print(basename)
+fit <- Rose::read_fit_P_file(paste0(basename, "_fit_P.dat"))
+make_table_fit_result(fit)
+gg <- plot_fit(basename, "amu",
+  # noline = TRUE,
+  gg = gg,
+  id_x = 1,
+  single_name_for_fit = "P[0]/amu^2"
+)
+df<-read.table(paste0(basename, "_fit_extra.txt"))
+cat("fpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
+cat("fpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
 
 ###########################
 basename <- paste0("/home/garofalo/analysis/flow/data/",dir,"/der_fpi_vs_mu_mu2")
@@ -107,6 +122,107 @@ cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
 gg <- gg + geom_vline(xintercept = masses[2], linetype = "dashed")
 gg <- gg + geom_vline(xintercept = masses[3], linetype = "dashed")
 myplotly(gg, "", "$a\\mu$", "$df_\\pi/d\\mu$",
+  to_print = FALSE,
+  yrange = c(-0.8, 0.4)
+)
+```
+
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basename <- paste0("/home/garofalo/analysis/flow/data/",dir,"/der_Mpi_vs_mu")
+print(basename)
+fit <- Rose::read_fit_P_file(paste0(basename, "_fit_P.dat"))
+make_table_fit_result(fit)
+gg <- plot_fit(basename, "amu",
+  # noline = TRUE,
+  gg = gg,
+  id_x = 1,
+  single_name_for_fit = "P[0]/amu"
+)
+df<-read.table(paste0(basename, "_fit_extra.txt"))
+cat("Mpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
+cat("Mpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+cat("(dMpi/dmu)(mc_iso-mc_sim)/Mpi=",mean_print(df[3,1],df[3,2]),"\n\n")
+###########################
+basename <- paste0("/home/garofalo/analysis/flow/data/",dir,"/der_Mpi_vs_mu2")
+print(basename)
+fit <- Rose::read_fit_P_file(paste0(basename, "_fit_P.dat"))
+make_table_fit_result(fit)
+gg <- plot_fit(basename, "amu",
+  # noline = TRUE,
+  gg = gg,
+  id_x = 1,
+  single_name_for_fit = "P[0]/amu^2"
+)
+df<-read.table(paste0(basename, "_fit_extra.txt"))
+cat("Mpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
+cat("Mpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+cat("(dMpi/dmu)(mc_iso-mc_sim)/Mpi=",mean_print(df[3,1],df[3,2]),"\n\n")
+
+###########################
+basename <- paste0("/home/garofalo/analysis/flow/data/",dir,"/der_Mpi_vs_mu_mu2")
+print(basename)
+fit <- Rose::read_fit_P_file(paste0(basename, "_fit_P.dat"))
+make_table_fit_result(fit)
+gg <- plot_fit(basename, "amu",
+  # noline = TRUE,
+  gg = gg,
+  id_x = 1,
+  single_name_for_fit = "P[0]/amu+P[1]/amu^2"
+)
+df<-read.table(paste0(basename, "_fit_extra.txt"))
+cat("Mpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
+cat("Mpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+cat("(dMpi/dmu)(mc_iso-mc_sim)/Mpi=",mean_print(df[3,1],df[3,2]),"\n\n")
+
+# #########################################################
+# basename <- paste0("/home/garofalo/analysis/flow/data/",dir,"/der_Mpi_vs_mu_mu2_mu3")
+# print(basename)
+# fit <- Rose::read_fit_P_file(paste0(basename, "_fit_P.dat"))
+# make_table_fit_result(fit)
+# gg <- plot_fit(basename, "amu",
+#   # noline = TRUE,
+#   gg = gg,
+#   id_x = 1,
+#   single_name_for_fit = "P[0]/amu+P[1]/amu^2+P[2]/amu^3"
+# )
+# df<-read.table(paste0(basename, "_fit_extra.txt"))
+# cat("Mpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
+# cat("Mpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+# ###############################################################
+# basename <- paste0("/home/garofalo/analysis/flow/data/",dir,"/der_Mpi_0123_vs_mu_mu2")
+# print(basename)
+# fit <- Rose::read_fit_P_file(paste0(basename, "_fit_P.dat"))
+# make_table_fit_result(fit)
+# gg <- plot_fit(basename, "amu",
+#   # noline = TRUE,
+#   gg = gg,
+#   id_x = 1,
+#   single_name_for_fit = "(removing last point)P[0]/amu+P[1]/amu^2"
+# )
+# df<-read.table(paste0(basename, "_fit_extra.txt"))
+# cat("Mpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
+# cat("Mpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+# ######################################################
+# basename <- paste0("/home/garofalo/analysis/flow/data/",dir,"/der_Mpi_012_vs_mu_mu2")
+# print(basename)
+# fit <- Rose::read_fit_P_file(paste0(basename, "_fit_P.dat"))
+# make_table_fit_result(fit)
+# gg <- plot_fit(basename, "amu",
+#   # noline = TRUE,
+#   gg = gg,
+#   id_x = 1,
+#   single_name_for_fit = "(removing last 2 points)P[0]/amu+P[1]/amu^2"
+# )
+# df<-read.table(paste0(basename, "_fit_extra.txt"))
+# cat("Mpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
+# cat("Mpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
+
+gg <- gg + geom_vline(xintercept = masses[2], linetype = "dashed")
+gg <- gg + geom_vline(xintercept = masses[3], linetype = "dashed")
+myplotly(gg, "", "$a\\mu$", "$dM_\\pi/d\\mu$",
   to_print = FALSE,
   yrange = c(-0.8, 0.4)
 )

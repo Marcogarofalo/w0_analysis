@@ -26,6 +26,42 @@ masses <- c(
 ```
 
 
+## $M_\pi$
+
+```{r, results='asis',echo=FALSE}
+df <- NULL
+
+# ######################## rew
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("M_{PS}", all_obs, mt, df, print_res = T, nudge = 0.5, reshape = T)
+df <- add_corr_to_df("M_{PS}_rewsOS", all_obs, mt, df, print_res = T, nudge = 0.5, reshape = T)
+print_full_res("dM_{PS}/drewsOS",all_obs ,mt)
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("M_{PS}_rewsOS_pdmu", all_obs, mt, df, print_res = T, nudge = 0.5, reshape = T)
+print_full_res("dM_{PS}/drewsOS_pdmu",all_obs ,mt)
+
+# ######################## rew
+######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_charm_0.1_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+print("same statistic of gm2 LMA")
+df <- add_corr_to_df("M_{PS}_rewcOS_0.1", all_obs, mt, df, print_res = T, nudge = 0.4, reshape = T)
+print_full_res("dM_{PS}/drewcOS_0.1",all_obs ,mt)
+print("---")
+######################## rew
+
+
+
+df$y<- df$y
+df$fit<- df$fit
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+
+fig <- myplotly(gg, "", "$t/a$", "$aM_{PS}(t)$", to_print = TRUE)
+```
 
 ## $f_\pi$
 
@@ -75,23 +111,316 @@ fig <- myplotly(gg, "", "$t/a$", "$af_{PS}(t)$", to_print = TRUE)
 ```
 
 
+```{r, results='asis',echo=FALSE}
+df <- data.frame(
+  mu=c(0),
+  X=c(0),
+  dX=c(0),
+  hits=c("")
+)
+df<-df[-1,]
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],paste0("20h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+#####
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_0.2_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_0.2"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]-0.001,fit[1,1],fit[1,2],paste0("20h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##############à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_mdmu_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_mdmu"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],paste0("20h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_pdmu"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],paste0("20h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_p2dmu_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_p2dmu"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],paste0("20h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_charm_0.1_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewcOS_0.1"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],paste0("20h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################  h5 #########################################à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2], paste0("5h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##############à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_mdmu_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_mdmu_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2],paste0("5h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_pdmu_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2],paste0("5h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_p2dmu_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_p2dmu_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2],paste0("5h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_charm_0.1_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewcOS_0.1_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2],paste0("5h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################  h10 #########################################à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],paste0("10h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##############à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_mdmu_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_mdmu_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],paste0("10h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_pdmu_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],paste0("10h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_p2dmu_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewsOS_p2dmu_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],paste0("10h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_charm_0.1_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewcOS_0.1_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],paste0("10h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
 
 
+#### plot
+gg<-myggplot(fill=FALSE,shape=FALSE)
+gg<-gg+ geom_pointrange(data=df,mapping = aes(x=mu, y=X, ymin=X-dX, ymax=X+dX, color=(hits)))
+fig<-myplotly(gg,"","mu","df/dmu",to_print = TRUE,legend_title = "hits", legend_position = c(0.7,0))
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+df <- data.frame(
+  mu=c(0),
+  X=c(0),
+  dX=c(0),
+  hits=c(0)
+)
+df<-df[-1,]
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],20)
+#####
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_0.2_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_0.2"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]-0.001,fit[1,1],fit[1,2],"20 strange step x 0.2")
+##############à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_mdmu_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_mdmu"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],20)
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_pdmu"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],20)
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_p2dmu_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_p2dmu"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],20)
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_charm_0.1_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewcOS_0.1"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1],fit[1,1],fit[1,2],20)
+##################  h5 #########################################à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2],5)
+##############à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_mdmu_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_mdmu_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2],5)
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_pdmu_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2],5)
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_p2dmu_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_p2dmu_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2],5)
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_charm_0.1_h5_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewcOS_0.1_h5"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.002,fit[1,1],fit[1,2],5)
+##################  h10 #########################################à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],10)
+##############à
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_mdmu_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_mdmu_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],10)
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_pdmu_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],10)
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_p2dmu_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewsOS_p2dmu_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],10)
+##################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_charm_0.1_h10_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"dM_{PS}/drewcOS_0.1_h10"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],10)
+
+
+#### plot
+gg<-myggplot(fill=FALSE,shape=FALSE)
+gg<-gg+ geom_pointrange(data=df,mapping = aes(x=mu, y=X, ymin=X-dX, ymax=X+dX, color=as.factor(hits)))
+fig<-myplotly(gg,"","mu","dM/dmu",to_print = TRUE,legend_title = "hits")
+```
 
 ##  rew history
 
 the step in strange is dmu=-5.942533e-4 while in all the other is set to 0.1 the 
 step for the charm dmu=2.35147398e-4
 
+::: {.callout-note}
+looking at the history of the reweighting and the outlier in the estimate of the 
+$\frac{df_\pi}{d\mu}$ we could consider to consider the reweighting acceptable if 
+$(\text{spike-heigh})/(N_{confs})<0.1$ 
+:::
+
+
+
 ```{r, results='asis',echo=FALSE}
-gg <- ggplot()
+gg <-ggplot()+theme_bw()# myggplot(fill = FALSE,shape = FALSE)
 
-df <- read.table("/home/garofalo/analysis/flow/data/rewU_s_pdmu_C80.txt")
-gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,6]) , color = "s+dmu"))
-df <- read.table("/home/garofalo/analysis/flow/data/rewU_s_C80.txt")
-gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,6]) , color = "s"))
-df <- read.table("/home/garofalo/analysis/flow/data/rewU_c_0.1_C80.txt")
-gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,6]) , color = "c"))
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_charm_0.1_OS_C80_LMA.dat_history.txt",header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "c"))
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_OS_C80_LMA.dat_history.txt",header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "s"))
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_0.2_OS_C80_LMA.dat_history.txt",header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "s 0.2"))
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_OS_C80_LMA.dat_history.txt",header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "s +dmu"))
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_h10_OS_C80_LMA.dat_history.txt",header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "s +dmu h10"))
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_pdmu_h5_OS_C80_LMA.dat_history.txt",header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "s +dmu h5"))
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_mdmu_OS_C80_LMA.dat_history.txt",header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "s -dmu"))
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_mdmu_h10_OS_C80_LMA.dat_history.txt",header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "s -dmu h10"))
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_strange_mdmu_h5_OS_C80_LMA.dat_history.txt",header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[,3]) , color = "s -dmu h5"))
 
-fig <- myplotly(gg, "", "hit+conf*100 ", "$e^{w(U,\\phi)-<w>}$", to_print = TRUE)
+
+
+
+
+fig <- myplotly(gg, "", "conf", "$e^{w(U)-<w>}$", to_print = TRUE)
 ```
