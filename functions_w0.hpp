@@ -2,6 +2,8 @@
 #define functions_w0_H
 #include "non_linear_fit.hpp"
 
+constexpr double hbarc = 197.326963; // MeV*fm
+
 double ****bin_intoN_exp(double ****data, int ivar, int T, int Nconf_in, int Nb);
 double ****bin_intoN_exp1(double ****data, double ****data_noexp, int ivar, int ivar_noexp, int T, int Nconf_in, int Nb);
 void make_ratio_of_jacks(double ****final, int Njack, int i, int T, double ****num, int i1, double ****den, int i2);

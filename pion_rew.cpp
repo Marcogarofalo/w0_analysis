@@ -20,7 +20,6 @@
 #include "correlators_analysis.hpp"
 #include "functions_w0.hpp"
 struct kinematic kinematic_2pt;
-constexpr double hbarc = 197.326963; // MeV*fm
 generic_header read_head(FILE *stream)
 {
     generic_header header;
@@ -200,6 +199,7 @@ int main(int argc, char **argv)
     {
         read_twopt(infile, data[iconf], head);
     }
+    symmetrise_corr(head.Njack, 0, head.T, data);
     //////////////////////////////////////////////////////////////
     // normalization of the correlator
     //////////////////////////////////////////////////////////////
@@ -685,4 +685,16 @@ int main(int argc, char **argv)
     }
     mysprintf(name_rew, NAMESIZE, "(df_{PS}/d%s)(mliso-mlsim)/f_{PS}", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
+
+    write_jack(amuiso[0], Njack, jack_file); check_correlatro_counter(13);
+    write_jack(amuiso[1], Njack, jack_file); check_correlatro_counter(14);
+    write_jack(amuiso[2], Njack, jack_file); check_correlatro_counter(15);
+    write_jack(a_fm, Njack, jack_file); check_correlatro_counter(16);
+
+    write_jack(amusim[0], Njack, jack_file);
+    check_correlatro_counter(17);
+    write_jack(amusim[1], Njack, jack_file);
+    check_correlatro_counter(18);
+    write_jack(amusim[2], Njack, jack_file);
+    check_correlatro_counter(19);
 }
