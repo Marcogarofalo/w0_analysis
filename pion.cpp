@@ -21,7 +21,6 @@
 #include "correlators_analysis.hpp"
 #include "functions_w0.hpp"
 struct kinematic kinematic_2pt;
-constexpr double hbarc = 1.97326979e-6; // GeV*fm
 
 generic_header read_head(FILE *stream)
 {
@@ -198,6 +197,8 @@ int main(int argc, char **argv)
             }
         }
     }
+    symmetrise_corr(head.Njack, 0, head.T, data);
+    // symmetrise_jackboot(head.Njack, 0, head.T, data);
     //////////////////////////////////////////////////////////////
     // correcting P5P5 and V0P5
     //////////////////////////////////////////////////////////////
