@@ -28,7 +28,8 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_OS_B64.dat rewcOS
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_strange_OS_B64.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_light_TM_B64.dat rewlTM
-
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_light_TM_B64_LMA.dat rewlTM
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_light_OS_B64_LMA.dat rewlOS
 
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.25_OS_B64.dat rewcOS_0.25
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_charm_0.25_OS_50s_B64.dat rewcOS_0.25_50s
@@ -56,6 +57,8 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_ndg_charm0.1_strange0_TM_B64.dat rew_charm0.1_strange0_ndgTM
 
 ### LMA
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_light_OS_B64_LMA.dat rewlOS
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_light_TM_B64_LMA.dat rewlTM
 
 ./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_charm_0.1_OS_B64_LMA.dat rewcOS_0.1
 ./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_strange_OS_B64_LMA.dat rewsOS
@@ -70,6 +73,9 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 
 
 ## C80
+./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_light_TM_C80_LMA.dat rewlTM
+
+./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_light_OS_C80_LMA.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_charm_0.1_OS_C80_LMA.dat rewcOS_0.1
 ./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_strange_OS_C80_LMA.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_strange_0.2_OS_C80_LMA.dat rewsOS_0.2
@@ -95,3 +101,7 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 # ./fit_all_rew_der_C80_LMA   jack ../../data/jackknife/  ../../data/fit_all_C80_LMA
 ./fit_all_rew_der  jack ../../data/jackknife/  ../../data/fit_all_C80_LMA  ../fit_files_C80_LMA
 
+## fake D96
+./create  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_light_OS_C80_LMA.dat rewlOS
+
+./fit_all_beta_rew_der  jack ../../data/jackknife/  ../../data/fit_all_beta  ../fit_files_all
