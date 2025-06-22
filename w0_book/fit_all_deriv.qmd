@@ -1,0 +1,61 @@
+# Fit all derivative B64
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+masses <- c(
+  0.0006669,
+  0.018267,
+  0.23134
+)
+```
+
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basename <- "/home/garofalo/analysis/flow/data/fit_all_beta/der_fpi_vs_mu"
+print(basename)
+fit <- Rose::read_fit_P_file(paste0(basename, "_fit_P.dat"))
+make_table_fit_result(fit)
+gg <- plot_fit(basename, "amu",
+  # noline = TRUE,
+  data_type = c("B64", "C80"),
+  gg = gg,
+  id_x = 1,
+  single_name_for_fit = "P[0]/amu"
+)
+lat<-c("B","C")
+for (i in seq_along(lat)){
+df <- read.table(paste0(basename, "_fit_extra_n",i-1,".txt"))
+cat(lat[i]," fpi(mc_sim)=", mean_print(df[1, 1], df[1, 2]), "\n\n")
+cat(lat[i]," fpi(mc_iso)=", mean_print(df[2, 1], df[2, 2]), "\n\n")
+cat(lat[i]," $d\\mu \\partial_\\mu f_{\\pi}/f_{\\pi}$=", mean_print(df[3, 1], df[3, 2]), "\n\n")
+}
+# cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
+
+
+gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed")
+gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed")
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell$", "$\\mu_\\ell df_\\pi)/d\\mu$",
+  to_print = TRUE,
+  yrange = c(-0.5, 3),
+  legend_position = c(0.7, 0.98)
+)
+```

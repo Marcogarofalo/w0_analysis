@@ -73,6 +73,13 @@ mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight
 all_obs <- Rose::get_all_corr(mt)
 df <- add_corr_to_df("M_{PS}_rew_charm0.1_strange0_ndgTM", all_obs, mt, df, print_res = FALSE, nudge = 0.4, reshape = T)
 
+#####
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64_LMA.dat_reweight_strange_OS_B64_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("M_{PS}", all_obs, mt, df, print_res = FALSE, nudge = 0.5, reshape = T, rename = "M_{PS}_LMA")
+# print_full_res("w0_rewsOS", all_obs, mt)
+#####
 
 ### plot
 gg <- plot_df_corr_ggplot(df, width = 0.05)
@@ -280,6 +287,12 @@ all_obs <- Rose::get_all_corr(mt)
 name <- "df_{PS}/drewsOS"
 res <- get_full_res(name, all_obs, mt)
 df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "rew", masses[2], name)
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64_LMA.dat_reweight_strange_OS_B64_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+name <- "df_{PS}/drewsOS"
+res <- get_full_res(name, all_obs, mt)
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "rew", masses[2], paste0(name,"_LMA"))
 
 # ######################## rew
 mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64.dat_reweight_charm_0.25_OS_B64.dat_output")
@@ -350,18 +363,18 @@ df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), "loop",
 
 
 ## plot
-gg <- ggplot() +
-  theme_bw() # myggplot(fill = FALSE)
-gg <- gg + geom_pointrange(
-  data = df,
-  aes(x = 1 / mass+5*runif(length(mass)), y = dm, ymin = dm - ddm, ymax = dm + ddm, color = name, shape = label)
-)
-gg <- gg + theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1))
-
-fig <- myplotly(gg, "", "$1/am$", "$df_{PS}/d\\mu$",
-  to_print = TRUE,
-  legend_position = c(0,0)
-)
+# gg <- ggplot() +
+#   theme_bw() # myggplot(fill = FALSE)
+# gg <- gg + geom_pointrange(
+#   data = df,
+#   aes(x = 1 / mass+5*runif(length(mass)), y = dm, ymin = dm - ddm, ymax = dm + ddm, color = name, shape = label)
+# )
+# gg <- gg + theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1))
+# 
+# fig <- myplotly(gg, "", "$1/am$", "$df_{PS}/d\\mu$",
+#   to_print = TRUE,
+#   legend_position = c(0,0)
+# )
 ###
 gg <- ggplot() +
   theme_bw() # myggplot(fill = FALSE)

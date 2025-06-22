@@ -119,11 +119,12 @@ cat("(dfpi/dmu)(mc_iso-mc_sim)/fpi=",mean_print(df[3,1],df[3,2]),"\n\n")
 # cat("fpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
 # cat("fpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
 
-gg <- gg + geom_vline(xintercept = masses[2], linetype = "dashed")
-gg <- gg + geom_vline(xintercept = masses[3], linetype = "dashed")
-myplotly(gg, "", "$a\\mu$", "$df_\\pi/d\\mu$",
+gg <- gg + geom_vline(xintercept = masses[2]/masses[1], linetype = "dashed")
+gg <- gg + geom_vline(xintercept = masses[3]/masses[1], linetype = "dashed")
+myplotly(gg, "", "$\\mu/\\mu_\\ell$", "$\\mu_\\ell df_\\pi/d\\mu$",
   to_print = FALSE,
-  yrange = c(-0.8, 0.4)
+  yrange = c(-0.2, 1),
+  legend_position = c(0.7,0.8)
 )
 ```
 
@@ -220,9 +221,10 @@ cat("(dMpi/dmu)(mc_iso-mc_sim)/Mpi=",mean_print(df[3,1],df[3,2]),"\n\n")
 # cat("Mpi(mc_sim)=",mean_print(df[1,1],df[1,2]),"\n\n")
 # cat("Mpi(mc_iso)=",mean_print(df[2,1],df[2,2]),"\n\n")
 
-gg <- gg + geom_vline(xintercept = masses[2], linetype = "dashed")
-gg <- gg + geom_vline(xintercept = masses[3], linetype = "dashed")
-myplotly(gg, "", "$a\\mu$", "$dM_\\pi/d\\mu$",
+
+gg <- gg + geom_vline(xintercept = masses[2]/masses[1], linetype = "dashed")
+gg <- gg + geom_vline(xintercept = masses[3]/masses[1], linetype = "dashed")
+myplotly(gg, "", "$\\mu/\\mu_\\ell$", "$\\mu_\\ell dM_\\pi/d\\mu$",
   to_print = FALSE,
   yrange = c(-0.8, 0.4)
 )

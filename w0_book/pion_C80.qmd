@@ -246,6 +246,22 @@ fit<-get_full_res(obs,all_obs ,mt )
 mu<-get_full_res("mu_in",all_obs ,mt )
 mu_out<-get_full_res("mu_out",all_obs ,mt )
 df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],paste0("10h dmu",format(mu_out[1,1]-mu[1,1],digit=2)))
+################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_light_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewlOS"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],paste0("l OS ",format(mu_out[1,1]-mu[1,1],digit=2)))
+################
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_C80_LMA.dat_reweight_light_TM_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+obs<-"df_{PS}/drewlTM"
+fit<-get_full_res(obs,all_obs ,mt )
+mu<-get_full_res("mu_in",all_obs ,mt )
+mu_out<-get_full_res("mu_out",all_obs ,mt )
+df[length(df[,1])+1,]<-list(mu[1,1]+0.001,fit[1,1],fit[1,2],paste0("l TM ",format(mu_out[1,1]-mu[1,1],digit=2)))
 
 
 #### plot
