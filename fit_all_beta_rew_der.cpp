@@ -143,9 +143,9 @@ data_all read_all_the_files(std::vector<std::string> files, const char *resampli
 double lhs_fun(int n, int e, int j, data_all gjack, struct fit_type fit_info)
 {
 
-    double r = gjack.en[e].jack[fit_info.corr_id[0]][j]; // fpi
-    r *= gjack.en[e].jack[fit_info.corr_id[1]][j]; // amu_l
-    r /= gjack.en[e].jack[fit_info.corr_id[2]][j]/hbarc; // a
+    double r = gjack.en[e].jack[fit_info.corr_id[0]][j];   // fpi
+    r *= gjack.en[e].jack[fit_info.corr_id[1]][j];         // amu_l
+    r /= gjack.en[e].jack[fit_info.corr_id[2]][j] / hbarc; // a
     return r;
 }
 double rhs_1overamu(int n, int Nvar, double *x, int Npar, double *P)
@@ -179,22 +179,26 @@ struct file_out_name
     char path[NAMESIZE];
     char basename[NAMESIZE];
     char namefile[NAMESIZE];
+    char label[NAMESIZE];
     file_out_name(const char *path, const char *label)
     {
         mysprintf(this->path, NAMESIZE, "%s", path);
         mysprintf(this->basename, NAMESIZE, "%s", path);
+        mysprintf(this->label, NAMESIZE, "%s", label);
         mysprintf(this->namefile, NAMESIZE, "%s/%s_fit_extra.txt", path, label);
     }
     file_out_name(const file_out_name &other)
     {
         mysprintf(this->path, NAMESIZE, "%s", other.path);
         mysprintf(this->basename, NAMESIZE, "%s", other.basename);
+        mysprintf(this->label, NAMESIZE, "%s", other.label);
         mysprintf(this->namefile, NAMESIZE, "%s", other.namefile);
     }
     file_out_name &operator=(const file_out_name &other)
     {
         mysprintf(this->path, NAMESIZE, "%s", other.path);
         mysprintf(this->basename, NAMESIZE, "%s", other.basename);
+        mysprintf(this->label, NAMESIZE, "%s", other.label);
         mysprintf(this->namefile, NAMESIZE, "%s", other.namefile);
         return *this;
     }
@@ -207,7 +211,7 @@ struct file_out_name
     }
 };
 
-void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_res, std::vector<double *> amusim, std::vector<double *> amuiso, int id_dfpi, file_out_name f_name)
+void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_res, int id_dfpi, file_out_name f_name)
 {
     int Njack = jackall.en[0].Njack;
     error(fit_info.Njack != jackall.en[0].Njack, 1, "compute_fpi_at_mciso", "fit_info.Njack != jackall.en[0].Njack");
@@ -216,26 +220,44 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
     double *relative_error = (double *)malloc(sizeof(double) * Njack);
     double *tmp_x = (double *)malloc(sizeof(double) * fit_info.Nvar);
     double *tif = (double *)malloc(sizeof(double) * fit_info.Npar);
-    for (int j = 0; j < Njack; j++)
-    {
-        tmp_x[0] = amuiso[2][j]/amuiso[0][j]; // amuciso/amuliso
-        for (int p = 0; p < fit_info.Npar; p++)
-            tif[p] = fit_res.P[p][j];
-        double der = fit_info.function(0, fit_info.Nvar, tmp_x, fit_info.Npar, tif)* (jackall.en[0].jack[16][j] /hbarc) /amuiso[0][j];
-        fpi_mciso[j] = jackall.en[0].jack[id_dfpi][j] + (amuiso[2][j] - amusim[2][j]) * der;
-        relative_error[j] = der * (amuiso[2][j] - amusim[2][j]) / jackall.en[0].jack[id_dfpi][j];
-    }
-    free(tmp_x);
-    free(tif);
-    printf("fpi(mc_sim) %g  %g\n", jackall.en[0].jack[id_dfpi][Njack - 1], myres->comp_error(jackall.en[0].jack[id_dfpi]));
-    printf("fpi(mc_iso) %g  %g\n", fpi_mciso[Njack - 1], myres->comp_error(fpi_mciso));
 
-    printf("writing in file %s\n", f_name.namefile);
-    FILE *f = open_file(f_name.namefile, "w+");
-    fprintf(f, "%-20.12g %-20.12g\n", jackall.en[0].jack[id_dfpi][Njack - 1], myres->comp_error(jackall.en[0].jack[id_dfpi]));
-    fprintf(f, "%-20.12g %-20.12g\n", fpi_mciso[Njack - 1], myres->comp_error(fpi_mciso));
-    fprintf(f, "%-20.12g %-20.12g\n", relative_error[Njack - 1], myres->comp_error(relative_error));
-    fclose(f);
+    double *fpi_sim_mev = myres->create_copy(jackall.en[0].jack[id_dfpi]);
+    for (int n = 0; n < fit_info.N; n++)
+    {
+        int id = fit_info.Nxen[n][0];
+        myres->copy(fpi_sim_mev, jackall.en[id].jack[id_dfpi]); // fpi
+        myres->div(fpi_sim_mev, fpi_sim_mev, jackall.en[id].jack[fit_info.corr_id[2]]); // convert to fm^-1
+        myres->mult(fpi_sim_mev, fpi_sim_mev, hbarc);                                  // convert to MeV
+        for (int j = 0; j < Njack; j++)
+        {
+            double amuliso = jackall.en[id].jack[fit_info.corr_id[1]][j];
+            double amuciso = jackall.en[id].jack[15][j];
+            double amucsim = jackall.en[id].jack[19][j];
+            double a_fm = jackall.en[id].jack[fit_info.corr_id[2]][j]; // a
+
+            tmp_x[0] = amuciso / amuliso; // amuciso/amuliso
+            for (int p = 0; p < fit_info.Npar; p++)
+                tif[p] = fit_res.P[p][j];
+            double der = fit_info.function(0, fit_info.Nvar, tmp_x, fit_info.Npar, tif) * (a_fm / hbarc) / amuliso;
+            fpi_mciso[j] = (jackall.en[id].jack[id_dfpi][j] + (amuciso - amucsim) * der) / (a_fm / hbarc);
+            relative_error[j] = der * (amuciso - amucsim) / jackall.en[id].jack[id_dfpi][j];
+        }
+
+        printf("fpi(mc_sim) %g  %g\n", fpi_sim_mev[Njack - 1], myres->comp_error(fpi_sim_mev));
+        printf("fpi(mc_iso) %g  %g\n", fpi_mciso[Njack - 1], myres->comp_error(fpi_mciso));
+
+        char nameextra[NAMESIZE];
+        mysprintf(nameextra, NAMESIZE, "%s/%s_fit_extra_n%d.txt", f_name.path, f_name.label, n);
+        printf("writing in file %s\n", nameextra);
+
+        FILE *f = open_file(nameextra, "w+");
+        fprintf(f, "%-20.12g %-20.12g\n", fpi_sim_mev[Njack - 1], myres->comp_error(fpi_sim_mev));
+        fprintf(f, "%-20.12g %-20.12g\n", fpi_mciso[Njack - 1], myres->comp_error(fpi_mciso));
+        fprintf(f, "%-20.12g %-20.12g\n", relative_error[Njack - 1], myres->comp_error(relative_error));
+        fclose(f);
+    }
+    free(tif);
+    free(tmp_x);
 }
 
 int main(int argc, char **argv)
@@ -252,6 +274,11 @@ int main(int argc, char **argv)
     }
     std::string line;
     std::string basename;
+    int beta_count = 0;
+    int file_count = 0;
+    // std::vector<std::string> beta_names;
+    std::vector<std::vector<int>> myen(1, std::vector<int>());
+
     while (std::getline(file, line))
     {
         if (!line.empty() && line[0] != '#') // skip empty lines and comments
@@ -265,6 +292,24 @@ int main(int argc, char **argv)
                 mysprintf(namefile, NAMESIZE, "%s/%s_%s_%s", argv[2], argv[1], word[0].c_str(), word[1].c_str());
                 printf("adding file %s\n", namefile);
                 files.emplace_back(namefile);
+                myen[beta_count].emplace_back(file_count);
+                file_count++;
+            }
+            else if (word.size() == 1)
+            {
+                if (strcmp(word[0].c_str(), "new_beta") == 0)
+                {
+                    myen.emplace_back(std::vector<int>());
+                    beta_count++;
+                }
+                else
+                {
+                    printf("impossible to give a meaning to the line: %s\n", word[0].c_str());
+                    exit(1);
+                }
+            }
+            else if (word.size() == 0)
+            {
             }
             else
             {
@@ -284,11 +329,11 @@ int main(int argc, char **argv)
     // mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_step_0.01_to_0.01027408_OS_B64.dat", argv[2], argv[1]);
     // files.emplace_back(namefile);
 
-    std::vector<int> myen(files.size());
-    for (int e = 0; e < files.size(); e++)
-    {
-        myen[e] = e;
-    }
+    // std::vector<int> myen(files.size());
+    // for (int e = 0; e < files.size(); e++)
+    // {
+    //     myen[e] = e;
+    // }
 
     data_all jackall = read_all_the_files(files, argv[1]);
     printf("we read all\n");
@@ -328,22 +373,22 @@ int main(int argc, char **argv)
     char namefile_plateaux[NAMESIZE];
     mysprintf(namefile_plateaux, NAMESIZE, "plateaux.txt");
     double mean, err;
-    int seed;
-    std::vector<double *> amuiso(3);
-    line_read_param(option_read, "muliso", mean, err, seed, namefile_plateaux);
-    amuiso[0] = myres->create_fake(mean, err, seed);
-    line_read_param(option_read, "musiso", mean, err, seed, namefile_plateaux);
-    amuiso[1] = myres->create_fake(mean, err, seed);
-    line_read_param(option_read, "muciso", mean, err, seed, namefile_plateaux);
-    amuiso[2] = myres->create_fake(mean, err, seed);
+    // int seed;
+    // std::vector<double *> amuiso(3);
+    // line_read_param(option_read, "muliso", mean, err, seed, namefile_plateaux);
+    // amuiso[0] = myres->create_fake(mean, err, seed);
+    // line_read_param(option_read, "musiso", mean, err, seed, namefile_plateaux);
+    // amuiso[1] = myres->create_fake(mean, err, seed);
+    // line_read_param(option_read, "muciso", mean, err, seed, namefile_plateaux);
+    // amuiso[2] = myres->create_fake(mean, err, seed);
 
-    std::vector<double *> amusim(3);
-    line_read_param(option_read, "mulsim", mean, err, seed, namefile_plateaux);
-    amusim[0] = myres->create_fake(mean, err, seed);
-    line_read_param(option_read, "mussim", mean, err, seed, namefile_plateaux);
-    amusim[1] = myres->create_fake(mean, err, seed);
-    line_read_param(option_read, "mucsim", mean, err, seed, namefile_plateaux);
-    amusim[2] = myres->create_fake(mean, err, seed);
+    // std::vector<double *> amusim(3);
+    // line_read_param(option_read, "mulsim", mean, err, seed, namefile_plateaux);
+    // amusim[0] = myres->create_fake(mean, err, seed);
+    // line_read_param(option_read, "mussim", mean, err, seed, namefile_plateaux);
+    // amusim[1] = myres->create_fake(mean, err, seed);
+    // line_read_param(option_read, "mucsim", mean, err, seed, namefile_plateaux);
+    // amusim[2] = myres->create_fake(mean, err, seed);
     //
     int id_dfpi_dmu = 9;
     int id_dMpi_dmu = 4;
@@ -353,19 +398,21 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
     std::vector<std::string> der_name = {"fpi", "Mpi"};
     std::vector<int> id_der = {id_dfpi_dmu, id_dMpi_dmu};
-    int id_amuliso=13;
-    int id_a_fm=16;
+    int id_amuliso = 13;
+    int id_a_fm = 16;
     for (int i = 0; i < 2; i++)
     {
         fit_type fit_info;
 
         fit_info.corr_id = {id_der[i], id_amuliso, id_a_fm};
 
-        fit_info.Nxen.resize(1, std::vector<int>(files.size()));
-        for (int e = 0; e < files.size(); e++)
-        {
-            fit_info.Nxen[0][e] = e;
-        }
+        fit_info.Nxen = myen;
+        printf("fit_info.Nxen.size()=%ld\n", fit_info.Nxen.size());
+        // fit_info.Nxen.resize(1, std::vector<int>(files.size()));
+        // for (int e = 0; e < files.size(); e++)
+        // {
+        //     fit_info.Nxen[0][e] = e;
+        // }
         fit_info.N = fit_info.Nxen.size();
         fit_info.Npar = 1;
         fit_info.function = rhs_1overamu;
@@ -374,6 +421,7 @@ int main(int argc, char **argv)
         fit_info.Njack = Njack;
         fit_info.init_N_etot_form_Nxen();
         fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+        printf("fit_info.Nvar=%d fit_info.entot=%d fit_info.Njack=%d\n", fit_info.Nvar, fit_info.entot, fit_info.Njack);
 
         int count = 0;
         for (int n = 0; n < fit_info.N; n++)
@@ -383,7 +431,7 @@ int main(int argc, char **argv)
                 for (int j = 0; j < Njack; j++)
                 {
                     // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
-                    fit_info.x[0][count][j] = jackall.en[e].jack[11][j]/jackall.en[e].jack[id_amuliso][j];// mu/muliso
+                    fit_info.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
                 }
                 count++;
             }
@@ -392,84 +440,85 @@ int main(int argc, char **argv)
         // fit_info.verbosity = 1;
         fit_info.covariancey = true;
         fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+        fit_info.make_covariance_block_diagonal_in_n();
         fit_info.compute_cov1_fit();
-        std::string namefit("der_"+der_name[i]+"_vs_mu");
+        std::string namefit("der_" + der_name[i] + "_vs_mu");
 
         fit_result der_fpi = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
         fit_info.band_range = {0.1, 350};
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi, der_fpi, 0, fit_info.Nxen[0].size() - 1, 1, {});
 
-        // compute fpi at the charm point
+        // // compute fpi at the charm point
         file_out_name f_name(argv[3], namefit.c_str());
-        compute_fpi_at_mciso(jackall, fit_info, der_fpi, amusim, amuiso, id_dfpi, f_name);
+        compute_fpi_at_mciso(jackall, fit_info, der_fpi, id_dfpi, f_name);
 
-        free_fit_result(fit_info, der_fpi);
+        // free_fit_result(fit_info, der_fpi);
 
-        // add 1/amu^2
-        fit_info.Npar = 2;
-        fit_info.function = rhs_1overamu_1overamu2;
-        namefit = "der_"+der_name[i]+"_vs_mu_mu2";
+        // // add 1/amu^2
+        // fit_info.Npar = 2;
+        // fit_info.function = rhs_1overamu_1overamu2;
+        // namefit = "der_" + der_name[i] + "_vs_mu_mu2";
 
-        fit_result der_fpi_mu_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2, der_fpi_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 1, {});
-        f_name = file_out_name(argv[3], namefit.c_str());
-        compute_fpi_at_mciso(jackall, fit_info, der_fpi_mu_mu2, amusim, amuiso, id_dfpi, f_name);
-        free_fit_result(fit_info, der_fpi_mu_mu2);
+        // fit_result der_fpi_mu_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+        // print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2, der_fpi_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 1, {});
+        // f_name = file_out_name(argv[3], namefit.c_str());
+        // compute_fpi_at_mciso(jackall, fit_info, der_fpi_mu_mu2, amusim, amuiso, id_dfpi, f_name);
+        // free_fit_result(fit_info, der_fpi_mu_mu2);
 
-        // only 1/amu^2
-        fit_info.Npar = 1;
-        fit_info.function = rhs_1overamu2;
-        namefit = "der_"+der_name[i]+"_vs_mu2";
+        // // only 1/amu^2
+        // fit_info.Npar = 1;
+        // fit_info.function = rhs_1overamu2;
+        // namefit = "der_" + der_name[i] + "_vs_mu2";
 
-        fit_result der_fpi_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu2, der_fpi_mu2, 0, fit_info.Nxen[0].size() - 1, 1, {});
-        f_name = file_out_name(argv[3], namefit.c_str());
-        compute_fpi_at_mciso(jackall, fit_info, der_fpi_mu2, amusim, amuiso, id_dfpi, f_name);
-        free_fit_result(fit_info, der_fpi_mu2);
+        // fit_result der_fpi_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+        // print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu2, der_fpi_mu2, 0, fit_info.Nxen[0].size() - 1, 1, {});
+        // f_name = file_out_name(argv[3], namefit.c_str());
+        // compute_fpi_at_mciso(jackall, fit_info, der_fpi_mu2, amusim, amuiso, id_dfpi, f_name);
+        // free_fit_result(fit_info, der_fpi_mu2);
 
-        // add 1/amu^2 + 1/amu^3
-        fit_info.Npar = 3;
-        fit_info.function = rhs_1overamu_1overamu2_1overamu3;
-        namefit = "der_"+der_name[i]+"_vs_mu_mu2_mu3";
+        // // add 1/amu^2 + 1/amu^3
+        // fit_info.Npar = 3;
+        // fit_info.function = rhs_1overamu_1overamu2_1overamu3;
+        // namefit = "der_" + der_name[i] + "_vs_mu_mu2_mu3";
 
-        fit_result der_fpi_mu_mu2_mu3 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2_mu3, der_fpi_mu_mu2_mu3, 0, fit_info.Nxen[0].size() - 1, 1, {});
-        f_name = file_out_name(argv[3], namefit.c_str());
-        compute_fpi_at_mciso(jackall, fit_info, der_fpi_mu_mu2_mu3, amusim, amuiso, id_dfpi, f_name);
-        free_fit_result(fit_info, der_fpi_mu_mu2_mu3);
+        // fit_result der_fpi_mu_mu2_mu3 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+        // print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2_mu3, der_fpi_mu_mu2_mu3, 0, fit_info.Nxen[0].size() - 1, 1, {});
+        // f_name = file_out_name(argv[3], namefit.c_str());
+        // compute_fpi_at_mciso(jackall, fit_info, der_fpi_mu_mu2_mu3, amusim, amuiso, id_dfpi, f_name);
+        // free_fit_result(fit_info, der_fpi_mu_mu2_mu3);
 
-        // add 1/amu^2
-        fit_info.Nxen.resize(1, std::vector<int>(files.size()));
-        for (int e = 0; e < files.size() - 1; e++)
-        {
-            fit_info.Nxen[0][e] = e;
-        }
-        fit_info.Npar = 2;
-        fit_info.function = rhs_1overamu_1overamu2;
-        fit_info.compute_cov_fit(argv, jackall, lhs_fun);
-        fit_info.compute_cov1_fit();
-        namefit = "der_"+der_name[i]+"_0123_vs_mu_mu2";
+        // // add 1/amu^2
+        // fit_info.Nxen.resize(1, std::vector<int>(files.size()));
+        // for (int e = 0; e < files.size() - 1; e++)
+        // {
+        //     fit_info.Nxen[0][e] = e;
+        // }
+        // fit_info.Npar = 2;
+        // fit_info.function = rhs_1overamu_1overamu2;
+        // fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+        // fit_info.compute_cov1_fit();
+        // namefit = "der_" + der_name[i] + "_0123_vs_mu_mu2";
 
-        fit_result der_fpi_0123_mu_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_0123_mu_mu2, der_fpi_0123_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 1, {});
-        f_name = file_out_name(argv[3], namefit.c_str());
-        compute_fpi_at_mciso(jackall, fit_info, der_fpi_0123_mu_mu2, amusim, amuiso, id_dfpi, f_name);
-        free_fit_result(fit_info, der_fpi_0123_mu_mu2);
+        // fit_result der_fpi_0123_mu_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+        // print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_0123_mu_mu2, der_fpi_0123_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 1, {});
+        // f_name = file_out_name(argv[3], namefit.c_str());
+        // compute_fpi_at_mciso(jackall, fit_info, der_fpi_0123_mu_mu2, amusim, amuiso, id_dfpi, f_name);
+        // free_fit_result(fit_info, der_fpi_0123_mu_mu2);
 
-        // add 1/amu^2
-        fit_info.Nxen.resize(1, std::vector<int>(files.size()));
-        for (int e = 0; e < files.size() - 2; e++)
-        {
-            fit_info.Nxen[0][e] = e;
-        }
-        fit_info.Npar = 2;
-        fit_info.function = rhs_1overamu_1overamu2;
-        namefit = "der_"+der_name[i]+"_012_vs_mu_mu2";
+        // // add 1/amu^2
+        // fit_info.Nxen.resize(1, std::vector<int>(files.size()));
+        // for (int e = 0; e < files.size() - 2; e++)
+        // {
+        //     fit_info.Nxen[0][e] = e;
+        // }
+        // fit_info.Npar = 2;
+        // fit_info.function = rhs_1overamu_1overamu2;
+        // namefit = "der_" + der_name[i] + "_012_vs_mu_mu2";
 
-        fit_result der_fpi_012_mu_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_012_mu_mu2, der_fpi_012_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 1, {});
-        f_name = file_out_name(argv[3], namefit.c_str());
-        compute_fpi_at_mciso(jackall, fit_info, der_fpi_012_mu_mu2, amusim, amuiso, id_dfpi, f_name);
-        free_fit_result(fit_info, der_fpi_012_mu_mu2);
+        // fit_result der_fpi_012_mu_mu2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+        // print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_012_mu_mu2, der_fpi_012_mu_mu2, 0, fit_info.Nxen[0].size() - 1, 1, {});
+        // f_name = file_out_name(argv[3], namefit.c_str());
+        // compute_fpi_at_mciso(jackall, fit_info, der_fpi_012_mu_mu2, amusim, amuiso, id_dfpi, f_name);
+        // free_fit_result(fit_info, der_fpi_012_mu_mu2);
     }
 }
