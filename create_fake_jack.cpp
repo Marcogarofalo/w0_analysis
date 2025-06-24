@@ -353,7 +353,7 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
     // detiv MPS
     //////////////////////////////////////////////////////////////
-    mysprintf(name, NAMESIZE, "dM_{PS}/dmu%s", argv[8]);
+    mysprintf(name, NAMESIZE, "dM_{PS}/dmu_%s", argv[8]);
     line_read_param(option, name, mean, err, seed, namefile_plateaux);
     double *derM = myres->create_fake(mean, err, seed);
     write_jack(derM, Njack, jack_file);
@@ -383,7 +383,7 @@ int main(int argc, char **argv)
 
     check_correlatro_counter(8);
     // der mpi_fpi /dmu
-    mysprintf(name, NAMESIZE, "df_{PS}/dmu%s", argv[8]);
+    mysprintf(name, NAMESIZE, "df_{PS}/dmu_%s", argv[8]);
     line_read_param(option, name, mean, err, seed, namefile_plateaux);
     double *derf = myres->create_fake(mean, err, seed);
     write_jack(derf, Njack, jack_file);
