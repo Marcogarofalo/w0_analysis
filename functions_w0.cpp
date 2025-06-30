@@ -387,7 +387,7 @@ double lhs_plateau_dM_dmu(int j, double ****in, int t, struct fit_type fit_info)
 
 double lhs_plateau_df_dmu(int j, double ****in, int t, struct fit_type fit_info)
 {
-
+    std::vector<int> id(fit_info.corr_id);   
     double *Mp = fit_info.ext_P[0];
     double *M = fit_info.ext_P[1];
     double *mu1 = fit_info.ext_P[2];
@@ -398,12 +398,14 @@ double lhs_plateau_df_dmu(int j, double ****in, int t, struct fit_type fit_info)
     fit_info.ext_P[2] = mu2;
     double fp = lhs_function_f_PS(j, in, t, fit_info);
 
+    fit_info.corr_id[0] = id[1]; 
     fit_info.ext_P[0] = M;
     fit_info.ext_P[1] = mu1;
     fit_info.ext_P[2] = mu2;
     double f = lhs_function_f_PS(j, in, t, fit_info);
 
     // rstore the original values
+    fit_info.corr_id[0] = id[0]; 
     fit_info.ext_P[0] = Mp;
     fit_info.ext_P[1] = M;
     fit_info.ext_P[2] = mu1;

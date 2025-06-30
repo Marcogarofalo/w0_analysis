@@ -700,10 +700,10 @@ int main(int argc, char **argv)
     // plateau derivativea
     //////////////////////////////////////////////////////////////
 
-    fit_info.codeplateaux = true;
-    int tmin, tmax,sep;
-    mysprintf(name_rew, NAMESIZE, "M_{PS}_%s", argv[8]);
-    line_read_param(option, name_rew, fit_info.tmin, fit_info.tmax, fit_info.sep , namefile_plateaux);
+    // fit_info.codeplateaux = true;
+    // int tmin, tmax,sep;
+    // mysprintf(name_rew, NAMESIZE, "M_{PS}_%s", argv[8]);
+    // line_read_param(option, name_rew, fit_info.tmin, fit_info.tmax, fit_info.sep , namefile_plateaux);
 
     fit_info.Nvar = 1;
     fit_info.Npar = 1;

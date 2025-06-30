@@ -468,6 +468,10 @@ int main(int argc, char **argv)
     //
     int id_dfpi_dmu = 9;
     int id_dMpi_dmu = 4;
+
+    int id_dMpi_diffplat_dmu = 20;
+    int id_dfpi_diffplat_dmu = 21;
+    
     int id_dfpi = 6;
     // ///// fillind D96
     // fit_type fit_info;
@@ -532,6 +536,7 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
     std::vector<std::string> der_name = {"fpi", "Mpi"};
     std::vector<int> id_der = {id_dfpi_dmu, id_dMpi_dmu};
+    std::vector<int> id_der_diffplat = {id_dfpi_diffplat_dmu, id_dMpi_diffplat_dmu};
     int id_amuliso = 13;
     int id_a_fm = 16;
     for (int i = 0; i < 2; i++)
@@ -747,5 +752,57 @@ int main(int argc, char **argv)
         // // compute fpi at the charm point
         file_out_name f_name_c_full(argv[3], namefit.c_str());
         compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full, id_dfpi, f_name_c_full);
+
+
+        //////////////////////////////////////////////////////////////
+        // fit all defferences
+        //////////////////////////////////////////////////////////////
+        fit_info.corr_id = {id_der_diffplat[i], id_amuliso, id_a_fm};
+
+        fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
+        for (int n = 0; n < myen.size(); n++)
+        {
+            fit_info.Nxen[n].resize(myen[n].size());
+            for (int e = 0; e < myen[n].size(); e++)
+            {
+                fit_info.Nxen[n][e] = myen[n][e];
+            }
+        }
+        fit_info.init_N_etot_form_Nxen();
+        fit_info.function = rhs_1overamu_mu2_mu3;
+        fit_info.linear_fit = true;
+        fit_info.Npar = 3;
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+        count = 0;
+        for (int n = 0; n < fit_info.N; n++)
+        {
+            for (int e : fit_info.Nxen[n])
+            {
+                for (int j = 0; j < Njack; j++)
+                {
+                    // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
+                    fit_info.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
+                }
+                count++;
+            }
+        }
+        // fit_info.linear_fit = false;
+        fit_info.verbosity = 0;
+        fit_info.covariancey = true;
+        fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+        fit_info.make_covariance_block_diagonal_in_n();
+        fit_info.compute_cov1_fit();
+        
+
+        namefit = "der_" + der_name[i] + "_diffplat_full_mu_mu2_mu3";
+
+        fit_result der_fpi_diffplat_const_full = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+        fit_info.band_range = {1, 350};
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_diffplat_const_full, der_fpi_diffplat_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
+
+        // // compute fpi at the charm point
+        file_out_name f_name_diffplat_c_full(argv[3], namefit.c_str());
+        compute_fpi_at_mciso(jackall, fit_info, der_fpi_diffplat_const_full, id_dfpi, f_name_diffplat_c_full);
     }
 }
