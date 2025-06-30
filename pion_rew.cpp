@@ -110,16 +110,6 @@ void read_twopt(FILE *stream, double ***to_write, generic_header head)
     }
 }
 
-double lhs_mpcac(int j, double ****in, int t, struct fit_type fit_info)
-{
-    int id_V = fit_info.corr_id[0];
-    int id_P = fit_info.corr_id[1];
-    // we should take -Im of V0P5 which is saved as real part in this data
-    double r = -(in[j][id_V][t + 1][0] - in[j][id_V][t][0]) / (2. * in[j][id_P][t][0]);
-
-    return r;
-}
-
 double int2flowt(double i)
 {
     return 0.010000 + i * 0.02;
@@ -549,6 +539,10 @@ int main(int argc, char **argv)
     double dmu = head_rew.oranges[0] - head_rew.mus[0];
     myres->sub(derM, M_PS_rew, M_PS);
     myres->div(derM, derM, dmu);
+    // for (int j = 0; j < Njack; j++)
+    // {
+    //     derM[j] = (M_PS_rew[j] - M_PS[j]) / dmu;
+    // }
     mysprintf(name_rew, NAMESIZE, "dM_{PS}/d%s", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
     printf("////////////////////////////\n");
@@ -686,10 +680,14 @@ int main(int argc, char **argv)
     mysprintf(name_rew, NAMESIZE, "(df_{PS}/d%s)(mliso-mlsim)/f_{PS}", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
 
-    write_jack(amuiso[0], Njack, jack_file); check_correlatro_counter(13);
-    write_jack(amuiso[1], Njack, jack_file); check_correlatro_counter(14);
-    write_jack(amuiso[2], Njack, jack_file); check_correlatro_counter(15);
-    write_jack(a_fm, Njack, jack_file); check_correlatro_counter(16);
+    write_jack(amuiso[0], Njack, jack_file);
+    check_correlatro_counter(13);
+    write_jack(amuiso[1], Njack, jack_file);
+    check_correlatro_counter(14);
+    write_jack(amuiso[2], Njack, jack_file);
+    check_correlatro_counter(15);
+    write_jack(a_fm, Njack, jack_file);
+    check_correlatro_counter(16);
 
     write_jack(amusim[0], Njack, jack_file);
     check_correlatro_counter(17);
@@ -697,4 +695,51 @@ int main(int argc, char **argv)
     check_correlatro_counter(18);
     write_jack(amusim[2], Njack, jack_file);
     check_correlatro_counter(19);
+
+    //////////////////////////////////////////////////////////////
+    // plateau derivativea
+    //////////////////////////////////////////////////////////////
+
+    fit_info.codeplateaux = true;
+    int tmin, tmax,sep;
+    mysprintf(name_rew, NAMESIZE, "M_{PS}_%s", argv[8]);
+    line_read_param(option, name_rew, fit_info.tmin, fit_info.tmax, fit_info.sep , namefile_plateaux);
+
+    fit_info.Nvar = 1;
+    fit_info.Npar = 1;
+    fit_info.N = 1;
+    fit_info.Njack = Njack;
+    fit_info.n_ext_P = 0;
+    fit_info.function = constant_fit;
+    fit_info.linear_fit = true;
+    fit_info.T = head.T;
+    fit_info.corr_id = {head.ncorr + 0, 0};
+    fit_info.ave_P = {dmu};
+
+    mysprintf(name_rew, NAMESIZE, "plateau_dM/d%s", argv[8]);
+    struct fit_result fit_dM_dmu = fit_fun_to_fun_of_corr(
+        option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
+        outfile, lhs_plateau_dM_dmu, name_rew, fit_info,
+        jack_file);
+    check_correlatro_counter(20);
+    // fit_info.restore_default();
+
+
+    fit_info.n_ext_P = 4;
+    fit_info.ext_P = malloc_2<double>(fit_info.n_ext_P, fit_info.Njack);
+    for (int j = 0; j < fit_info.Njack; j++)
+    {
+        fit_info.ext_P[0][j] = M_PS_rew[j];
+        fit_info.ext_P[1][j] = M_PS[j];
+        fit_info.ext_P[2][j] = amusim[0][j];
+        fit_info.ext_P[3][j] = amusim[0][j];
+    }
+
+    mysprintf(name_rew, NAMESIZE, "plateau_df/d%s", argv[8]);
+    struct fit_result fit_df_dmu = fit_fun_to_fun_of_corr(
+        option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
+        outfile, lhs_plateau_df_dmu, name_rew, fit_info,
+        jack_file);
+    check_correlatro_counter(21);
+
 }

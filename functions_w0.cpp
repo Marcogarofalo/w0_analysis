@@ -368,3 +368,48 @@ double lhs_dfpi_sea(int j, double ****in, int t, struct fit_type fit_info)
         printf("dM=%g  df=%g  fpi=%g  G=%g  A=%g\n", dM, df, fpi, G, A);
     return df;
 }
+
+double lhs_plateau_dM_dmu(int j, double ****in, int t, struct fit_type fit_info)
+{
+    int idp = fit_info.corr_id[0];
+    int id = fit_info.corr_id[1];
+
+    double Mp = M_eff_T(t, fit_info.T, in[j][idp]);
+    double M = M_eff_T(t, fit_info.T, in[j][id]);
+
+    double dmu = fit_info.ave_P[0];
+
+    // we should take -Im of V0P5 which is saved as real part in this data
+    double r = (Mp - M) / dmu;
+
+    return r;
+}
+
+double lhs_plateau_df_dmu(int j, double ****in, int t, struct fit_type fit_info)
+{
+
+    double *Mp = fit_info.ext_P[0];
+    double *M = fit_info.ext_P[1];
+    double *mu1 = fit_info.ext_P[2];
+    double *mu2 = fit_info.ext_P[3];
+
+    fit_info.ext_P[0] = Mp;
+    fit_info.ext_P[1] = mu1;
+    fit_info.ext_P[2] = mu2;
+    double fp = lhs_function_f_PS(j, in, t, fit_info);
+
+    fit_info.ext_P[0] = M;
+    fit_info.ext_P[1] = mu1;
+    fit_info.ext_P[2] = mu2;
+    double f = lhs_function_f_PS(j, in, t, fit_info);
+
+    // rstore the original values
+    fit_info.ext_P[0] = Mp;
+    fit_info.ext_P[1] = M;
+    fit_info.ext_P[2] = mu1;
+    fit_info.ext_P[3] = mu2;
+
+    double dmu = fit_info.ave_P[0];
+
+    return (fp - f) / dmu;
+}
