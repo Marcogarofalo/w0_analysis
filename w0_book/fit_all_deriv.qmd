@@ -27,15 +27,63 @@ masses <- c(
 ```
 
 
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_fpi_full_mu_mu2_mu3"
+)
+labels <- c(
+  "const"
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "amu",
+    # noline = TRUE,
+    data_type = c("B64", "C80","D96"),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j]
+  )
+  lat <- c("B", "C","D")
+  for (i in seq_along(lat)) {
+    df <- read.table(paste0(basenames[j], "_fit_extra_n", i - 1, ".txt"))
+    cat(lat[i], " fpi(mc_sim)=", mean_print(df[1, 1], df[1, 2], digit = 2), "\n\n")
+    cat(lat[i], " fpi(mc_iso)=", mean_print(df[2, 1], df[2, 2], digit = 2), "\n\n")
+    cat(lat[i], " $\\delta\\mu \\partial_\\mu f_{\\pi}/f_{\\pi}$=", mean_print(df[3, 1], df[3, 2]), "\n\n")
+    cat(lat[i], " fpi(mc_iso)*chidof=", mean_print(df[4, 1], df[4, 2], digit = 2), "\n\n")
+
+    cat(lat[i], " $\\delta\\mu \\partial_\\mu f_{\\pi}/f_{\\pi}*\\chi_{dof}$=", mean_print(df[5, 1], df[5, 2]), "\n\n")
+    cat(lat[i], " fpi(mc_iso)*chi=", mean_print(df[6, 1], df[6, 2], digit = 2), "\n\n")
+
+    cat(lat[i], " $\\delta\\mu \\partial_\\mu f_{\\pi}/f_{\\pi}*\\chi$=", mean_print(df[7, 1], df[7, 2]), "\n\n")
+  }
+}
+
+gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed")
+gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed")
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell df_\\pi)/d\\mu$",
+  to_print = TRUE,
+  yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/der_fpi_vs_mu",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_fpi_vs_mu_mu2_mu3",
   "/home/garofalo/analysis/flow/data/fit_all_beta/der_fpi_const"
 )
 labels <- c(
   "P[0]/amu",
+  "P[0]/amu+ P[1]/mu2+ P[2]/mu3",
   "const"
 )
 
@@ -78,13 +126,15 @@ fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell df_\\pi)/d\\mu$",
 
 
 
+
+
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
-  "/home/garofalo/analysis/flow/data/fit_all_beta/der_fpi_full_const"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_Mpi_full_mu_mu2_mu3"
 )
 labels <- c(
-  "const"
+  "P[0]/amu + P[1]/amu2 + P[3]/amu3 "
 )
 
 
@@ -94,7 +144,7 @@ for (j in seq_along(basenames)) {
   make_table_fit_result(fit)
   gg <- plot_fit(basenames[j], "amu",
     # noline = TRUE,
-    data_type = c("B64", "C80","D96-fake"),
+    data_type = c("B64", "C80","D96"),
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j]
@@ -102,13 +152,13 @@ for (j in seq_along(basenames)) {
   lat <- c("B", "C","D")
   for (i in seq_along(lat)) {
     df <- read.table(paste0(basenames[j], "_fit_extra_n", i - 1, ".txt"))
-    cat(lat[i], " fpi(mc_sim)=", mean_print(df[1, 1], df[1, 2], digit = 2), "\n\n")
-    cat(lat[i], " fpi(mc_iso)=", mean_print(df[2, 1], df[2, 2], digit = 2), "\n\n")
-    cat(lat[i], " $\\delta\\mu \\partial_\\mu f_{\\pi}/f_{\\pi}$=", mean_print(df[3, 1], df[3, 2]), "\n\n")
-    cat(lat[i], " fpi(mc_iso)*chidof=", mean_print(df[4, 1], df[4, 2], digit = 2), "\n\n")
+    cat(lat[i], " Mpi(mc_sim)=", mean_print(df[1, 1], df[1, 2], digit = 2), "\n\n")
+    cat(lat[i], " Mpi(mc_iso)=", mean_print(df[2, 1], df[2, 2], digit = 2), "\n\n")
+    cat(lat[i], " $\\delta\\mu \\partial_\\mu M_{\\pi}/M_{\\pi}$=", mean_print(df[3, 1], df[3, 2]), "\n\n")
+    cat(lat[i], " Mpi(mc_iso)*chidof=", mean_print(df[4, 1], df[4, 2], digit = 2), "\n\n")
 
-    cat(lat[i], " $\\delta\\mu \\partial_\\mu f_{\\pi}/f_{\\pi}*\\chi_{dof}$=", mean_print(df[5, 1], df[5, 2]), "\n\n")
-    cat(lat[i], " fpi(mc_iso)*chi=", mean_print(df[6, 1], df[6, 2], digit = 2), "\n\n")
+    cat(lat[i], " $\\delta\\mu \\partial_\\mu M_{\\pi}/M_{\\pi}*\\chi_{dof}$=", mean_print(df[5, 1], df[5, 2]), "\n\n")
+    cat(lat[i], " Mpi(mc_iso)*chi=", mean_print(df[6, 1], df[6, 2], digit = 2), "\n\n")
 
     cat(lat[i], " $\\delta\\mu \\partial_\\mu f_{\\pi}/f_{\\pi}*\\chi$=", mean_print(df[7, 1], df[7, 2]), "\n\n")
   }
@@ -116,9 +166,9 @@ for (j in seq_along(basenames)) {
 
 gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed")
 gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed")
-fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell df_\\pi)/d\\mu$",
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell dM_\\pi)/d\\mu$",
   to_print = TRUE,
-  yrange = c(-1, 1),
+  #yrange = c(-1, 1),
   legend_position = c(0.7, 0.98)
 )
 ```

@@ -46,8 +46,8 @@ df <- data.frame(
   "mul" = c(0.0006669, 0.0005864, 0.0004934),
   "musig" = c(0,0,0),
   "mudel" = c(0,0,0),
-  "ms" = c(0.018267,  0.016053, 0.013559),
-  "mc" = c(0.23134,   0.19849, 0.16474)
+  "ms_iso" = c(0.018267,  0.016053, 0.013559),
+  "mc_iso" = c(0.23134,   0.19849, 0.16474)
 )
 ```
 
@@ -61,8 +61,8 @@ df <- mutate(df,
 )
 
 df <- mutate(df,
-  musig = (ms + mc) / 2,
-  mudel = (mc - ms) / Zp_Zs / 2
+  musig = (ms_iso + mc_iso) / 2,
+  mudel = (mc_iso - ms_iso) / Zp_Zs / 2
 )
 print(df$mc_sim,digits = 12)
 kable(df[, c(1:7)], digits = 20)
@@ -77,8 +77,8 @@ library(dplyr)
 library(knitr)
 
 df1 <- mutate(df,
-  musig = (ms_sim + mc) / 2,
-  mudel = (mc - ms_sim) / Zp_Zs / 2
+  musig = (ms_sim + mc_iso) / 2,
+  mudel = (mc_iso - ms_sim) / Zp_Zs / 2
 )
   # musigma = 0.1260567
   # mudelta = 0.1332397

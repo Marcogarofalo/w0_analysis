@@ -1,0 +1,63 @@
+# Pion D96
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+masses <- c(
+  0.0005864,
+  0.013559,
+  0.16474
+)
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+rews<-c("reweight_light_OS_D96.dat_output",
+        "reweight_strange_OS_D96.dat_output"
+        )
+types<-c("rewlOS",
+         "rewsOS"
+         )
+extras<-c("20h",
+          "20h"
+          )
+for (ob in c("f", "M")) {
+  df <- data.frame(
+    mu = c(0),
+    X = c(0),
+    dX = c(0),
+    hits = c("")
+  )
+  df <- df[-1, ]
+for (i in seq_along(rews)){
+  mt <- read_df(paste0("/home/garofalo/analysis/flow/data/out/onlinemeas_D96.dat_",rews[i]))
+  all_obs <- Rose::get_all_corr(mt)
+  obs <- paste0("d",ob,"_{PS}/d",types[i])
+  fit <- get_full_res(obs, all_obs, mt)
+  mu <- get_full_res("mu_in", all_obs, mt)
+  mu_out <- get_full_res("mu_out", all_obs, mt)
+  df[length(df[, 1]) + 1, ] <- list(mu[1, 1]+0.0015*runif(1), fit[1, 1], fit[1, 2], paste0(extras[i],", dmu", format(mu_out[1, 1] - mu[1, 1], digit = 2)))
+}  
+  #### plot
+  gg <- myggplot(fill = FALSE, shape = FALSE)
+  gg <- gg + geom_pointrange(data = df, mapping = aes(x = mu, y = X, ymin = X - dX, ymax = X + dX, color = (hits)))
+  fig <- myplotly(gg, "", "mu", paste0("d",ob,"/dmu"), to_print = TRUE, legend_title = "hits, dmu", legend_position = c(0.7, 0))
+}
+
+```

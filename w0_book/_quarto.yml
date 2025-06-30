@@ -12,6 +12,7 @@ book:
     - B64.qmd
     - pion_B64.qmd
     - pion_C80.qmd
+    - pion_D96.qmd
     - fit_deriv_fpi.qmd
     - fit_deriv_fpi_C80.qmd
     - fit_all_deriv.qmd
