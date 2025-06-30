@@ -142,7 +142,13 @@ data_all read_all_the_files(std::vector<std::string> files, const char *resampli
 
 double lhs_fun(int n, int e, int j, data_all gjack, struct fit_type fit_info)
 {
-
+    // if (j==fit_info.Njack-1) {
+    //     printf("lhs_fun: n=%d e=%d j=%d fit_info.corr_id[0]=%d fit_info.corr_id[1]=%d fit_info.corr_id[2]=%d\n",
+    //            n, e, j, fit_info.corr_id[0], fit_info.corr_id[1], fit_info.corr_id[2]);
+    //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[0]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[0]][j]);
+    //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[1]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[1]][j]);
+    //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[2]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[2]][j]);
+    // }
     double r = gjack.en[e].jack[fit_info.corr_id[0]][j];   // fpi
     r *= gjack.en[e].jack[fit_info.corr_id[1]][j];         // amu_l
     r /= gjack.en[e].jack[fit_info.corr_id[2]][j] / hbarc; // a
@@ -158,6 +164,13 @@ double rhs_1overamu(int n, int Nvar, double *x, int Npar, double *P)
 {
     double amu = x[0];
     double r = P[0] / amu;
+    return r;
+}
+
+double rhs_1overamu_mu2_mu3(int n, int Nvar, double *x, int Npar, double *P)
+{
+    double amu = x[0];
+    double r = P[0] / amu + P[1] / (amu * amu) + P[2] / (amu * amu * amu);
     return r;
 }
 
@@ -456,64 +469,63 @@ int main(int argc, char **argv)
     int id_dfpi_dmu = 9;
     int id_dMpi_dmu = 4;
     int id_dfpi = 6;
-    ///// fillind D96
-    fit_type fit_info;
-    fit_info.Nxen = std::vector<std::vector<int>>(1);
-    for (int n = 0; n < 1; n++)
-    {
-        fit_info.Nxen[n].resize(myen[n].size());
-        for (int e = 0; e < myen[n].size(); e++)
-        {
-            fit_info.Nxen[n][e] = myen[n][e];
-        }
-    }
-    fit_info.Npar = 1;
-    fit_info.Nvar = 1;
-    fit_info.Njack = Njack;
-    fit_info.init_N_etot_form_Nxen();
-    double *mean_fpi = (double *)malloc(sizeof(double) * fit_info.entot);
-    fit_info.corr_id = {id_dfpi_dmu};
-    fit_info.compute_cov_fit(argv, jackall, lhs_fun_fpi);
-    for (int e = 0; e < myen[0].size(); e++)
-    {
-        mean_fpi[e] = jackall.en[myen[0][e]].jack[fit_info.corr_id[0]][Njack - 1]; // fpi   
-    }
-    double **tmp = fake_sampling_covariance(argv[1], mean_fpi, Njack, myen[0].size(), fit_info.cov, 9);
-    int count=0;
-    for (int e = 0; e < myen[2].size(); e++)
-    {
-        for (int j = 0; j < Njack; j++)
-        {
-            jackall.en[myen[2][e]].jack[fit_info.corr_id[0]][j] = tmp[count][j]+0.2; // fpi   
-        }
-        count++;
-    }
-    
-    free(tmp);
-    free_2(fit_info.entot, fit_info.cov);
+    // ///// fillind D96
+    // fit_type fit_info;
+    // fit_info.Nxen = std::vector<std::vector<int>>(1);
+    // for (int n = 0; n < 1; n++)
+    // {
+    //     fit_info.Nxen[n].resize(myen[n].size());
+    //     for (int e = 0; e < myen[n].size(); e++)
+    //     {
+    //         fit_info.Nxen[n][e] = myen[n][e];
+    //     }
+    // }
+    // fit_info.Npar = 1;
+    // fit_info.Nvar = 1;
+    // fit_info.Njack = Njack;
+    // fit_info.init_N_etot_form_Nxen();
+    // double *mean_fpi = (double *)malloc(sizeof(double) * fit_info.entot);
+    // fit_info.corr_id = {id_dfpi_dmu};
+    // fit_info.compute_cov_fit(argv, jackall, lhs_fun_fpi);
+    // for (int e = 0; e < myen[0].size(); e++)
+    // {
+    //     mean_fpi[e] = jackall.en[myen[0][e]].jack[fit_info.corr_id[0]][Njack - 1]; // fpi
+    // }
+    // double **tmp = fake_sampling_covariance(argv[1], mean_fpi, Njack, myen[0].size(), fit_info.cov, 9);
+    // int count = 0;
+    // for (int e = 0; e < myen[2].size(); e++)
+    // {
+    //     for (int j = 0; j < Njack; j++)
+    //     {
+    //         jackall.en[myen[2][e]].jack[fit_info.corr_id[0]][j] = tmp[count][j] + 0.2; // fpi
+    //     }
+    //     count++;
+    // }
 
-    ///////////////////////////
-    ///// smame thig with Mpi
-    fit_info.corr_id = {id_dMpi_dmu};
-    fit_info.compute_cov_fit(argv, jackall, lhs_fun_fpi);
-    for (int e = 0; e < myen[0].size(); e++)
-    {
-        mean_fpi[e] = jackall.en[myen[0][e]].jack[fit_info.corr_id[0]][Njack - 1]; // fpi   
-    }
-    tmp = fake_sampling_covariance(argv[1], mean_fpi, Njack, myen[0].size(), fit_info.cov, 9);
-    count=0;
-    for (int e = 0; e < myen[2].size(); e++)
-    {
-        for (int j = 0; j < Njack; j++)
-        {
-            jackall.en[myen[2][e]].jack[fit_info.corr_id[0]][j] = tmp[count][j]+0.2; // fpi   
-        }
-        count++;
-    }
+    // free(tmp);
+    // free_2(fit_info.entot, fit_info.cov);
 
-    free(tmp);
-    free_2(fit_info.entot, fit_info.cov);
+    // ///////////////////////////
+    // ///// smame thig with Mpi
+    // fit_info.corr_id = {id_dMpi_dmu};
+    // fit_info.compute_cov_fit(argv, jackall, lhs_fun_fpi);
+    // for (int e = 0; e < myen[0].size(); e++)
+    // {
+    //     mean_fpi[e] = jackall.en[myen[0][e]].jack[fit_info.corr_id[0]][Njack - 1]; // fpi
+    // }
+    // tmp = fake_sampling_covariance(argv[1], mean_fpi, Njack, myen[0].size(), fit_info.cov, 9);
+    // count = 0;
+    // for (int e = 0; e < myen[2].size(); e++)
+    // {
+    //     for (int j = 0; j < Njack; j++)
+    //     {
+    //         jackall.en[myen[2][e]].jack[fit_info.corr_id[0]][j] = tmp[count][j] + 0.2; // fpi
+    //     }
+    //     count++;
+    // }
 
+    // free(tmp);
+    // free_2(fit_info.entot, fit_info.cov);
 
     //////////////////////////////////////////////////////////////
     // fitting
@@ -628,22 +640,81 @@ int main(int argc, char **argv)
         compute_fpi_at_mciso(jackall, fit_info, der_fpi_const, id_dfpi, f_name_c);
 
         //////////////////////////////////////////////////////////////
+        // 1/mu^2
+        //////////////////////////////////////////////////////////////
+        fit_info.Nxen = std::vector<std::vector<int>>(2);
+        for (int n = 0; n < 2; n++)
+        {
+            fit_info.Nxen[n].resize(myen[n].size());
+            for (int e = 0; e < myen[n].size(); e++)
+            {
+                fit_info.Nxen[n][e] = myen[n][e];
+            }
+        }
+        printf("fit_info.Nxen.size()=%ld\n", fit_info.Nxen.size());
+        // fit_info.Nxen.resize(1, std::vector<int>(files.size()));
+        // for (int e = 0; e < files.size(); e++)
+        // {
+        //     fit_info.Nxen[0][e] = e;
+        // }
+        // fit_info.N = fit_info.Nxen.size();
+        fit_info.function = rhs_1overamu_mu2_mu3;
+
+        fit_info.Npar = 3;
+        fit_info.Nvar = 1;
+        fit_info.Njack = Njack;
+        fit_info.init_N_etot_form_Nxen();
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+        printf("fit_info.Nvar=%d fit_info.entot=%d fit_info.Njack=%d\n", fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+        count = 0;
+        for (int n = 0; n < fit_info.N; n++)
+        {
+            for (int e : fit_info.Nxen[n])
+            {
+                for (int j = 0; j < Njack; j++)
+                {
+                    // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
+                    fit_info.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
+                }
+                count++;
+            }
+        }
+        fit_info.linear_fit = false;
+        // fit_info.verbosity = 1;
+        fit_info.covariancey = true;
+        fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+        fit_info.make_covariance_block_diagonal_in_n();
+        fit_info.compute_cov1_fit();
+        namefit = "der_" + der_name[i] + "_vs_mu_mu2_mu3";
+
+        fit_result der_fpi_mu_mu2_mu3 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+        fit_info.band_range = {0.1, 350};
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2_mu3, der_fpi_mu_mu2_mu3, 0, fit_info.Nxen[0].size() - 1, 1, {});
+
+        // // compute fpi at the charm point
+        file_out_name f_name_mu_mu2_mu3(argv[3], namefit.c_str());
+        compute_fpi_at_mciso(jackall, fit_info, der_fpi_mu_mu2_mu3, id_dfpi, f_name_mu_mu2_mu3);
+
+        //////////////////////////////////////////////////////////////
         fit_info.N = 0;
         //////////////////////////////////////////////////////////////
-        // const fit all
+        // fit all
         //////////////////////////////////////////////////////////////
 
         fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
         for (int n = 0; n < myen.size(); n++)
         {
-            fit_info.Nxen[n].resize(myen[n].size() - 2);
-            for (int e = 0; e < myen[n].size() - 2; e++)
+            fit_info.Nxen[n].resize(myen[n].size());
+            for (int e = 0; e < myen[n].size(); e++)
             {
                 fit_info.Nxen[n][e] = myen[n][e];
             }
         }
         fit_info.init_N_etot_form_Nxen();
-        fit_info.function = rhs_const;
+        fit_info.function = rhs_1overamu_mu2_mu3;
+        fit_info.linear_fit = true;
+        fit_info.Npar = 3;
         fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
 
         count = 0;
@@ -660,18 +731,18 @@ int main(int argc, char **argv)
             }
         }
         // fit_info.linear_fit = false;
-        fit_info.verbosity = 1;
+        fit_info.verbosity = 0;
         fit_info.covariancey = true;
         fit_info.compute_cov_fit(argv, jackall, lhs_fun);
         fit_info.make_covariance_block_diagonal_in_n();
         fit_info.compute_cov1_fit();
-        fit_info.covariancey = false;
+        
 
-        namefit = "der_" + der_name[i] + "_full_const";
+        namefit = "der_" + der_name[i] + "_full_mu_mu2_mu3";
 
         fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        fit_info.band_range = {27, 350};
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0].size() - 1, 1, {});
+        fit_info.band_range = {1, 350};
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
 
         // // compute fpi at the charm point
         file_out_name f_name_c_full(argv[3], namefit.c_str());
