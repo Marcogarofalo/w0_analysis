@@ -26,4 +26,5 @@ double lhs_function_f_PS_p_dmcorr(int j, double ****in, int t, struct fit_type f
 double lhs_plateau_dM_dmu(int j, double ****in, int t, struct fit_type fit_info);
 double lhs_plateau_df_dmu(int j, double ****in, int t, struct fit_type fit_info);
 
+double lhs_plateau_ratio_dM_dmu(int j, double ****in, int t, struct fit_type fit_info);
 #endif

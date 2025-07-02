@@ -385,6 +385,27 @@ double lhs_plateau_dM_dmu(int j, double ****in, int t, struct fit_type fit_info)
     return r;
 }
 
+double lhs_plateau_ratio_dM_dmu(int j, double ****in, int t, struct fit_type fit_info)
+{
+    int idp = fit_info.corr_id[0];
+    int idl = fit_info.corr_id[1];
+    int id = fit_info.corr_id[2];
+    
+    double dmu2 = fit_info.ave_P[0];
+    double dmul = fit_info.ave_P[1];
+
+    double M2 = M_eff_T(t, fit_info.T, in[j][idp]);
+    double Ml = M_eff_T(t, fit_info.T, in[j][idl]);
+    double M = M_eff_T(t, fit_info.T, in[j][id]);
+
+    // we should take -Im of V0P5 which is saved as real part in this data
+    double r2 = (M2 - M) / dmu2;
+    double rl = (Ml - M) / dmul;
+
+    return r2/rl;
+}
+
+
 double lhs_plateau_df_dmu(int j, double ****in, int t, struct fit_type fit_info)
 {
     std::vector<int> id(fit_info.corr_id);   
