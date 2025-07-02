@@ -109,6 +109,31 @@ gg <- plot_df_corr_ggplot(df, width = 0.05)
 fig <- myplotly(gg, "", "$t/a$", "$dM_{PS}/d\\mu$", to_print = TRUE)
 ```
 
+```{r, results='asis',echo=FALSE}
+df <- NULL
+
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/ratio_onlinemeas_C80_LMA.dat_reweight_light_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("plateau_ratio_dM/dreweight_light_OS_C80_LMA.dat", all_obs, mt, df, print_res = T, nudge = 0.0, reshape = T)
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/ratio_onlinemeas_C80_LMA.dat_reweight_strange_mdmu_OS_C80_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("plateau_ratio_dM/dreweight_strange_mdmu_OS_C80_LMA.dat", all_obs, mt, df, print_res = T, nudge = 0.0, reshape = T)
+
+df <- add_corr_to_df("plateau_dM/dreweight_strange_mdmu_OS_C80_LMA.dat", all_obs, mt, df, print_res = T, nudge = 0.0, reshape = T)
+df <- add_corr_to_df("plateau_dM/dreweight_light_OS_C80_LMA.dat", all_obs, mt, df, print_res = T, nudge = 0.0, reshape = T)
+
+
+
+df$y <- df$y
+df$fit <- df$fit
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+
+fig <- myplotly(gg, "", "$t/a$", "$dM_{PS}/d\\mu$", to_print = TRUE)
+```
+
+
 ## $f_\pi$
 
 ```{r, results='asis',echo=FALSE}
