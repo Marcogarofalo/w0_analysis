@@ -12,9 +12,6 @@ onlinemeas_C80_LMA.dat reweight_strange_0.2_OS_C80_LMA.dat
 onlinemeas_C80_LMA.dat reweight_strange_mdmu_OS_C80_LMA.dat
 onlinemeas_C80_LMA.dat reweight_light_OS_C80_LMA.dat
 new_beta
-# onlinemeas_D96_LMA.dat reweight_charm_OS_D96_LMA.dat
-# onlinemeas_D96_LMA.dat reweight_strange_p2dmu_OS_D96_LMA.dat
-# onlinemeas_D96_LMA.dat reweight_strange_pdmu_OS_D96_LMA.dat
+onlinemeas_D96.dat reweight_strange_pdmu_OS_D96.dat
 onlinemeas_D96.dat reweight_strange_OS_D96.dat
-# onlinemeas_D96_LMA.dat reweight_strange_pdmu_OS_D96_LMA.dat
 onlinemeas_D96.dat reweight_light_OS_D96.dat

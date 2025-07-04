@@ -16,6 +16,7 @@ book:
     - fit_deriv_fpi.qmd
     - fit_deriv_fpi_C80.qmd
     - fit_all_deriv.qmd
+    - fit_all_deriv_w0.qmd
     - w0_scale_setting.qmd
     - params.qmd
     - summary.qmd

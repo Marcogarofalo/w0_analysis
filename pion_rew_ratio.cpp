@@ -512,9 +512,17 @@ int main(int argc, char **argv)
     write_jack(zero, Njack, jack_file);
     write_jack(zero, Njack, jack_file);
     write_jack(zero, Njack, jack_file);
-    write_jack(zero, Njack, jack_file);
-    write_jack(zero, Njack, jack_file);
+
+    double *tmp = myres->create_fake(head_rew.mus[0], 1e-20, 1);
+    print_result_in_file(outfile, tmp, "mu_in", 0, 0, 0);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(11);
+    free(tmp);
+    tmp = myres->create_fake(head_rew.oranges[0], 1e-20, 1);
+    print_result_in_file(outfile, tmp, "mu_out", 0, 0, 0);
+    write_jack(tmp, Njack, jack_file);
     check_correlatro_counter(12);
+    free(tmp);
 
     write_jack(amuiso[0], Njack, jack_file);
     check_correlatro_counter(13);
@@ -550,8 +558,8 @@ int main(int argc, char **argv)
     fit_info.function = constant_fit;
     fit_info.linear_fit = true;
     fit_info.T = head.T;
-    fit_info.corr_id = { head.ncorr + 0, 0};
-    fit_info.ave_P = { dmul};
+    fit_info.corr_id = {head.ncorr + 0, 0};
+    fit_info.ave_P = {dmul};
 
     mysprintf(name_rew, NAMESIZE, "plateau_dM/d%s", argv[7]);
     struct fit_result fit_dM_dmul = fit_fun_to_fun_of_corr(
@@ -560,8 +568,8 @@ int main(int argc, char **argv)
         jack_file);
     check_correlatro_counter(20);
 
-    fit_info.corr_id = { head.ncorr *2+ 0, 0};
-    fit_info.ave_P = { dmu2};
+    fit_info.corr_id = {head.ncorr * 2 + 0, 0};
+    fit_info.ave_P = {dmu2};
 
     mysprintf(name_rew, NAMESIZE, "plateau_dM/d%s", argv[8]);
     struct fit_result fit_dM_dmu2 = fit_fun_to_fun_of_corr(
