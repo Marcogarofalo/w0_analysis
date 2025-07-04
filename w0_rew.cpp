@@ -7,6 +7,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <regex>
 #include <string>
 
 #include "global.hpp"
@@ -471,6 +472,7 @@ int main(int argc, char **argv)
     // start fitting
     //////////////////////////////
     corr_counter = -1;
+    file_head.l0 = head.T * 2;  // dou
     // std::vector<double> w0(Njack);
     // for (size_t j = 0; j < Njack; j++) {
     //     w0[j] = rtbis_func_eq_input(fit_info.function, l /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, Mpi2_fpi2_phys[j], 1e-6, 2, 1e-10, 2);
@@ -505,7 +507,8 @@ int main(int argc, char **argv)
     // }
     fit_info.function = poly3;
     fit_info.linear_fit = true;
-    fit_info.T = head.T;
+    fit_info.T = head.T * 2;
+    printf("T = %d\n", fit_info.T);
     fit_info.corr_id = {6};
 
     for (int t = 1; t < head.T; t++)
@@ -548,12 +551,15 @@ int main(int argc, char **argv)
         w0[j] = std::sqrt(w0[j]);
     }
     printf("w0 = %g  %g\n", w0[Njack - 1], myres->comp_error(w0.data()));
+    write_jack(w0.data(), Njack, jack_file);
+    check_correlatro_counter(1);
 
     print_result_in_file(outfile, w0.data(), "w0", 0.0, fit_info.tmin, fit_info.tmax);
     free_2(Njack, tif);
     //////////////////////////////////////////////////////////////
     // charm reweighting
     //////////////////////////////////////////////////////////////
+    std::vector<double> w0_rew(Njack);
     {
         fit_info.corr_id = {head.ncorr + 0, head.ncorr + 1};
         // fit_info.linear_fit = false;
@@ -562,8 +568,8 @@ int main(int argc, char **argv)
         {
             if (lhs_function_W_rew(Njack - 1, conf_jack, t, fit_info) > 0.3)
             {
-                fit_info.tmin = t - 5;
-                fit_info.tmax = t + 5;
+                fit_info.tmin = t - 3;
+                fit_info.tmax = t + 2;
                 break;
             }
             if (t == head.T - 1)
@@ -599,80 +605,107 @@ int main(int argc, char **argv)
             option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
             outfile, lhs_function_W_rew, name_rew, fit_info,
             jack_file);
-        check_correlatro_counter(1);
+        check_correlatro_counter(2);
 
         double **tif = swap_indices(fit_info.Npar, Njack, fit_W.P);
         std::vector<double> swapped_x(fit_info.Nvar);
-        std::vector<double> w0(Njack);
 
         mysprintf(name_rew, NAMESIZE, "w0_%s", argv[8]);
         for (size_t j = 0; j < Njack; j++)
         {
-            w0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin - 5, fit_info.tmax + 5, 1e-10, 2);
-            w0[j] = int2flowt(w0[j]);
-            w0[j] = std::sqrt(w0[j]);
+            w0_rew[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin - 5, fit_info.tmax + 5, 1e-10, 2);
+            w0_rew[j] = int2flowt(w0_rew[j]);
+            w0_rew[j] = std::sqrt(w0_rew[j]);
         }
-        printf("%s = %g  %g\n", name_rew, w0[Njack - 1], myres->comp_error(w0.data()));
+        printf("%s = %g  %g\n", name_rew, w0_rew[Njack - 1], myres->comp_error(w0_rew.data()));
+        write_jack(w0_rew.data(), Njack, jack_file);
+        check_correlatro_counter(3);
 
-        print_result_in_file(outfile, w0.data(), name_rew, 0.0, fit_info.tmin, fit_info.tmax);
+        print_result_in_file(outfile, w0_rew.data(), name_rew, 0.0, fit_info.tmin, fit_info.tmax);
         free_2(Njack, tif);
     }
 
-    // //////////////////////////////////////////////////////////////
-    // // charm reweighting
-    // //////////////////////////////////////////////////////////////
-    // {
-    //     fit_info.corr_id = {0};
-    //     fit_info.linear_fit = true;
+    std::vector<double> der(Njack);
 
-    //     for (int t = 1; t < head.T; t++)
-    //     {
-    //         if (lhs_function_w0_eg(Njack - 1, conf_jack_Orew, t, fit_info) > 0.3)
-    //         {
-    //             fit_info.tmin = t - 5;
-    //             fit_info.tmax = t + 5;
-    //             break;
-    //         }
-    //         if (t == head.T - 1)
-    //             printf("Warning: W(t) with charm reweighting never gets to 0.3\n");
-    //     }
+    //////////////////////////////////////////////////////////////
+    // reading onlinemeas parameters
+    //////////////////////////////////////////////////////////////
+    std::vector<double *> amuiso(3);
+    double mean, err;
+    int seed;
+    std::string name_in(option[6]);
+    std::string name_online(option[6]);
+    name_online = std::regex_replace(name_online, std::regex("flow"), "onlinemeas");
+    mysprintf(option[6], NAMESIZE, "%s", name_online.c_str());
 
-    //     // // print for frezzotti
-    //     // {
-    //     //     double *tmp = (double *)malloc(sizeof(double) * Njack);
-    //     //     for (int j = 0; j < Njack; j++)
-    //     //     {
-    //     //         tmp[j] = lhs_function_w0_eg(j, conf_jack_Orew, 150, fit_info);
-    //     //     }
-    //     //     char name[NAMESIZE];
-    //     //     mysprintf(name, NAMESIZE, "%s/out/W_rew_charm_OS_t150_jack.txt", option[3]);
-    //     //     myres->write_jack_in_file(tmp, name);
-    //     //     free(tmp);
-    //     // }
-    //     char name_rew[NAMESIZE];
-    //     mysprintf(name_rew, NAMESIZE, "W_%s(t)", argv[8]);
-    //     struct fit_result fit_W = fit_fun_to_fun_of_corr(
-    //         option, kinematic_2pt, (char *)"P5P5", conf_jack_Orew, namefile_plateaux,
-    //         outfile, lhs_function_w0_eg, name_rew, fit_info,
-    //         jack_file);
-    //     check_correlatro_counter(2);
+    line_read_param(option, "muliso", mean, err, seed, namefile_plateaux);
+    amuiso[0] = myres->create_fake(mean, err, seed);
+    line_read_param(option, "musiso", mean, err, seed, namefile_plateaux);
+    amuiso[1] = myres->create_fake(mean, err, seed);
+    line_read_param(option, "muciso", mean, err, seed, namefile_plateaux);
+    amuiso[2] = myres->create_fake(mean, err, seed);
 
-    //     double **tif = swap_indices(fit_info.Npar, Njack, fit_W.P);
-    //     std::vector<double> swapped_x(fit_info.Nvar);
-    //     std::vector<double> w0(Njack);
+    std::vector<double *> amusim(3);
+    line_read_param(option, "mulsim", mean, err, seed, namefile_plateaux);
+    amusim[0] = myres->create_fake(mean, err, seed);
+    line_read_param(option, "mussim", mean, err, seed, namefile_plateaux);
+    amusim[1] = myres->create_fake(mean, err, seed);
+    line_read_param(option, "mucsim", mean, err, seed, namefile_plateaux);
+    amusim[2] = myres->create_fake(mean, err, seed);
 
-    //     mysprintf(name_rew, NAMESIZE, "w0_%s", argv[8]);
-    //     for (size_t j = 0; j < Njack; j++)
-    //     {
-    //         w0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin - 5, fit_info.tmax + 5, 1e-10, 2);
-    //         w0[j] = int2flowt(w0[j]);
-    //         w0[j] = std::sqrt(w0[j]);
-    //     }
-    //     printf("%s = %g  %g\n", name_rew, w0[Njack - 1], myres->comp_error(w0.data()));
+    line_read_param(option, "a", mean, err, seed, namefile_plateaux);
+    double *a_fm = myres->create_fake(mean, err, seed);
 
-    //     print_result_in_file(outfile, w0.data(), name_rew, 0.0, fit_info.tmin, fit_info.tmax);
-    //     free_2(Njack, tif);
-    // }
+    mysprintf(option[6], NAMESIZE, "%s", name_in.c_str());
+
+    //// end reading onlinemeas parameters
+    double dmu = head_rew.oranges[0] - head_rew.mus[0];
+    for (size_t j = 0; j < Njack; j++)
+    {
+        der[j] = (w0_rew[j] - w0[j]) / dmu;
+    }
+    char name_rew[NAMESIZE];
+    mysprintf(name_rew, NAMESIZE, "dw0/d%s", argv[7]);
+    printf("%s = %g  %g\n", name_rew, der[Njack - 1], myres->comp_error(der.data()));
+    print_result_in_file(outfile, der.data(), name_rew, 0.0, fit_info.tmin, fit_info.tmax);
+
+    write_jack(der.data(), Njack, jack_file);
+    check_correlatro_counter(4);
+
+    std::vector<double> zeros(Njack, 0.0);
+    write_jack(zeros.data(), Njack, jack_file);
+    write_jack(zeros.data(), Njack, jack_file);
+    write_jack(zeros.data(), Njack, jack_file);
+    write_jack(zeros.data(), Njack, jack_file);
+    write_jack(zeros.data(), Njack, jack_file);
+    write_jack(zeros.data(), Njack, jack_file);
+
+    double *tmp = myres->create_fake(head_rew.mus[0], 1e-20, 1);
+    print_result_in_file(outfile, tmp, "mu_in", 0, 0, 0);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(11);
+    free(tmp);
+    tmp = myres->create_fake(head_rew.oranges[0], 1e-20, 1);
+    print_result_in_file(outfile, tmp, "mu_out", 0, 0, 0);
+    write_jack(tmp, Njack, jack_file);
+    check_correlatro_counter(12);
+    free(tmp);
+
+    write_jack(amuiso[0], Njack, jack_file);
+    check_correlatro_counter(13);
+    write_jack(amuiso[1], Njack, jack_file);
+    check_correlatro_counter(14);
+    write_jack(amuiso[2], Njack, jack_file);
+    check_correlatro_counter(15);
+    write_jack(a_fm, Njack, jack_file);
+    check_correlatro_counter(16);
+
+    write_jack(amusim[0], Njack, jack_file);
+    check_correlatro_counter(17);
+    write_jack(amusim[1], Njack, jack_file);
+    check_correlatro_counter(18);
+    write_jack(amusim[2], Njack, jack_file);
+    check_correlatro_counter(19);
 
     fit_info.restore_default();
 }

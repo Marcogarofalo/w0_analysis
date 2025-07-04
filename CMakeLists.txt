@@ -85,3 +85,5 @@ add_target_with_libs(create_fake_jack create_fake_jack.cpp)
 add_target_with_libs(fit_all_beta_rew_der fit_all_beta_rew_der.cpp)
 
 add_target_with_libs(pion_rew_ratio pion_rew_ratio.cpp)
+
+add_target_with_libs(fit_all_beta_w0rew_der fit_all_beta_w0rew_der.cpp)
