@@ -35,7 +35,7 @@ the derivative with respect to the sea is computed with the scalar insertions.
 
 ```{r}
 df <- data.frame(
-  "en" = c("B64", "C80","D54"),
+  "en" = c("B64", "C80","96"),
   "kappa" = c(0.139426500000, 0.138752850000, 0.137972174000),
   "mul_sim" = c(0.00072, 0.0006, 0.00054),
   "musig_sim" = c(0.1315052, 0.107146000965, 0.087911000000),#0.077706999882

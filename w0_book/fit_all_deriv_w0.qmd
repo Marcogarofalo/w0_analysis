@@ -31,10 +31,12 @@ masses <- c(
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
-  "/home/garofalo/analysis/flow/data/fit_all_beta/der_w0_full_mu_mu2_mu3"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_w0_full_mu_mu2_mu3",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_w0_full_mu0_mu1"
 )
 labels <- c(
-  "P[0]/amu + P[1]/amu2 + P[3]/amu3 "
+  "P[0]/amu + P[1]/amu2 + P[3]/amu3 ",
+  "P[0] + P[1]*mu "
 )
 
 
@@ -66,7 +68,7 @@ for (j in seq_along(basenames)) {
 
 gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed")
 gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed")
-fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell dw_0)/d\\mu$",
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell dw_0)/d\\mu[fm]$",
   to_print = TRUE,
   #yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)

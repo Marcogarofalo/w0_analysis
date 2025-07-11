@@ -61,3 +61,30 @@ for (i in seq_along(rews)){
 }
 
 ```
+
+
+
+
+##  rew history
+
+
+```{r, results='asis',echo=FALSE}
+gg <- ggplot() +
+  theme_bw() # myggplot(fill = FALSE,shape = FALSE)
+
+
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_D96.dat_reweight_light_OS_D96.dat_history.txt", header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[, 3]), color = "l"))
+
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_D96.dat_reweight_strange_OS_D96.dat_history.txt", header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[, 3]), color = "s"))
+
+
+df <- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_D96.dat_reweight_strange_pdmu_OS_D96.dat_history.txt", header = TRUE)
+gg <- gg + geom_line(aes(x = !!seq_along(df[, 1]), y = !!(df[, 3]), color = "s+dmu"))
+
+
+
+
+fig <- myplotly(gg, "", "conf", "$e^{w(U)-<w>}$", to_print = TRUE)
+```
