@@ -20,9 +20,9 @@ res1 <- f1(df)
 ggp # Let knit handle the plot
 myplotly(ggplot())
 masses <- c(
-  0.0006669,
-  0.018267,
-  0.23134
+  1,
+   27.30,
+   11.70*27.30
 )
 ```
 
@@ -276,9 +276,6 @@ fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell dM_\\pi)/d\\mu$",
 ## enlarging the error to have chi2dof=1
 
 
-## fitting the difference
-
-larger plateau respect to fit the mass separatelly 0.7-4.8 fm
 
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}

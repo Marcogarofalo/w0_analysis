@@ -149,8 +149,8 @@ double lhs_fun(int n, int e, int j, data_all gjack, struct fit_type fit_info)
     //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[1]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[1]][j]);
     //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[2]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[2]][j]);
     // }
-    double r = gjack.en[e].jack[fit_info.corr_id[0]][j]; // fpi
-    r *= gjack.en[e].jack[fit_info.corr_id[1]][j];       // amu_l
+    double r = gjack.en[e].jack[fit_info.corr_id[0]][j]; // d(w0/a)/d(a*mu)
+    r *= gjack.en[e].jack[fit_info.corr_id[1]][j];       // a*mu_l
     r *= gjack.en[e].jack[fit_info.corr_id[2]][j];       // a
     return r;
 }
@@ -287,15 +287,15 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
             for (int p = 0; p < fit_info.Npar; p++)
                 tif[p] = fit_res.P[p][j];
             double der = fit_info.function(n, fit_info.Nvar, tmp_x, fit_info.Npar, tif) / (amuliso * a_fm);
-            fpi_mciso[j] = (jackall.en[id].jack[id_dfpi][j] + (amuciso - amucsim) * der) ;
+            fpi_mciso[j] = (jackall.en[id].jack[id_dfpi][j] + (amuciso - amucsim) * der);
             relative_error[j] = der * (amuciso - amucsim) / jackall.en[id].jack[id_dfpi][j];
 
             double derchidof = fit_info.function(n, fit_info.Nvar, tmp_x, fit_info.Npar, tifchidof[j]) / (amuliso * a_fm);
-            fpi_mcisochidof[j] = (jackall.en[id].jack[id_dfpi][j] + (amuciso - amucsim) * derchidof) ;
+            fpi_mcisochidof[j] = (jackall.en[id].jack[id_dfpi][j] + (amuciso - amucsim) * derchidof);
             relative_error_chidof[j] = derchidof * (amuciso - amucsim) / jackall.en[id].jack[id_dfpi][j];
 
             double derchi = fit_info.function(n, fit_info.Nvar, tmp_x, fit_info.Npar, tifchi[j]) / (amuliso * a_fm);
-            fpi_mcisochi[j] = (jackall.en[id].jack[id_dfpi][j] + (amuciso - amucsim) * derchi) ;
+            fpi_mcisochi[j] = (jackall.en[id].jack[id_dfpi][j] + (amuciso - amucsim) * derchi);
             relative_error_chi[j] = derchi * (amuciso - amucsim) / jackall.en[id].jack[id_dfpi][j];
 
             // relative_error[j] = fit_res.P[0][j] * (amuciso - amucsim);
@@ -556,5 +556,112 @@ int main(int argc, char **argv)
         // // compute fpi at the charm point
         file_out_name f_name_c_full_poly(argv[3], namefit.c_str());
         compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full_poly, id_w0, f_name_c_full_poly);
+
+        //////////////////////////////////////////////////////////////
+        // enlarge error such that chi2/dof=1
+        //////////////////////////////////////////////////////////////
+
+        printf("chi2_dof= %g\n", der_fpi_const_full_poly.chi2[Njack - 1]);
+        printf("sqrt(chi2_dof)= %g\n", std::sqrt(der_fpi_const_full_poly.chi2[Njack - 1]));
+
+        std::vector<double> fin(Njack);
+        std::vector<double> mul(Njack);
+        for (int n = 0; n < fit_info.N; n++)
+        {
+            for (int e : fit_info.Nxen[n])
+            {
+
+                double chi2_dof = der_fpi_const_full_poly.chi2[Njack - 1];
+
+                int id = fit_info.corr_id[0];
+
+                for (int j = 0; j < Njack; j++)
+                {
+                    fin[j] = lhs_fun(n, e, j, jackall, fit_info);
+                }
+                // // to a quantity a we want to sum b  such that
+                // // sigma_a+b = sqrt(sigma_a^2 + sigma_b^2) = sigma_a * sqrt(chi_d^2)
+                // // --> sigma_b = sqrt(sigma_a^2 (chi_d^2-1))
+                // // this can work only if chi^2_d >1
+                // error(chi2_dof < 1, 1, "enlarge error such that chi2/dof=1", "chi2_dof = %g <1", chi2_dof);
+                // double sigma_a = myres->comp_error(fin.data());
+                // double sigma_b = std::sqrt(sigma_a * sigma_a * (chi2_dof - 1));
+                // double *b = myres->create_fake(0, sigma_b, 2);
+                myres->mult_error(fin.data(), fin.data(), std::sqrt(chi2_dof));
+                for (int j = 0; j < Njack; j++)
+                {
+                    // fin[j] += b[j];
+                    // reverse lhs_fun to get the jacknife for the derivative
+                    jackall_chi.en[e].jack[id][j] = fin[j] / (jackall.en[e].jack[fit_info.corr_id[2]][j] * jackall.en[e].jack[fit_info.corr_id[1]][j]); //
+                    // // check consistency
+                    double tmp = lhs_fun(n, e, j, jackall_chi, fit_info);
+                    printf("%g\n", fin[j] / tmp);
+                }
+                // check that the actually the error grows as expected
+                // double sigma_apb = myres->comp_error(fin.data());
+                // printf("sigma_apb/sigma_a = %g\n", sigma_apb / sigma_a);
+                count++;
+            }
+        }
+        fit_type fit_info_chi;
+        fit_info_chi.corr_id = {id_dw0_dmu, id_amuliso, id_a_fm};
+
+        fit_info_chi.Nxen = std::vector<std::vector<int>>(myen.size());
+        for (int n = 0; n < myen.size(); n++)
+        {
+            fit_info_chi.Nxen[n].resize(myen[n].size());
+            for (int e = 0; e < myen[n].size(); e++)
+            {
+                fit_info_chi.Nxen[n][e] = myen[n][e];
+            }
+        }
+        fit_info_chi.init_N_etot_form_Nxen();
+        fit_info_chi.function = rhs_1_mu;
+        fit_info_chi.linear_fit = true;
+        fit_info_chi.Npar = 2;
+        fit_info_chi.Nvar = 1;
+        fit_info_chi.Njack = Njack;
+        fit_info_chi.x = double_malloc_3(fit_info_chi.Nvar, fit_info_chi.entot, fit_info_chi.Njack);
+
+        count = 0;
+        for (int n = 0; n < fit_info_chi.N; n++)
+        {
+            for (int e : fit_info_chi.Nxen[n])
+            {
+                for (int j = 0; j < Njack; j++)
+                {
+                    // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
+                    fit_info_chi.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
+                }
+                count++;
+            }
+        }
+        // fit_info.linear_fit = false;
+        fit_info_chi.verbosity = 0;
+        fit_info_chi.covariancey = true;
+        fit_info_chi.compute_cov_fit(argv, jackall_chi, lhs_fun);
+        fit_info_chi.make_covariance_block_diagonal_in_n();
+        fit_info_chi.compute_cov1_fit();
+
+        // for (int i = 0; i < fit_info.entot; i++)
+        // {
+        //     for (int j = 0; j < fit_info.entot; j++)
+        //     {
+        //         printf("%-15g ", fit_info_chi.cov1[i][j] / fit_info.cov1[i][j]);
+        //     }
+        //     printf("\n");
+        // }
+        namefit = "der_" + der_name[i] + "_full_mu0_mu1_chi2d1";
+
+        fit_result der_fpi_const_full_poly_chi2d1 = fit_all_data(argv, jackall_chi, lhs_fun, fit_info_chi, namefit.c_str());
+        fit_info_chi.band_range = {1, 350};
+        print_fit_band(argv, jackall_chi, fit_info_chi, fit_info_chi, namefit.c_str(), "amu", der_fpi_const_full_poly_chi2d1, der_fpi_const_full_poly_chi2d1, 0, fit_info_chi.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
+
+        // // compute fpi at the charm point
+        file_out_name f_name_diffplat_c_full_chi21(argv[3], namefit.c_str());
+        compute_fpi_at_mciso(jackall_chi, fit_info_chi, der_fpi_const_full_poly_chi2d1, id_w0, f_name_diffplat_c_full_chi21);
+
+        fit_info_chi.restore_default();
+        fit_info.restore_default();
     }
 }

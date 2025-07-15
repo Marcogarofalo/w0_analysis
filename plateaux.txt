@@ -124,10 +124,40 @@ onlinemeas_B64.dat  plateau_df/drewcOS_0.25_25s  20 60 1
 onlinemeas_B64.dat  plateau_dM/drewcOS_0.25_1s  20 60 1
 onlinemeas_B64.dat  plateau_df/drewcOS_0.25_1s  20 60 1
 
-onlinemeas_B64.dat  plateau_dM/drewsOS       20 60 1
-onlinemeas_B64.dat  plateau_df/drewsOS       20 60 1
-onlinemeas_B64.dat  plateau_dM/drewlTM       20 60 1
-onlinemeas_B64.dat  plateau_df/drewlTM       20 60 1
+onlinemeas_B64.dat  plateau_dM/drewsOS       9 60 1
+onlinemeas_B64.dat  plateau_df/drewsOS       9 60 1
+onlinemeas_B64.dat  plateau_dM/drewlTM       9 60 1
+onlinemeas_B64.dat  plateau_df/drewlTM       9 60 1
+onlinemeas_B64.dat  plateau_dM/drewlTM_1s    9 60 1
+onlinemeas_B64.dat  plateau_df/drewlTM_1s    9 60 1
+onlinemeas_B64.dat  plateau_dM/drewlTM_25s    9 60 1
+onlinemeas_B64.dat  plateau_df/drewlTM_25s    9 60 1
+onlinemeas_B64.dat  plateau_dM/drewlTM_50s    9 60 1
+onlinemeas_B64.dat  plateau_df/drewlTM_50s    9 60 1
+onlinemeas_B64.dat  plateau_dM/drewcOS_0.02   9 60 1
+onlinemeas_B64.dat  plateau_df/drewcOS_0.02   9 60 1
+onlinemeas_B64.dat  plateau_dM/drewcOS_0.1    9 60 1
+onlinemeas_B64.dat  plateau_df/drewcOS_0.1    9 60 1
+onlinemeas_B64.dat  plateau_dM/drew_0.1232229005_to_0.1234969805_OS 9 60 1
+onlinemeas_B64.dat  plateau_df/drew_0.1232229005_to_0.1234969805_OS 9 60 1
+onlinemeas_B64.dat  plateau_dM/drew_0.03125_to_0.03152408_OS 9 60 1
+onlinemeas_B64.dat  plateau_df/drew_0.03125_to_0.03152408_OS 9 60 1
+onlinemeas_B64.dat  plateau_dM/drew_0.01_to_0.01027408_OS 9 60 1
+onlinemeas_B64.dat  plateau_df/drew_0.01_to_0.01027408_OS 9 60 1
+onlinemeas_B64.dat  plateau_dM/drew_scndgTM  9 60 1
+onlinemeas_B64.dat  plateau_df/drew_scndgTM  9 60 1
+onlinemeas_B64.dat  plateau_dM/drew_charm0.1_strange0_ndgTM 9 60 1
+onlinemeas_B64.dat  plateau_df/drew_charm0.1_strange0_ndgTM 9 60 1
+onlinemeas_B64_LMA.dat  plateau_dM/drewcOS_0.1 9 60 1
+onlinemeas_B64_LMA.dat  plateau_df/drewcOS_0.1 9 60 1
+onlinemeas_B64_LMA.dat  plateau_dM/drewsOS 9 60 1
+onlinemeas_B64_LMA.dat  plateau_df/drewsOS 9 60 1
+onlinemeas_B64_LMA.dat  plateau_dM/drew_0.1232229005_to_0.1234969805_OS 9 60 1
+onlinemeas_B64_LMA.dat  plateau_df/drew_0.1232229005_to_0.1234969805_OS 9 60 1
+onlinemeas_B64_LMA.dat  plateau_dM/drew_0.03125_to_0.03152408_OS 9 60 1
+onlinemeas_B64_LMA.dat  plateau_df/drew_0.03125_to_0.03152408_OS 9 60 1
+onlinemeas_B64_LMA.dat  plateau_dM/drew_0.01_to_0.01027408_OS 9 60 1
+onlinemeas_B64_LMA.dat  plateau_df/drew_0.01_to_0.01027408_OS 9 60 1
 
 ###################################################à
 
@@ -248,6 +278,10 @@ onlinemeas_B64_LMA.dat  f_{PS}_rewlTM  20 60 1
 onlinemeas_B64_LMA.dat  plateau_dM/drewlOS       20 60 1
 onlinemeas_B64_LMA.dat  plateau_df/drewlOS       20 60 1
 
+
+onlinemeas_B64_LMA.dat  M_{PS}_reweight_light_OS_B64_LMA.dat             9 60 1
+onlinemeas_B64_LMA.dat  plateau_dM/dreweight_light_OS_B64_LMA.dat        9 60 1
+onlinemeas_B64_LMA.dat  plateau_ratio_dM/dreweight_light_OS_B64_LMA.dat  9 60 1
 
 ##################################################
 
@@ -412,51 +446,59 @@ onlinemeas_C80_LMA.dat f_{PS}_rewlOS_h10    23 70 1
 onlinemeas_C80_LMA.dat  plateau_dM/drewlTM  23 70 1
 onlinemeas_C80_LMA.dat  plateau_df/drewlTM  23 70 1
 
-onlinemeas_C80_LMA.dat  plateau_dM/drewlOS       23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewlOS       23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewcOS_0.1   23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewcOS_0.1   23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS       23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS       23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_0.2   23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_0.2   23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_pdmu  23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_pdmu  23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_p2dmu 23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_p2dmu 23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_mdmu  23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_mdmu  23 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewlOS       10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewlOS       10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewcOS_0.1   10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewcOS_0.1   10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS       10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS       10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_0.2   10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_0.2   10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_pdmu  10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_pdmu  10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_p2dmu 10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_p2dmu 10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_mdmu  10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_mdmu  10 70 1
 
-onlinemeas_C80_LMA.dat  plateau_dM/drewlOS_h5       23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewlOS_h5       23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewcOS_0.1_h5   23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewcOS_0.1_h5   23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_h5       23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_h5       23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_0.2_h5   23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_0.2_h5   23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_pdmu_h5  23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_pdmu_h5  23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_p2dmu_h5 23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_p2dmu_h5 23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_mdmu_h5  23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_mdmu_h5  23 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewlOS_h5       10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewlOS_h5       10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewcOS_0.1_h5   10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewcOS_0.1_h5   10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_h5       10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_h5       10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_0.2_h5   10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_0.2_h5   10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_pdmu_h5  10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_pdmu_h5  10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_p2dmu_h5 10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_p2dmu_h5 10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_mdmu_h5  10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_mdmu_h5  10 70 1
 
-onlinemeas_C80_LMA.dat  plateau_dM/drewlOS_h10       23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewlOS_h10       23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewcOS_0.1_h10   23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewcOS_0.1_h10   23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_h10       23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_h10       23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_0.2_h10   23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_0.2_h10   23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_pdmu_h10  23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_pdmu_h10  23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_p2dmu_h10 23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_p2dmu_h10 23 70 1
-onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_mdmu_h10  23 70 1
-onlinemeas_C80_LMA.dat  plateau_df/drewsOS_mdmu_h10  23 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewlOS_h10       10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewlOS_h10       10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewcOS_0.1_h10   10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewcOS_0.1_h10   10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_h10       10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_h10       10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_0.2_h10   10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_0.2_h10   10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_pdmu_h10  10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_pdmu_h10  10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_p2dmu_h10 10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_p2dmu_h10 10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/drewsOS_mdmu_h10  10 70 1
+onlinemeas_C80_LMA.dat  plateau_df/drewsOS_mdmu_h10  10 70 1
 
+
+onlinemeas_C80_LMA.dat  M_{PS}_reweight_light_OS_C80_LMA.dat             10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/dreweight_light_OS_C80_LMA.dat        10 70 1
+onlinemeas_C80_LMA.dat  plateau_ratio_dM/dreweight_light_OS_C80_LMA.dat  10 70 1
+
+onlinemeas_C80_LMA.dat  M_{PS}_reweight_strange_mdmu_OS_C80_LMA.dat            10 70 1
+onlinemeas_C80_LMA.dat  plateau_dM/dreweight_strange_mdmu_OS_C80_LMA.dat       10 70 1
+onlinemeas_C80_LMA.dat  plateau_ratio_dM/dreweight_strange_mdmu_OS_C80_LMA.dat 10 70 1
 #########################################
 
 
@@ -482,11 +524,23 @@ onlinemeas_D96.dat  M_{PS}_rewsOS   28 84 1
 onlinemeas_D96.dat  mpcac_rewsOS    28 84 1
 onlinemeas_D96.dat  f_{PS}_rewsOS   28 84 1
 
+onlinemeas_D96.dat  M_{PS}_rewsOS_pdmu   28 84 1
+onlinemeas_D96.dat  mpcac_rewsOS_pdmu    28 84 1
+onlinemeas_D96.dat  f_{PS}_rewsOS_pdmu   28 84 1
 
-onlinemeas_D96.dat  plateau_dM/drewlOS       27 84 1
-onlinemeas_D96.dat  plateau_df/drewlOS       27 84 1
-onlinemeas_D96.dat  plateau_dM/drewsOS       27 84 1
-onlinemeas_D96.dat  plateau_df/drewsOS       27 84 1
+onlinemeas_D96.dat  M_{PS}_rewcOS_dmu   28 84 1
+onlinemeas_D96.dat  mpcac_rewcOS_dmu    28 84 1
+onlinemeas_D96.dat  f_{PS}_rewcOS_dmu   28 84 1
+
+
+onlinemeas_D96.dat  plateau_dM/drewlOS       12 84 1
+onlinemeas_D96.dat  plateau_df/drewlOS       12 84 1
+onlinemeas_D96.dat  plateau_dM/drewsOS       12 84 1
+onlinemeas_D96.dat  plateau_df/drewsOS       12 84 1
+onlinemeas_D96.dat  plateau_dM/drewsOS_pdmu       12 84 1
+onlinemeas_D96.dat  plateau_df/drewsOS_pdmu       12 84 1
+onlinemeas_D96.dat  plateau_dM/drewcOS_dmu       12 84 1
+onlinemeas_D96.dat  plateau_df/drewcOS_dmu       12 84 1
 
 onlinemeas_D96_LMA.dat M_{PS}         0.0393692811458 2.47513956472e-5 26
 onlinemeas_D96_LMA.dat f_{PS}         0.0375750051618 3.48502486283e-5 26
