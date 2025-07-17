@@ -514,6 +514,23 @@ gg <- gg + geom_pointrange(
 fig <- myplotly(gg, "", "", "$dC(t=20)/d\\mu$", to_print = TRUE)
 ```
 
+## mpcac
+
+
+```{r, results='asis',echo=FALSE}
+df <- NULL
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64_LMA.dat_reweight_light_OS_B64_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df("mpcac", all_obs, mt, df, print_res = T, nudge = 0.0, reshape = T)
+
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+# gg<-myggplot()
+# gg <- gg + geom_hline(yintercept = 0.3)
+
+fig <- myplotly(gg, "", "$t/a$", "$m_{pcac}(t)$", to_print = TRUE)
+```
+
 ## mpcac sea corrections
 
 ```{r, results='asis',echo=FALSE}
