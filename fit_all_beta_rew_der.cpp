@@ -244,6 +244,9 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
     double *fpi_sim_mev = myres->create_copy(jackall.en[0].jack[id_dfpi]);
 
     double *fpi_mcisochidof = (double *)malloc(sizeof(double) * Njack);
+    double *muder_l_MeV = (double *)malloc(sizeof(double) * Njack);
+    double *muder_s_MeV = (double *)malloc(sizeof(double) * Njack);
+    double *muder_c_MeV = (double *)malloc(sizeof(double) * Njack);
     double **Pchidof = malloc_2<double>(fit_info.Npar, Njack);
     double *relative_error_chidof = (double *)malloc(sizeof(double) * Njack);
     for (int p = 0; p < fit_info.Npar; p++)
@@ -273,13 +276,30 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
         for (int j = 0; j < Njack; j++)
         {
             double amuliso = jackall.en[id].jack[fit_info.corr_id[1]][j];
+            double amuliso_check = jackall.en[id].jack[13][j];
+            double amusiso = jackall.en[id].jack[14][j];
             double amuciso = jackall.en[id].jack[15][j];
-            double amucsim = jackall.en[id].jack[19][j];
-            double a_fm = jackall.en[id].jack[fit_info.corr_id[2]][j]; // a
 
-            tmp_x[0] = amuciso / amuliso; // amuciso/amuliso
+            double amulsim = jackall.en[id].jack[17][j];
+            double amussim = jackall.en[id].jack[18][j];
+            double amucsim = jackall.en[id].jack[19][j];
+
+            double a_fm = jackall.en[id].jack[fit_info.corr_id[2]][j]; // a
+            error(fabs(amuliso - amuliso_check) > 1e-10, 1, "compute_fpi_at_mciso",
+                  "amuliso=%g amuliso_check=%g", amuliso, amuliso_check);
+
             for (int p = 0; p < fit_info.Npar; p++)
                 tif[p] = fit_res.P[p][j];
+            tmp_x[0] = amulsim / amuliso;
+            ; // amuciso/amuliso
+            muder_l_MeV[j] = fit_info.function(n, fit_info.Nvar, tmp_x, fit_info.Npar, tif);
+
+            tmp_x[0] = amussim / amuliso;
+            muder_s_MeV[j] = fit_info.function(n, fit_info.Nvar, tmp_x, fit_info.Npar, tif);
+
+            tmp_x[0] = amucsim / amuliso; // amuciso/amuliso
+            muder_c_MeV[j] = fit_info.function(n, fit_info.Nvar, tmp_x, fit_info.Npar, tif);
+
             double der = fit_info.function(n, fit_info.Nvar, tmp_x, fit_info.Npar, tif) * (a_fm / hbarc) / amuliso;
             fpi_mciso[j] = (jackall.en[id].jack[id_dfpi][j] + (amuciso - amucsim) * der) / (a_fm / hbarc);
             relative_error[j] = der * (amuciso - amucsim) / jackall.en[id].jack[id_dfpi][j];
@@ -311,15 +331,18 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
         fprintf(f, "%-20.12g %-20.12g\n", relative_error_chidof[Njack - 1], myres->comp_error(relative_error_chidof));
         fprintf(f, "%-20.12g %-20.12g\n", fpi_mcisochi[Njack - 1], myres->comp_error(fpi_mcisochi));
         fprintf(f, "%-20.12g %-20.12g\n", relative_error_chi[Njack - 1], myres->comp_error(relative_error_chi));
+        fprintf(f, "%-20.12g %-20.12g\n", muder_l_MeV[Njack - 1], myres->comp_error(muder_l_MeV));
+        fprintf(f, "%-20.12g %-20.12g\n", muder_s_MeV[Njack - 1], myres->comp_error(muder_s_MeV));
+        fprintf(f, "%-20.12g %-20.12g\n", muder_c_MeV[Njack - 1], myres->comp_error(muder_c_MeV));
 
-        printf("chi2/dof=%g  dof=%d\n", fit_res.chi2[Njack - 1], fit_res.dof);
-        printf("%-20.12g %-20.12g\n", fpi_sim_mev[Njack - 1], myres->comp_error(fpi_sim_mev));
-        printf("%-20.12g %-20.12g\n", fpi_mciso[Njack - 1], myres->comp_error(fpi_mciso));
-        printf("%-20.12g %-20.12g\n", relative_error[Njack - 1], myres->comp_error(relative_error));
-        printf("%-20.12g %-20.12g\n", fpi_mcisochidof[Njack - 1], myres->comp_error(fpi_mcisochidof));
-        printf("%-20.12g %-20.12g\n", relative_error_chidof[Njack - 1], myres->comp_error(relative_error_chidof));
-        printf("%-20.12g %-20.12g\n", fpi_mcisochi[Njack - 1], myres->comp_error(fpi_mcisochi));
-        printf("%-20.12g %-20.12g\n", relative_error_chi[Njack - 1], myres->comp_error(relative_error_chi));
+        // printf("chi2/dof=%g  dof=%d\n", fit_res.chi2[Njack - 1], fit_res.dof);
+        // printf("%-20.12g %-20.12g\n", fpi_sim_mev[Njack - 1], myres->comp_error(fpi_sim_mev));
+        // printf("%-20.12g %-20.12g\n", fpi_mciso[Njack - 1], myres->comp_error(fpi_mciso));
+        // printf("%-20.12g %-20.12g\n", relative_error[Njack - 1], myres->comp_error(relative_error));
+        // printf("%-20.12g %-20.12g\n", fpi_mcisochidof[Njack - 1], myres->comp_error(fpi_mcisochidof));
+        // printf("%-20.12g %-20.12g\n", relative_error_chidof[Njack - 1], myres->comp_error(relative_error_chidof));
+        // printf("%-20.12g %-20.12g\n", fpi_mcisochi[Njack - 1], myres->comp_error(fpi_mcisochi));
+        // printf("%-20.12g %-20.12g\n", relative_error_chi[Njack - 1], myres->comp_error(relative_error_chi));
 
         fclose(f);
     }
@@ -334,6 +357,11 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
     free(fpi_mcisochi);
     free_2(fit_info.Npar, Pchi);
     free_2(Njack, tifchi);
+    free(muder_l_MeV);
+    free(muder_s_MeV);
+    free(muder_c_MeV);
+    free(relative_error_chidof);
+    free(relative_error_chi);
 }
 
 int main(int argc, char **argv)
@@ -819,11 +847,11 @@ int main(int argc, char **argv)
         {
             for (int e : fit_info.Nxen[n])
             {
-                
+
                 double chi2_dof = der_fpi_diffplat_const_full.chi2[Njack - 1];
-                
+
                 int id = fit_info.corr_id[0];
-                
+
                 for (int j = 0; j < Njack; j++)
                 {
                     fin[j] = lhs_fun(n, e, j, jackall, fit_info);
@@ -836,7 +864,7 @@ int main(int argc, char **argv)
                 // double sigma_a = myres->comp_error(fin.data());
                 // double sigma_b = std::sqrt(sigma_a * sigma_a * (chi2_dof - 1));
                 // double *b = myres->create_fake(0, sigma_b, 2);
-                myres->mult_error(fin.data(), fin.data(),std::sqrt(chi2_dof));
+                myres->mult_error(fin.data(), fin.data(), std::sqrt(chi2_dof));
                 for (int j = 0; j < Njack; j++)
                 {
                     // fin[j] += b[j];
@@ -893,14 +921,15 @@ int main(int argc, char **argv)
         fit_info_chi.compute_cov1_fit();
 
         printf("chi2 = %g\n", der_fpi_diffplat_const_full.chi2[Njack - 1]);
-        // for (int i = 0; i < fit_info.entot; i++)
-        // {
-        //     for (int j = 0; j < fit_info.entot; j++)
-        //     {
-        //         printf("%-15g ", fit_info_chi.cov1[i][j] / fit_info.cov1[i][j]);
-        //     }
-        //     printf("\n");
-        // }
+        for (int i = 0; i < fit_info.entot; i++)
+        {
+            for (int j = 0; j < fit_info.entot; j++)
+            {
+                // printf("%-15g ", fit_info_chi.cov1[i][j] / fit_info.cov1[i][j]);
+                printf("%-15g ", fit_info_chi.cov[i][j] / std::sqrt(fit_info_chi.cov[i][i] * fit_info_chi.cov[j][j]));
+            }
+            printf("\n");
+        }
         namefit = "der_" + der_name[i] + "_diffplat_full_mu_mu2_mu3_chi2d1";
 
         fit_result der_fpi_diffplat_const_full_chi21 = fit_all_data(argv, jackall_chi, lhs_fun, fit_info_chi, namefit.c_str());
