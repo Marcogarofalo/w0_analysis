@@ -625,7 +625,7 @@ int main(int argc, char **argv)
 
         fit_result der_fpi = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
         fit_info.band_range = {0.1, 350};
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi, der_fpi, 0, fit_info.Nxen[0].size() - 1, 1, {});
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi, der_fpi, 0, fit_info.Nxen[0][0], 1, {});
 
         // // compute fpi at the charm point
         file_out_name f_name(argv[3], namefit.c_str());
@@ -670,7 +670,7 @@ int main(int argc, char **argv)
 
         fit_result der_fpi_const = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
         fit_info.band_range = {27, 350};
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const, der_fpi_const, 0, fit_info.Nxen[0].size() - 1, 1, {});
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const, der_fpi_const, 0, fit_info.Nxen[0][0], 1, {});
 
         // // compute fpi at the charm point
         file_out_name f_name_c(argv[3], namefit.c_str());
@@ -727,7 +727,7 @@ int main(int argc, char **argv)
 
         fit_result der_fpi_mu_mu2_mu3 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
         fit_info.band_range = {0.1, 350};
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2_mu3, der_fpi_mu_mu2_mu3, 0, fit_info.Nxen[0].size() - 1, 1, {});
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2_mu3, der_fpi_mu_mu2_mu3, 0, fit_info.Nxen[0][0], 1, {});
 
         // // compute fpi at the charm point
         file_out_name f_name_mu_mu2_mu3(argv[3], namefit.c_str());
