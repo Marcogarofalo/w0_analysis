@@ -9,7 +9,7 @@ flow_B64.dat m0  -0.4138934 0.0000046   4
 flow_B64.dat a  0.07948    0.00011  5
 
 onlinemeas_B64.dat mulsim  0.00072    1e-20      1
-onlinemeas_B64.dat mussim  0.018267   0.000053   2
+onlinemeas_B64.dat mussim  0.017846601   0.000053   2
 onlinemeas_B64.dat mucsim  0.2285992  1e-20      3
 
 onlinemeas_B64.dat muliso  0.0006669  0.0000028  1
@@ -29,10 +29,10 @@ onlinemeas_B64.dat M_{PS}          20 60 1
 onlinemeas_B64.dat M_{PS}_rewcOS   20 60 1
 onlinemeas_B64.dat M_{PS}_rewsOS   20 60 1
 onlinemeas_B64.dat M_{PS}_rewlTM   20 60 1
-onlinemeas_B64.dat mpcac           20 60 1
-onlinemeas_B64.dat mpcac_rewcOS    20 60 1
-onlinemeas_B64.dat mpcac_rewsOS    20 60 1
-onlinemeas_B64.dat mpcac_rewlTM    20 60 1
+onlinemeas_B64.dat mpcac           12 63 1
+onlinemeas_B64.dat mpcac_rewcOS    12 63 1
+onlinemeas_B64.dat mpcac_rewsOS    12 63 1
+onlinemeas_B64.dat mpcac_rewlTM    12 63 1
 
 onlinemeas_B64.dat  M_{PS}+mul_correction 20 60 1
 onlinemeas_B64.dat  M_{PS}+mus_correction 20 60 1
@@ -45,20 +45,20 @@ onlinemeas_B64.dat  mpcac+muc_correction 20 60 1
 
 
 onlinemeas_B64.dat M_{PS}_rew_scndgTM   20 60 1
-onlinemeas_B64.dat mpcac_rew_scndgTM    20 60 1
+onlinemeas_B64.dat mpcac_rew_scndgTM    12 63 1
 
 onlinemeas_B64.dat M_{PS}_rewcOS_0.25   20 60 1
-onlinemeas_B64.dat mpcac_rewcOS_0.25    20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.25    12 63 1
 
 onlinemeas_B64.dat M_{PS}_rewcOS_0.25_50s   20 60 1
-onlinemeas_B64.dat mpcac_rewcOS_0.25_50s    20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.25_50s    12 63 1
 
 onlinemeas_B64.dat M_{PS}_rewcOS_0.25_25s   20 60 1
-onlinemeas_B64.dat mpcac_rewcOS_0.25_25s    20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.25_25s    12 63 1
 
 
 onlinemeas_B64.dat M_{PS}_rewcOS_0.25_1s   20 60 1
-onlinemeas_B64.dat mpcac_rewcOS_0.25_1s    20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.25_1s    12 63 1
 
 
 onlinemeas_B64.dat  f_{PS}+mul_correction 20 60 1
@@ -78,35 +78,35 @@ onlinemeas_B64.dat f_{PS}_rewcOS_0.25_1s    20 60 1
 onlinemeas_B64.dat M_{PS}_rewlTM_1s    20 60 1 
 onlinemeas_B64.dat M_{PS}_rewlTM_25s   20 60 1 
 onlinemeas_B64.dat M_{PS}_rewlTM_50s   20 60 1
-onlinemeas_B64.dat mpcac_rewlTM_1s    20 60 1 
-onlinemeas_B64.dat mpcac_rewlTM_25s   20 60 1 
-onlinemeas_B64.dat mpcac_rewlTM_50s   20 60 1
+onlinemeas_B64.dat mpcac_rewlTM_1s    12 63 1 
+onlinemeas_B64.dat mpcac_rewlTM_25s   12 63 1 
+onlinemeas_B64.dat mpcac_rewlTM_50s   12 63 1
 onlinemeas_B64.dat f_{PS}_rewlTM_1s    20 60 1 
 onlinemeas_B64.dat f_{PS}_rewlTM_25s   20 60 1 
 onlinemeas_B64.dat f_{PS}_rewlTM_50s   20 60 1
 
 
 onlinemeas_B64.dat M_{PS}_rewcOS_0.02   20 60 1
-onlinemeas_B64.dat mpcac_rewcOS_0.02    20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.02    12 63 1
 onlinemeas_B64.dat f_{PS}_rewcOS_0.02   20 60 1
 
 onlinemeas_B64.dat M_{PS}_rewcOS_0.1    20 60 1
-onlinemeas_B64.dat mpcac_rewcOS_0.1     20 60 1
+onlinemeas_B64.dat mpcac_rewcOS_0.1     12 63 1
 onlinemeas_B64.dat f_{PS}_rewcOS_0.1    20 60 1
 
 
 onlinemeas_B64.dat M_{PS}_rew_0.1232229005_to_0.1234969805_OS    20 60 1
-onlinemeas_B64.dat mpcac_rew_0.1232229005_to_0.1234969805_OS     20 60 1
+onlinemeas_B64.dat mpcac_rew_0.1232229005_to_0.1234969805_OS     12 63 1
 onlinemeas_B64.dat f_{PS}_rew_0.1232229005_to_0.1234969805_OS    20 60 1
 
 
 onlinemeas_B64.dat M_{PS}_rew_0.03125_to_0.03152408_OS    20 60 1
-onlinemeas_B64.dat mpcac_rew_0.03125_to_0.03152408_OS     20 60 1
+onlinemeas_B64.dat mpcac_rew_0.03125_to_0.03152408_OS     12 63 1
 onlinemeas_B64.dat f_{PS}_rew_0.03125_to_0.03152408_OS    20 60 1
 
 
 onlinemeas_B64.dat M_{PS}_rew_0.01_to_0.01027408_OS    20 60 1
-onlinemeas_B64.dat mpcac_rew_0.01_to_0.01027408_OS     20 60 1
+onlinemeas_B64.dat mpcac_rew_0.01_to_0.01027408_OS     12 63 1
 onlinemeas_B64.dat f_{PS}_rew_0.01_to_0.01027408_OS    20 60 1
 
 onlinemeas_B64.dat  M_{PS}_rew_charm0.1_strange0_ndgTM 20 60 1
@@ -162,7 +162,7 @@ onlinemeas_B64_LMA.dat  plateau_df/drew_0.01_to_0.01027408_OS 9 60 1
 ###################################################à
 
 onlinemeas_B64_LMA.dat mulsim  0.00072    1e-20      1
-onlinemeas_B64_LMA.dat mussim  0.018267   0.000053   2
+onlinemeas_B64_LMA.dat mussim  0.017846601   0.000053   2
 onlinemeas_B64_LMA.dat mucsim  0.2285992  1e-20      3
 
 onlinemeas_B64_LMA.dat muliso  0.0006669  0.0000028  1
@@ -181,11 +181,9 @@ onlinemeas_B64_LMA.dat  Delta_muc_f_{PS} 20 60 1
 onlinemeas_B64_LMA.dat M_{PS}          20 60 1
 onlinemeas_B64_LMA.dat M_{PS}_rewcOS   20 60 1
 onlinemeas_B64_LMA.dat M_{PS}_rewsOS   20 60 1
-onlinemeas_B64_LMA.dat M_{PS}_rewlTM   20 60 1
-onlinemeas_B64_LMA.dat mpcac           20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewcOS    20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewsOS    20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewlTM    20 60 1
+onlinemeas_B64_LMA.dat mpcac           12 63 1
+onlinemeas_B64_LMA.dat mpcac_rewcOS    12 63 1
+onlinemeas_B64_LMA.dat mpcac_rewsOS    12 63 1
 
 onlinemeas_B64_LMA.dat  M_{PS}+mul_correction 20 60 1
 onlinemeas_B64_LMA.dat  M_{PS}+mus_correction 20 60 1
@@ -198,20 +196,20 @@ onlinemeas_B64_LMA.dat  mpcac+muc_correction 20 60 1
 
 
 onlinemeas_B64_LMA.dat M_{PS}_rew_scndgTM   20 60 1
-onlinemeas_B64_LMA.dat mpcac_rew_scndgTM    20 60 1
+onlinemeas_B64_LMA.dat mpcac_rew_scndgTM    12 63 1
 
 onlinemeas_B64_LMA.dat M_{PS}_rewcOS_0.25   20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewcOS_0.25    20 60 1
+onlinemeas_B64_LMA.dat mpcac_rewcOS_0.25    12 63 1
 
 onlinemeas_B64_LMA.dat M_{PS}_rewcOS_0.25_50s   20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewcOS_0.25_50s    20 60 1
+onlinemeas_B64_LMA.dat mpcac_rewcOS_0.25_50s    12 63 1
 
 onlinemeas_B64_LMA.dat M_{PS}_rewcOS_0.25_25s   20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewcOS_0.25_25s    20 60 1
+onlinemeas_B64_LMA.dat mpcac_rewcOS_0.25_25s    12 63 1
 
 
 onlinemeas_B64_LMA.dat M_{PS}_rewcOS_0.25_1s   20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewcOS_0.25_1s    20 60 1
+onlinemeas_B64_LMA.dat mpcac_rewcOS_0.25_1s    12 63 1
 
 
 onlinemeas_B64_LMA.dat  f_{PS}+mul_correction 20 60 1
@@ -221,7 +219,6 @@ onlinemeas_B64_LMA.dat  f_{PS}+muc_correction 20 60 1
 onlinemeas_B64_LMA.dat f_{PS}                   20 60 1
 onlinemeas_B64_LMA.dat f_{PS}_rewcOS            20 60 1
 onlinemeas_B64_LMA.dat f_{PS}_rewsOS            20 60 1
-onlinemeas_B64_LMA.dat f_{PS}_rewlTM            20 60 1
 onlinemeas_B64_LMA.dat f_{PS}_rew_scndgTM       20 60 1
 onlinemeas_B64_LMA.dat f_{PS}_rewcOS_0.25       20 60 1
 onlinemeas_B64_LMA.dat f_{PS}_rewcOS_0.25_50s   20 60 1
@@ -231,35 +228,35 @@ onlinemeas_B64_LMA.dat f_{PS}_rewcOS_0.25_1s    20 60 1
 onlinemeas_B64_LMA.dat M_{PS}_rewlTM_1s    20 60 1 
 onlinemeas_B64_LMA.dat M_{PS}_rewlTM_25s   20 60 1 
 onlinemeas_B64_LMA.dat M_{PS}_rewlTM_50s   20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewlTM_1s    20 60 1 
-onlinemeas_B64_LMA.dat mpcac_rewlTM_25s   20 60 1 
-onlinemeas_B64_LMA.dat mpcac_rewlTM_50s   20 60 1
+onlinemeas_B64_LMA.dat mpcac_rewlTM_1s    12 63 1 
+onlinemeas_B64_LMA.dat mpcac_rewlTM_25s   12 63 1 
+onlinemeas_B64_LMA.dat mpcac_rewlTM_50s   12 63 1
 onlinemeas_B64_LMA.dat f_{PS}_rewlTM_1s    20 60 1 
 onlinemeas_B64_LMA.dat f_{PS}_rewlTM_25s   20 60 1 
 onlinemeas_B64_LMA.dat f_{PS}_rewlTM_50s   20 60 1
 
 
 onlinemeas_B64_LMA.dat M_{PS}_rewcOS_0.02   20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewcOS_0.02    20 60 1
+onlinemeas_B64_LMA.dat mpcac_rewcOS_0.02    12 63 1
 onlinemeas_B64_LMA.dat f_{PS}_rewcOS_0.02   20 60 1
 
 onlinemeas_B64_LMA.dat M_{PS}_rewcOS_0.1    20 60 1
-onlinemeas_B64_LMA.dat mpcac_rewcOS_0.1     20 60 1
+onlinemeas_B64_LMA.dat mpcac_rewcOS_0.1     12 63 1
 onlinemeas_B64_LMA.dat f_{PS}_rewcOS_0.1    20 60 1
 
 
 onlinemeas_B64_LMA.dat M_{PS}_rew_0.1232229005_to_0.1234969805_OS    20 60 1
-onlinemeas_B64_LMA.dat mpcac_rew_0.1232229005_to_0.1234969805_OS     20 60 1
+onlinemeas_B64_LMA.dat mpcac_rew_0.1232229005_to_0.1234969805_OS     12 63 1
 onlinemeas_B64_LMA.dat f_{PS}_rew_0.1232229005_to_0.1234969805_OS    20 60 1
 
 
 onlinemeas_B64_LMA.dat M_{PS}_rew_0.03125_to_0.03152408_OS    20 60 1
-onlinemeas_B64_LMA.dat mpcac_rew_0.03125_to_0.03152408_OS     20 60 1
+onlinemeas_B64_LMA.dat mpcac_rew_0.03125_to_0.03152408_OS     12 63 1
 onlinemeas_B64_LMA.dat f_{PS}_rew_0.03125_to_0.03152408_OS    20 60 1
 
 
 onlinemeas_B64_LMA.dat M_{PS}_rew_0.01_to_0.01027408_OS    20 60 1
-onlinemeas_B64_LMA.dat mpcac_rew_0.01_to_0.01027408_OS     20 60 1
+onlinemeas_B64_LMA.dat mpcac_rew_0.01_to_0.01027408_OS     12 63 1
 onlinemeas_B64_LMA.dat f_{PS}_rew_0.01_to_0.01027408_OS    20 60 1
 
 onlinemeas_B64_LMA.dat  M_{PS}_rew_charm0.1_strange0_ndgTM 20 60 1
@@ -273,16 +270,23 @@ onlinemeas_B64_LMA.dat  f_{PS}_rewlOS  20 60 1
 onlinemeas_B64_LMA.dat  M_{PS}_rewlTM  20 60 1
 onlinemeas_B64_LMA.dat  mpcac_rewlTM   20 60 1
 onlinemeas_B64_LMA.dat  f_{PS}_rewlTM  20 60 1
+onlinemeas_B64_LMA.dat  plateau_dM/drewlTM       9 60 1
+onlinemeas_B64_LMA.dat  plateau_df/drewlTM       9 60 1
 
 
-onlinemeas_B64_LMA.dat  plateau_dM/drewlOS       20 60 1
-onlinemeas_B64_LMA.dat  plateau_df/drewlOS       20 60 1
+onlinemeas_B64_LMA.dat  plateau_dM/drewlOS       9 60 1
+onlinemeas_B64_LMA.dat  plateau_df/drewlOS       9 60 1
 
 
 onlinemeas_B64_LMA.dat  M_{PS}_reweight_light_OS_B64_LMA.dat             9 60 1
 onlinemeas_B64_LMA.dat  plateau_dM/dreweight_light_OS_B64_LMA.dat        9 60 1
 onlinemeas_B64_LMA.dat  plateau_ratio_dM/dreweight_light_OS_B64_LMA.dat  9 60 1
 
+onlinemeas_B64_LMA.dat  M_{PS}_rewpl0.3OS  20 60 1
+onlinemeas_B64_LMA.dat  mpcac_rewpl0.3OS  20 60 1
+onlinemeas_B64_LMA.dat  f_{PS}_rewpl0.3OS  20 60 1
+onlinemeas_B64_LMA.dat  plateau_dM/drewpl0.3OS     9 60 1
+onlinemeas_B64_LMA.dat  plateau_df/drewpl0.3OS     9 60 1
 ##################################################
 
 
@@ -306,10 +310,10 @@ onlinemeas_C80_LMA.dat M_{PS}          23 70 1
 onlinemeas_C80_LMA.dat M_{PS}_rewcOS   23 70 1
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS   23 70 1
 onlinemeas_C80_LMA.dat M_{PS}_rewlTM   23 70 1
-onlinemeas_C80_LMA.dat mpcac           23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewcOS    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewlTM    23 70 1
+onlinemeas_C80_LMA.dat mpcac           14 79 1
+onlinemeas_C80_LMA.dat mpcac_rewcOS    14 79 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS    14 79 1
+onlinemeas_C80_LMA.dat mpcac_rewlTM    14 79 1
 
 onlinemeas_C80_LMA.dat  M_{PS}+mul_correction 23 70 1
 onlinemeas_C80_LMA.dat  M_{PS}+mus_correction 23 70 1
@@ -322,20 +326,20 @@ onlinemeas_C80_LMA.dat  mpcac+muc_correction 23 70 1
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rew_scndgTM   23 70 1
-onlinemeas_C80_LMA.dat mpcac_rew_scndgTM    23 70 1
+onlinemeas_C80_LMA.dat mpcac_rew_scndgTM    14 79 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewcOS_0.25   23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewcOS_0.25    23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewcOS_0.25    14 79 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewcOS_0.25_50s   23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewcOS_0.25_50s    23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewcOS_0.25_50s    14 79 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewcOS_0.25_25s   23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewcOS_0.25_25s    23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewcOS_0.25_25s    14 79 1
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rewcOS_0.25_1s   23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewcOS_0.25_1s    23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewcOS_0.25_1s    14 79 1
 
 
 onlinemeas_C80_LMA.dat  f_{PS}+mul_correction 23 70 1
@@ -355,92 +359,92 @@ onlinemeas_C80_LMA.dat f_{PS}_rewcOS_0.25_1s    23 70 1
 onlinemeas_C80_LMA.dat M_{PS}_rewlTM_1s    23 70 1 
 onlinemeas_C80_LMA.dat M_{PS}_rewlTM_25s   23 70 1 
 onlinemeas_C80_LMA.dat M_{PS}_rewlTM_50s   23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewlTM_1s    23 70 1 
-onlinemeas_C80_LMA.dat mpcac_rewlTM_25s   23 70 1 
-onlinemeas_C80_LMA.dat mpcac_rewlTM_50s   23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewlTM_1s    14 79 1 
+onlinemeas_C80_LMA.dat mpcac_rewlTM_25s   14 79 1 
+onlinemeas_C80_LMA.dat mpcac_rewlTM_50s   14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewlTM_1s    23 70 1 
 onlinemeas_C80_LMA.dat f_{PS}_rewlTM_25s   23 70 1 
 onlinemeas_C80_LMA.dat f_{PS}_rewlTM_50s   23 70 1
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rewcOS_0.02   23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewcOS_0.02    23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewcOS_0.02    14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewcOS_0.02   23 70 1
 
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rewcOS_0.1    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewcOS_0.1     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewcOS_0.1     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewcOS_0.1    23 70 1
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_pdmu    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_pdmu     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_pdmu     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_pdmu    23 70 1
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_mdmu    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_mdmu     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_mdmu     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_mdmu    23 70 1
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_p2dmu    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_p2dmu     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_p2dmu     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_p2dmu    23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_0.2    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_0.2     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_0.2     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_0.2    23 70 1
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rewcOS_0.1_h5   23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewcOS_0.1_h5    23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewcOS_0.1_h5    14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewcOS_0.1_h5   23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_p2dmu_h5    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_p2dmu_h5     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_p2dmu_h5     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_p2dmu_h5    23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_pdmu_h5    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_pdmu_h5     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_pdmu_h5     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_pdmu_h5    23 70 1
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_h5    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_h5     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_h5     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_h5    23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_mdmu_h5    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_mdmu_h5     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_mdmu_h5     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_mdmu_h5    23 70 1
 
 
 onlinemeas_C80_LMA.dat M_{PS}_rewcOS_0.1_h10   23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewcOS_0.1_h10    23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewcOS_0.1_h10    14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewcOS_0.1_h10   23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_p2dmu_h10    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_p2dmu_h10     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_p2dmu_h10     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_p2dmu_h10    23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_pdmu_h10    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_pdmu_h10     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_pdmu_h10     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_pdmu_h10    23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_h10    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_h10     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_h10     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_h10    23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewsOS_mdmu_h10    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewsOS_mdmu_h10     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewsOS_mdmu_h10     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewsOS_mdmu_h10    23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewlOS    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewlOS     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewlOS     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewlOS    23 70 1
 
 onlinemeas_C80_LMA.dat M_{PS}_rewlOS_h10    23 70 1
-onlinemeas_C80_LMA.dat mpcac_rewlOS_h10     23 70 1
+onlinemeas_C80_LMA.dat mpcac_rewlOS_h10     14 79 1
 onlinemeas_C80_LMA.dat f_{PS}_rewlOS_h10    23 70 1
 
 onlinemeas_C80_LMA.dat  plateau_dM/drewlTM  23 70 1
@@ -513,23 +517,23 @@ onlinemeas_D96.dat m0  -0.3761252         0.0000039  24
 onlinemeas_D96.dat a     0.056850         0.000090   25
 
 onlinemeas_D96.dat  M_{PS}   28 84 1
-onlinemeas_D96.dat  mpcac    28 84 1
+onlinemeas_D96.dat  mpcac    17 95 1
 onlinemeas_D96.dat  f_{PS}   28 84 1
 
 onlinemeas_D96.dat  M_{PS}_rewlOS   28 84 1
-onlinemeas_D96.dat  mpcac_rewlOS    28 84 1
+onlinemeas_D96.dat  mpcac_rewlOS    17 95 1
 onlinemeas_D96.dat  f_{PS}_rewlOS   28 84 1
 
 onlinemeas_D96.dat  M_{PS}_rewsOS   28 84 1
-onlinemeas_D96.dat  mpcac_rewsOS    28 84 1
+onlinemeas_D96.dat  mpcac_rewsOS    17 95 1
 onlinemeas_D96.dat  f_{PS}_rewsOS   28 84 1
 
 onlinemeas_D96.dat  M_{PS}_rewsOS_pdmu   28 84 1
-onlinemeas_D96.dat  mpcac_rewsOS_pdmu    28 84 1
+onlinemeas_D96.dat  mpcac_rewsOS_pdmu    17 95 1
 onlinemeas_D96.dat  f_{PS}_rewsOS_pdmu   28 84 1
 
 onlinemeas_D96.dat  M_{PS}_rewcOS_dmu   28 84 1
-onlinemeas_D96.dat  mpcac_rewcOS_dmu    28 84 1
+onlinemeas_D96.dat  mpcac_rewcOS_dmu    17 95 1
 onlinemeas_D96.dat  f_{PS}_rewcOS_dmu   28 84 1
 
 
@@ -592,3 +596,14 @@ onlinemeas_E112_LMA.dat musiso  0.011787       0.000055   32
 onlinemeas_E112_LMA.dat muciso  0.14154        0.00054    33
 onlinemeas_E112_LMA.dat m0     -0.3613136      0.0000075  34
 onlinemeas_E112_LMA.dat a       0.04892        0.00011    35
+
+
+
+onlinemeas_A12.dat mulsim  0.000747122712203    8.0335446948e-06        41
+onlinemeas_A12.dat mussim  0.01162416     1e-20                         42
+onlinemeas_A12.dat mucsim  0.142700769256 1e-20                         43
+onlinemeas_A12.dat muliso  0.0012             0.0000023                     41
+onlinemeas_A12.dat musiso  0.011787       0.000055                      42
+onlinemeas_A12.dat muciso  0.14154        0.00054                       43
+onlinemeas_A12.dat m0     -0.3613136      0.0000075                     44
+onlinemeas_A12.dat a       0.0902508163222         0.000789055161891    45
