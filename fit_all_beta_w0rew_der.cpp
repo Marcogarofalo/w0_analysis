@@ -525,10 +525,10 @@ int main(int argc, char **argv)
         }
         // fit_info.linear_fit = false;
         fit_info.verbosity = 0;
-        fit_info.covariancey = true;
-        fit_info.compute_cov_fit(argv, jackall, lhs_fun);
-        fit_info.make_covariance_block_diagonal_in_n();
-        fit_info.compute_cov1_fit();
+        // fit_info.covariancey = true;
+        // fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+        // fit_info.make_covariance_block_diagonal_in_n();
+        // fit_info.compute_cov1_fit();
 
         std::string namefit = "der_" + der_name[i] + "_full_mu_mu2_mu3";
 
@@ -638,20 +638,20 @@ int main(int argc, char **argv)
         }
         // fit_info.linear_fit = false;
         fit_info_chi.verbosity = 0;
-        fit_info_chi.covariancey = true;
-        fit_info_chi.compute_cov_fit(argv, jackall_chi, lhs_fun);
-        fit_info_chi.make_covariance_block_diagonal_in_n();
-        fit_info_chi.compute_cov1_fit();
+        // fit_info_chi.covariancey = true;
+        // fit_info_chi.compute_cov_fit(argv, jackall_chi, lhs_fun);
+        // fit_info_chi.make_covariance_block_diagonal_in_n();
+        // fit_info_chi.compute_cov1_fit();
 
-        for (int i = 0; i < fit_info.entot; i++)
-        {
-            for (int j = 0; j < fit_info.entot; j++)
-            {
-                // printf("%-15g ", fit_info_chi.cov1[i][j] / fit_info.cov1[i][j]);
-                printf("%-15g ", fit_info_chi.cov[i][j] / std::sqrt(fit_info_chi.cov[i][i] * fit_info_chi.cov[j][j]));
-            }
-            printf("\n");
-        }
+        // for (int i = 0; i < fit_info.entot; i++)
+        // {
+        //     for (int j = 0; j < fit_info.entot; j++)
+        //     {
+        //         // printf("%-15g ", fit_info_chi.cov1[i][j] / fit_info.cov1[i][j]);
+        //         printf("%-15g ", fit_info_chi.cov[i][j] / std::sqrt(fit_info_chi.cov[i][i] * fit_info_chi.cov[j][j]));
+        //     }
+        //     printf("\n");
+        // }
         namefit = "der_" + der_name[i] + "_full_mu0_mu1_chi2d1";
 
         fit_result der_fpi_const_full_poly_chi2d1 = fit_all_data(argv, jackall_chi, lhs_fun, fit_info_chi, namefit.c_str());
