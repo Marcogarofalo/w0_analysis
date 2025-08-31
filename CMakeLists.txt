@@ -48,34 +48,55 @@ add_library(
 target_link_libraries(functions_w0 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 target_include_directories(functions_w0 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_executable(w0 w0.cpp)
-target_link_libraries(w0 PUBLIC functions_w0)
-IF(WITH_ARB)
-  set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")
-  target_link_libraries(w0 PUBLIC flint-arb flint)
-ENDIF()
-target_link_libraries(w0 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 
-add_executable(w0_rew w0_rew.cpp)
-target_link_libraries(w0_rew PUBLIC functions_w0)
+# add_executable(w0 w0.cpp)
+# target_link_libraries(w0 PUBLIC functions_w0)
+# IF(WITH_ARB)
+#   set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")
+#   target_link_libraries(w0 PUBLIC flint-arb flint)
+# ENDIF()
+# target_link_libraries(w0 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+
+# add_executable(w0_rew w0_rew.cpp)
+# target_link_libraries(w0_rew PUBLIC functions_w0)
+# IF(WITH_ARB)
+#   set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")
+#   target_link_libraries(w0_rew PUBLIC flint-arb flint)
+# ENDIF()
+# target_link_libraries(w0_rew PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 IF(WITH_ARB)
-  set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")
-  target_link_libraries(w0_rew PUBLIC flint-arb flint)
+  message("WITH_ARB is ON: linking with flint-arb and adding -DWITH_ARB to the compiler flags")
+    if(NOT DEFINED ARB_ROOT)
+      message(FATAL_ERROR "WITH_ARB=ON but ARB_ROOT is not specified. Use -DARB_ROOT=/path/to/flint")
+    endif()
+    set(CMAKE_CXX_FLAGS  " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB  ")#-larb -lflint -lgmp -lmpfr 
+
+    # Include directories
+    include_directories(
+      ${ARB_ROOT}/include
+      ${ARB_ROOT}/include/flint
+    )
+    
+    # Library directories
+    link_directories(${ARB_ROOT}/lib)
+    set(ARB_LIBS flint)
 ENDIF()
-target_link_libraries(w0_rew PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 
 macro(add_target_with_libs TARGETNAME)
   # Make the executable
   add_executable(${TARGETNAME} ${ARGN})
 
-  target_link_libraries(${TARGETNAME} PUBLIC functions_w0)
   IF(WITH_ARB)
-    set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} ${CXXFLAGS} -DWITH_ARB   ")
-    target_link_libraries(${TARGETNAME} PUBLIC flint-arb flint)
+    target_link_libraries(${TARGETNAME} PUBLIC ${ARB_LIBS})
   ENDIF()
   target_link_libraries(${TARGETNAME} PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
+  target_link_libraries(${TARGETNAME} PUBLIC functions_w0)
 
 endmacro()
+add_target_with_libs(w0_rew w0_rew.cpp)
+add_target_with_libs(w0 w0.cpp)
+add_target_with_libs(w0_m0 w0_m0.cpp)
+
 
 add_target_with_libs(pion_rew pion_rew.cpp)
 add_target_with_libs(pion pion.cpp)
