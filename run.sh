@@ -17,7 +17,11 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 #     grep "^w0+mus_correction = " tmp | awk -v n="$i" '{print 749/n"  "$3"  "$4}' >> $file_autoc_s
 #     grep "^w0+muc_correction = " tmp | awk -v n="$i" '{print 749/n"  "$3"  "$4}' >> $file_autoc_c
 # done
+./w0_m0  -p ../../data/  flow_B64_m0.dat  -bin 20 jack  bubbles/B64/P5_mu7.2000e-04.bin
+./w0_m0  -p ../../data/  flow_C80.dat  -bin 20 jack  bubbles/C80/P5_mu6.0000e-04.bin
+
 ./w0  -p ../../data/  flow_B64.dat  -bin 20 jack loop_B64.dat
+./w0_rew  -p ../../data/  flow_B64.dat  -bin 20 jack reweight_pl0.3_OS_B64.dat  rewpl0.3OS
 ./w0_rew  -p ../../data/  flow_B64.dat  -bin 20 jack reweight_charm_OS_B64.dat  rewcOS
 ./w0_rew  -p ../../data/  flow_B64.dat  -bin 20 jack reweight_strange_OS_B64.dat  rewsOS
 ./w0_rew  -p ../../data/  flow_B64.dat  -bin 20 jack reweight_light_TM_B64.dat  rewlTM
@@ -66,6 +70,7 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_B64.dat  -bin 100 jack reweight_ndg_charm0.1_strange0_TM_B64.dat rew_charm0.1_strange0_ndgTM
 
 ### LMA
+./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_pl0.3_OS_B64_LMA.dat rewpl0.3OS
 ./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_light_OS_B64_LMA.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_light_TM_B64_LMA.dat rewlTM
 
