@@ -46,7 +46,7 @@ with $\xi=\frac{M_\pi^2}{(4\pi f_\pi)^2}$, and the chiral LO from [@B_r_2014, eq
 
 
 ```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
-dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all/"
+dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_rew/"
 namefit <- paste0(dir, "w0_a_A12_noC20_simple")
 file <- paste0(namefit, "_fit_P.dat")
 fit <- read_fit_P_file(file)
@@ -104,4 +104,117 @@ gg <- gg + geom_pointrange(aes(
 gg <- gg + geom_line(aes(x = c(0, 0.009), y = c(0, 0)))
 
 fig <- myplotly(gg, "no C48", "$a^2$", "$a(f_\\pi)-a(w_0)$", to_print = TRUE, xrange = c(0, 0.0085))
+```
+
+## mu corrections
+
+```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
+dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_rew/"
+namefit <- paste0(dir, "w0_a_A12_noC20_rew")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+cat("\n\n")
+# dt <- make_table_fit_result(fit)
+
+# print(fit$P)
+dt <- data.frame(
+  "par" =c("a(A)","a(B)","a(C)","a(D)","a(E)","P[5]"), "a_from_w0" = mapply(mean_print, fit$P[, 2], fit$P[, 3])
+  # ,"percent" = fit$P[, 3] / fit$P[, 2]
+)
+a_tau <- c(9.025081e-02, 7.947758e-02, 6.818945e-02, 5.685040e-02, 4.891721e-02)
+da_tau <- c(7.890561e-04, 1.081341e-04, 1.429821e-04, 9.017466e-05, 1.065579e-04)
+dt$a_from_fpi <- c(
+  mapply(mean_print, a_tau, da_tau),
+  rep(0, length(dt[, 1]) - length(a_tau))
+)
+cat("$\\chi^2/dof=$ ", fit$chi2, "\n\n")
+kable(dt)
+gg <- myggplot(repeat_color = 1)
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 5,
+  data_type = c(
+    "A", "B", "C", "D", "E"
+    # ,"B", "C", "D"
+  ),
+  width = 1e-4,
+  gg = gg,
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+# filed <- paste0(namefit, "_fit_data.txt")
+# df <- read.table(filed, header = FALSE, fill = TRUE)
+# idy <- ncol(df) - 2
+# kable(df[, c(1,2,3,4,idy,idy+1)],col.names =c("mu","aMpi","afpi","L","afpi-inf","err") )
+gg <- gg + geom_vline(xintercept = 0.00678723)
+fig <- myplotly(gg, "", "$\\xi$", "$w_0/a$", to_print = TRUE, legend_position = c(0.9, 0.8))
+
+############## scaling with tau         ########################################
+gg <- myggplot()
+
+diff <- (a_tau - fit$P[c(1:5), 2])
+gg <- gg + geom_pointrange(aes(
+  x = a_tau^2, y = diff,
+  ymin = diff - da_tau,
+  ymax = diff + da_tau,
+  color = "fpi-w0",
+  shape = "fpi-w0",
+  fill = "fpi-w0"
+))
+gg <- gg + geom_line(aes(x = c(0, 0.009), y = c(0, 0)))
+
+fig <- myplotly(gg, "no C48", "$a^2$", "$a(f_\\pi)-a(w_0)$", to_print = TRUE, xrange = c(0, 0.0085))
+```
+
+
+
+
+```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
+dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_rew/"
+namefit <- paste0(dir, "w0_a_A12_noC20_simple")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+cat("\n\n")
+# dt <- make_table_fit_result(fit)
+
+
+gg <- myggplot(repeat_color = 1)
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 5,
+  data_type = c(
+    "A", "B", "C", "D", "E"
+    # ,"B", "C", "D"
+  ),
+  width = 1e-4,
+  gg = gg,
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+gg <- plot_fit(
+  basename = "/home/garofalo/analysis/g-2_new_stat/fit_all_rew/w0_a_A12_noC20_rew",
+  var = "xi",
+  id_x = 5,
+  data_type = c(
+    "A-rew", "B-rew", "C-rew", "D-rew", "E-rew"
+    # ,"B", "C", "D"
+  ),
+  width = 1e-4,
+  gg = gg,
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+
+gg <- gg + geom_vline(xintercept = 0.00678723)
+fig <- myplotly(gg, "", "$\\xi$", "$w_0/a$", to_print = TRUE, legend_position = c(0.9, 0.8))
+
 ```

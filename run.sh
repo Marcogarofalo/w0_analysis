@@ -17,8 +17,6 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 #     grep "^w0+mus_correction = " tmp | awk -v n="$i" '{print 749/n"  "$3"  "$4}' >> $file_autoc_s
 #     grep "^w0+muc_correction = " tmp | awk -v n="$i" '{print 749/n"  "$3"  "$4}' >> $file_autoc_c
 # done
-./w0_m0  -p ../../data/  flow_B64_m0.dat  -bin 20 jack  bubbles/B64/P5_mu7.2000e-04.bin
-./w0_m0  -p ../../data/  flow_C80.dat  -bin 20 jack  bubbles/C80/P5_mu6.0000e-04.bin
 
 ./w0  -p ../../data/  flow_B64.dat  -bin 20 jack loop_B64.dat
 ./w0_rew  -p ../../data/  flow_B64.dat  -bin 20 jack reweight_pl0.3_OS_B64.dat  rewpl0.3OS
