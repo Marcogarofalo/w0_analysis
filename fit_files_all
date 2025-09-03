@@ -4,6 +4,7 @@ onlinemeas_B64_LMA.dat reweight_step_0.03125_to_0.03152408_OS_B64_LMA.dat
 onlinemeas_B64_LMA.dat reweight_strange_OS_B64_LMA.dat
 onlinemeas_B64_LMA.dat reweight_step_0.01_to_0.01027408_OS_B64_LMA.dat
 onlinemeas_B64_LMA.dat reweight_light_OS_B64_LMA.dat
+#onlinemeas_B64_LMA.dat reweight_pl0.3_OS_B64_LMA.dat
 new_beta
 onlinemeas_C80_LMA.dat reweight_charm_0.1_OS_C80_LMA.dat
 onlinemeas_C80_LMA.dat reweight_strange_p2dmu_OS_C80_LMA.dat

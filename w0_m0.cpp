@@ -659,8 +659,8 @@ int main(int argc, char** argv) {
     for (int j = 0;j < Njack;j++) {
         deriv[j] = (w0pdmu[j] - w0[j]) / (m0iso[j] - m0sim[j]);
     }
-    printf("m0sim  %.12g  w0  %.12g   %.12g\n", m0sim[Njack - 1], w0[Njack - 1], myres->comp_error(w0.data()));
-    printf("m0iso  %.12g  w0  %.12g   %.12g\n", m0iso[Njack - 1], w0pdmu[Njack - 1], myres->comp_error(w0pdmu.data()));
+    printf("m0sim  %-20.12g  w0  %-20.12g   %-20.12g\n", m0sim[Njack - 1], w0[Njack - 1], myres->comp_error(w0.data()));
+    printf("m0iso  %-20.12g  w0  %-20.12g   %-20.12g\n", m0iso[Njack - 1], w0pdmu[Njack - 1], myres->comp_error(w0pdmu.data()));
     printf("deriv  %g   %g\n", deriv[Njack - 1], myres->comp_error(deriv));
     char name[NAMESIZE];
     mysprintf(name, NAMESIZE, "dw0_dm0_mu%g", head_loops.mus[0]);
@@ -680,4 +680,9 @@ int main(int argc, char** argv) {
     write_jack(a_fm, Njack, jack_file);    check_correlatro_counter(11);
 
     write_jack(a_fm, Njack, jack_file);    check_correlatro_counter(12); // empty space to add all derivative
+
+    double *mu_loop = myres->create_fake(head_loops.mus[0], 1e-20,1 );
+
+    write_jack(mu_loop, Njack, jack_file);    check_correlatro_counter(13);
+
 }
