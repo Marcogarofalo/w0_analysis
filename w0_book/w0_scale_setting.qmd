@@ -55,7 +55,7 @@ cat("\n\n")
 
 # print(fit$P)
 dt <- data.frame(
-  "par" =c("a(A)","a(B)","a(C)","a(D)","a(E)","P[5]"), "a_from_w0" = mapply(mean_print, fit$P[, 2], fit$P[, 3])
+  "par" = c("a(A)", "a(B)", "a(C)", "a(D)", "a(E)", "P[5]"), "a_from_w0" = mapply(mean_print, fit$P[, 2], fit$P[, 3])
   # ,"percent" = fit$P[, 3] / fit$P[, 2]
 )
 a_tau <- c(9.025081e-02, 7.947758e-02, 6.818945e-02, 5.685040e-02, 4.891721e-02)
@@ -118,11 +118,18 @@ cat("\n\n")
 
 # print(fit$P)
 dt <- data.frame(
-  "par" =c("a(A)","a(B)","a(C)","a(D)","a(E)","P[5]"), "a_from_w0" = mapply(mean_print, fit$P[, 2], fit$P[, 3])
+  "par" = c("a(A)", "a(B)", "a(C)", "a(D)", "a(E)", "P[5]"), "a_from_w0" = mapply(mean_print, fit$P[, 2], fit$P[, 3])
   # ,"percent" = fit$P[, 3] / fit$P[, 2]
 )
-a_tau <- c(9.025081e-02, 7.947758e-02, 6.818945e-02, 5.685040e-02, 4.891721e-02)
-da_tau <- c(7.890561e-04, 1.081341e-04, 1.429821e-04, 9.017466e-05, 1.065579e-04)
+dir_fpi <- "/home/garofalo/analysis/g-2_new_stat/fit_all_rew/"
+namefit_fpi <- paste0(dir_fpi, "afpi_max_twist_A12_noC20_rew")
+file_fpi <- paste0(namefit_fpi, "_fit_P.dat")
+fit_fpi <- read_fit_P_file(file_fpi)
+
+a_tau <- fit_fpi$P[c(1:5), 2] # c(9.025081e-02, 7.947758e-02, 6.818945e-02, 5.685040e-02, 4.891721e-02)
+da_tau <- fit_fpi$P[c(1:5), 3] # c(7.890561e-04, 1.081341e-04, 1.429821e-04, 9.017466e-05, 1.065579e-04)
+
+
 dt$a_from_fpi <- c(
   mapply(mean_print, a_tau, da_tau),
   rep(0, length(dt[, 1]) - length(a_tau))
@@ -170,7 +177,7 @@ fig <- myplotly(gg, "no C48", "$a^2$", "$a(f_\\pi)-a(w_0)$", to_print = TRUE, xr
 ```
 
 
-
+# comparing w0 before and after corrections
 
 ```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
 dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_rew/"
@@ -216,5 +223,4 @@ gg <- plot_fit(
 
 gg <- gg + geom_vline(xintercept = 0.00678723)
 fig <- myplotly(gg, "", "$\\xi$", "$w_0/a$", to_print = TRUE, legend_position = c(0.9, 0.8))
-
 ```
