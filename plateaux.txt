@@ -11,7 +11,7 @@ flow_B64.dat a  0.07948    0.00011  5
 onlinemeas_B64.dat mulsim  0.00072    1e-20      1
 onlinemeas_B64.dat mussim  0.017846601   0.000053   2
 onlinemeas_B64.dat mucsim  0.2285992  1e-20      3
-onlinemeas_B64.dat m0sim   -0.413894009051   1e-20      3
+onlinemeas_B64.dat m0sim   -0.4138863   1e-20      3
 
 onlinemeas_B64.dat muliso  0.0006669  0.0000028  1
 onlinemeas_B64.dat musiso  0.018267   0.000053   2

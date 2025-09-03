@@ -179,6 +179,12 @@ double rhs_1_mu(int n, int Nvar, double *x, int Npar, double *P)
     double r = P[0] + P[1] * amu;
     return r;
 }
+double rhs_1_mu_mu2(int n, int Nvar, double *x, int Npar, double *P)
+{
+    double amu = x[0];
+    double r = P[0] + P[1] * amu + P[2] * amu * amu;
+    return r;
+}
 
 double rhs_1overamu_1overamu2(int n, int Nvar, double *x, int Npar, double *P)
 {
@@ -558,6 +564,25 @@ int main(int argc, char **argv)
         // // compute fpi at the charm point
         file_out_name f_name_c_full_poly(argv[3], namefit.c_str());
         // compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full_poly, id_w0, f_name_c_full_poly);
+
+
+        //////////////////////////////////////////////////////////////
+        // a+b*mu+c mu^2
+        //////////////////////////////////////////////////////////////
+
+        fit_info.function = rhs_1_mu_mu2;
+        fit_info.Npar = 3;
+
+        namefit = "der_" + der_name[i] + "_full_mu0_mu1_mu2";
+
+        fit_result der_fpi_const_full_poly2 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+        fit_info.band_range = {1, 350};
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full_poly2, der_fpi_const_full_poly2, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
+
+        // // compute fpi at the charm point
+        file_out_name f_name_c_full_poly2(argv[3], namefit.c_str());
+        // compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full_poly2, id_w0, f_name_c_full_poly2);
+
 
         //////////////////////////////////////////////////////////////
         // enlarge error such that chi2/dof=1
