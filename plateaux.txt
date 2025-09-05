@@ -12,12 +12,14 @@ onlinemeas_B64.dat mulsim  0.00072    1e-20      1
 onlinemeas_B64.dat mussim  0.017846601   0.000053   2
 onlinemeas_B64.dat mucsim  0.2285992  1e-20      3
 onlinemeas_B64.dat m0sim   -0.4138863   1e-20      3
+onlinemeas_B64_LMA.dat m0sim   -0.4138863   1e-20      3
 
 onlinemeas_B64.dat muliso  0.0006669  0.0000028  1
 onlinemeas_B64.dat musiso  0.018267   0.000053   2
 onlinemeas_B64.dat muciso  0.23134    0.00052    3
 onlinemeas_B64.dat m0  -0.4138934 0.0000046   4
 onlinemeas_B64.dat m0iso  -0.4138934 0.0000046   6
+onlinemeas_B64_LMA.dat m0iso  -0.4138934 0.0000046   6
 onlinemeas_B64.dat a   0.07948    0.00011  5
 
 onlinemeas_B64.dat  Delta_mul_M_{PS} 20 60 1 
@@ -296,6 +298,7 @@ onlinemeas_C80.dat mulsim  0.00060        1e-20      11
 onlinemeas_C80.dat mussim  0.0166472533   0.000053   12
 onlinemeas_C80.dat mucsim  0.194775730329 1e-20      13
 onlinemeas_C80.dat m0sim  -0.396474310465 1e-20      13
+onlinemeas_C80_LMA.dat m0sim  -0.396474310465 1e-20      13
 onlinemeas_C80.dat muliso  0.0005864      0.0000034  11
 onlinemeas_C80.dat musiso  0.016053       0.000067   12
 onlinemeas_C80.dat muciso  0.19849        0.00064    13
@@ -531,6 +534,9 @@ onlinemeas_D96.dat muciso  0.16474        0.00044    23
 onlinemeas_D96.dat m0  -0.3761252         0.0000039  24
 onlinemeas_D96.dat a     0.056850         0.000090   25
 
+onlinemeas_D96.dat m0iso   -0.3761252    0.0000039    26
+onlinemeas_D96.dat m0sim   -0.3761157    1e-20        26
+
 onlinemeas_D96.dat  M_{PS}   28 84 1
 onlinemeas_D96.dat  mpcac    17 95 1
 onlinemeas_D96.dat  f_{PS}   28 84 1
@@ -612,6 +618,8 @@ onlinemeas_E112_LMA.dat muciso  0.14154        0.00054    33
 onlinemeas_E112_LMA.dat m0     -0.3613136      0.0000075  34
 onlinemeas_E112_LMA.dat a       0.04892        0.00011    35
 
+onlinemeas_E112_LMA.dat m0iso   -0.3613136    0.0000026   26
+onlinemeas_E112_LMA.dat m0sim   -0.361330902896  1e-20    26
 
 
 onlinemeas_A12.dat mulsim  0.000747122712203    8.0335446948e-06        41
@@ -622,3 +630,4 @@ onlinemeas_A12.dat musiso  0.011787       0.000055                      42
 onlinemeas_A12.dat muciso  0.14154        0.00054                       43
 onlinemeas_A12.dat m0     -0.3613136      0.0000075                     44
 onlinemeas_A12.dat a       0.0902508163222         0.000789055161891    45
+
