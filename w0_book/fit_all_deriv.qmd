@@ -392,3 +392,45 @@ fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell df_\\pi)/d\\mu$",
   legend_position = c(0.7, 0.98)
 )
 ```
+
+
+## cost fit light
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_fpi_diffplat_full_mul_const"
+)
+labels <- c(
+  "P[0] "
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "amu",
+    # noline = TRUE,
+    data_type = c("B64", "C80","D96"),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j]
+  )
+  lat <- c("B", "C","D")
+  
+}
+
+# gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed")
+# gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed")
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell df_\\pi)/d\\mu$",
+  to_print = TRUE,
+  yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+
+

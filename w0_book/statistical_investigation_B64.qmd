@@ -1,0 +1,215 @@
+# statistical tests Pion B64 
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+masses <- c(
+  0.0006669,
+  0.018267,
+  0.23134
+)
+```
+
+
+
+```{r, results='asis',echo=FALSE}
+df<-read.table("/home/garofalo/analysis/flow/w0_analysis/build/autocorr_der_mul_B64.txt", header = TRUE)
+gg<-myggplot()
+gg<- gg + geom_pointrange(aes(x=df[,1], y= df[,2], ymin = df[,2]-df[,3]
+                              , ymax = df[,2]+df[,3]))
+gg<- gg+ xlab("bin size") + ylab("d(Mpi)/dmul B64")
+gg
+gg<-myggplot()
+gg<- gg + geom_pointrange(aes(x=df[,1], y= df[,4], ymin = df[,4]-df[,5]
+                              , ymax = df[,4]+df[,5]))
+gg<- gg+ xlab("bin size") + ylab("d(fpi)/dmul B64")
+gg
+```
+
+```{r, results='asis',echo=FALSE}
+df<-read.table("/home/garofalo/analysis/flow/w0_analysis/build/error_scaling_der_mul_B64.txt", header = TRUE)
+gg<-myggplot()
+gg<- gg + geom_pointrange(aes(x=(df[,1]), y= df[,2], ymin = df[,2]-df[,3]
+                              , ymax = df[,2]+df[,3]))
+gg<- gg+ xlab("Nconf") + ylab("d(Mpi)/dmul B64")
+gg
+gg<-myggplot()
+gg<- gg + geom_pointrange(aes(x=(df[,1]), y= df[,4], ymin = df[,4]-df[,5]
+                              , ymax = df[,4]+df[,5]))
+gg<- gg+ xlab("Nconf") + ylab("d(fpi)/dmul B64")
+gg
+################## error
+gg<-myggplot()
+fit <- lm(df[,3] ~ I(1/sqrt(df[,1])))
+df$inv_sqrt <- 1/sqrt(df[,1])
+chi2 <- sum(residuals(fit)^2)
+fit_label <- paste0("Linear fit (Chi^2 = ", round(chi2, 2), ")")
+#df$inv_sqrt <- 1/sqrt(df[,1])
+gg<- gg + geom_point(aes(x=1/sqrt(df[,1]), y= df[,3], color=fit_label))
+gg<- gg +geom_abline(
+        intercept = coef(fit)[1],
+        slope     = coef(fit)[2],
+        color     = "red"
+        #show.legend =TRUE
+      )
+gg<- gg+ xlab("1/sqrt(Nconf)") + ylab("error(d(Mpi)/dmul B64)")+  theme(legend.position = "top")
+
+gg
+
+gg<-myggplot()
+gg<- gg + geom_point(aes(x=1/sqrt(df[,1]), y= df[,5]))
+gg<- gg+ xlab("1/sqrt(Nconf)") + ylab("error(d(fpi)/dmul B64)")
+gg
+
+```
+
+
+
+<!-- ```{r, results='asis',echo=FALSE} -->
+<!-- df<-read.table("/home/garofalo/analysis/flow/w0_analysis/build/error_scaling_from_the_bottom_der_mul_B64.txt", header = TRUE) -->
+<!-- gg<-myggplot() -->
+<!-- gg<- gg + geom_pointrange(aes(x=(df[,1]), y= df[,2], ymin = df[,2]-df[,3] -->
+<!--                               , ymax = df[,2]+df[,3])) -->
+<!-- gg<- gg+ xlab("Nconf") + ylab("d(Mpi)/dmul B64") -->
+<!-- gg -->
+<!-- gg<-myggplot() -->
+<!-- gg<- gg + geom_pointrange(aes(x=(df[,1]), y= df[,4], ymin = df[,4]-df[,5] -->
+<!--                               , ymax = df[,4]+df[,5])) -->
+<!-- gg<- gg+ xlab("Nconf") + ylab("d(fpi)/dmul B64") -->
+<!-- gg -->
+<!-- ################## error -->
+<!-- gg<-myggplot() -->
+<!-- fit <- lm(df[,3] ~ I(1/sqrt(df[,1]))) -->
+<!-- df$inv_sqrt <- 1/sqrt(df[,1]) -->
+<!-- chi2 <- sum(residuals(fit)^2) -->
+<!-- fit_label <- paste0("Linear fit (Chi^2 = ", round(chi2, 2), ")") -->
+<!-- #df$inv_sqrt <- 1/sqrt(df[,1]) -->
+<!-- gg<- gg + geom_point(aes(x=1/sqrt(df[,1]), y= df[,3], color=fit_label)) -->
+<!-- gg<- gg +geom_abline( -->
+<!--         intercept = coef(fit)[1], -->
+<!--         slope     = coef(fit)[2], -->
+<!--         color     = "red" -->
+<!--         #show.legend =TRUE -->
+<!--       ) -->
+<!-- gg<- gg+ xlab("1/sqrt(Nconf)") + ylab("error(d(Mpi)/dmul B64)")+  theme(legend.position = "top") -->
+
+<!-- gg -->
+
+<!-- gg<-myggplot() -->
+<!-- gg<- gg + geom_point(aes(x=1/sqrt(df[,1]), y= df[,5])) -->
+<!-- gg<- gg+ xlab("1/sqrt(Nconf)") + ylab("error(d(fpi)/dmul B64)") -->
+<!-- gg -->
+
+<!-- ``` -->
+
+
+
+
+```{r}
+df <- data.frame(
+  "dm" = c(0),
+  "ddm" = c(0),
+  "label" = c("")
+)
+df <- df[-1, ]
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64_LMA.dat_reweight_light_OS_B64_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+name <- "d_ratio"
+res <- get_full_res(name, all_obs, mt) 
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("  l"))
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64_LMA.dat_reweight_strange_OS_B64_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+name <- "d_ratio"
+res <- get_full_res(name, all_obs, mt) 
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0(" s"))
+# ######################## rew
+mt <- read_df("/home/garofalo/analysis/flow/data/out/onlinemeas_B64_LMA.dat_reweight_charm_0.1_OS_B64_LMA.dat_output")
+all_obs <- Rose::get_all_corr(mt)
+name <- "d_ratio"
+res <- get_full_res(name, all_obs, mt) 
+df[nrow(df) + 1, ] <- list(as.numeric(res[1, 1]), as.numeric(res[1, 2]), paste0("c"))
+
+
+
+## plot
+gg <- myggplot(fill = FALSE)
+gg <- gg + geom_pointrange(
+  data = df,
+  aes(x = label, y = dm, ymin = dm - ddm, ymax = dm + ddm, color = label, shape = label)
+)
+gg <- gg + theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust = 1))
+gg<- gg + theme(legend.position = "none")
+
+fig <- myplotly(gg, "", "", "$dR/d\\mu$", to_print = TRUE, legend_position =  NULL)
+```
+
+
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_fpi_Mpi_full_mu_mu2_mu3"
+)
+labels <- c(
+  "P[0]/amu + P[1]/amu2 + P[3]/amu3 "
+)
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "amu",
+    # noline = TRUE,
+    data_type = c("B64", "C80","D96"),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j]
+  )
+}
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_fpi_Mpi_diffplat_full_mu_mu2_mu3"
+)
+labels <- c(
+  "(analytic) P[0]/amu + P[1]/amu2 + P[3]/amu3  "
+)
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "amu",
+    # noline = TRUE,
+    data_type = c("B64-a", "C80-a","D96-a"),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j]
+  )
+}
+
+
+gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed")
+gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed")
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell df_\\pi/M_\\pi)/d\\mu$",
+  to_print = TRUE,
+  #yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```

@@ -96,22 +96,6 @@ gg <- plot_fit(
 # kable(df[, c(1,2,3,4,idy,idy+1)],col.names =c("mu","aMpi","afpi","L","afpi-inf","err") )
 gg <- gg + geom_vline(xintercept = 0.00678723)
 fig <- myplotly(gg, "", "$\\xi$", "$w_0/a$", to_print = TRUE, legend_position = c(0.9, 0.8))
-
-############## scaling with tau         ########################################
-gg <- myggplot()
-
-diff <- (a_tau - fit$P[c(1:5), 2])
-gg <- gg + geom_pointrange(aes(
-  x = a_tau^2, y = diff,
-  ymin = diff - da_tau,
-  ymax = diff + da_tau,
-  color = "fpi-w0",
-  shape = "fpi-w0",
-  fill = "fpi-w0"
-))
-gg <- gg + geom_line(aes(x = c(0, 0.009), y = c(0, 0)))
-
-fig <- myplotly(gg, "no C48", "$a^2$", "$a(f_\\pi)-a(w_0)$", to_print = TRUE, xrange = c(0, 0.0085))
 ```
 
 ## with corrections
@@ -160,28 +144,55 @@ gg <- plot_fit(
   # , nolabel_for_fit = TRUE
   noline = TRUE
 )
-# filed <- paste0(namefit, "_fit_data.txt")
-# df <- read.table(filed, header = FALSE, fill = TRUE)
-# idy <- ncol(df) - 2
-# kable(df[, c(1,2,3,4,idy,idy+1)],col.names =c("mu","aMpi","afpi","L","afpi-inf","err") )
+
+################ +a2*xi
+cat("adding a2*xi\n\n")
+namefit <- paste0(dir, "w0_a_A12_noC20_rew_a2xi")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+cat("\n\n")
+# dt <- make_table_fit_result(fit)
+
+# print(fit$P)
+dt <- data.frame(
+  "par" = c("a(A)", "a(B)", "a(C)", "a(D)", "a(E)", "P[5]", "P[6]"), "a_from_w0" = mapply(mean_print, fit$P[, 2], fit$P[, 3])
+  # ,"percent" = fit$P[, 3] / fit$P[, 2]
+)
+dir_fpi <- "/home/garofalo/analysis/g-2_new_stat/fit_all_rew/"
+namefit_fpi <- paste0(dir_fpi, "afpi_max_twist_A12_noC20_rew")
+file_fpi <- paste0(namefit_fpi, "_fit_P.dat")
+fit_fpi <- read_fit_P_file(file_fpi)
+
+a_tau <- fit_fpi$P[c(1:5), 2] # c(9.025081e-02, 7.947758e-02, 6.818945e-02, 5.685040e-02, 4.891721e-02)
+da_tau <- fit_fpi$P[c(1:5), 3] # c(7.890561e-04, 1.081341e-04, 1.429821e-04, 9.017466e-05, 1.065579e-04)
+
+
+dt$a_from_fpi <- c(
+  mapply(mean_print, a_tau, da_tau),
+  rep(0, length(dt[, 1]) - length(a_tau))
+)
+cat("$\\chi^2/dof=$ ", fit$chi2, "\n\n")
+kable(dt)
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 5,
+  data_type = c(
+    "A", "B", "C", "D", "E"
+    # ,"B", "C", "D"
+  ),
+  width = 1e-4,
+  gg = gg,
+  # labelfit = "",
+  single_name_for_fit = "fit-a2xi",
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+
+
 gg <- gg + geom_vline(xintercept = 0.00678723)
 fig <- myplotly(gg, "", "$\\xi$", "$w_0/a$", to_print = TRUE, legend_position = c(0.9, 0.8))
-
-############## scaling with tau         ########################################
-gg <- myggplot()
-
-diff <- (a_tau - fit$P[c(1:5), 2])
-gg <- gg + geom_pointrange(aes(
-  x = a_tau^2, y = diff,
-  ymin = diff - da_tau,
-  ymax = diff + da_tau,
-  color = "fpi-w0",
-  shape = "fpi-w0",
-  fill = "fpi-w0"
-))
-gg <- gg + geom_line(aes(x = c(0, 0.009), y = c(0, 0)))
-
-fig <- myplotly(gg, "no C48", "$a^2$", "$a(f_\\pi)-a(w_0)$", to_print = TRUE, xrange = c(0, 0.0085))
 ```
 
 
@@ -266,5 +277,177 @@ gg <- plot_fit(
 
 gg <- gg + geom_vline(xintercept = 0.00678723)
 fig <- myplotly(gg, "", "$\\xi$", "$w_0/a$", to_print = TRUE, legend_position = c(0.9, 0.8))
+```
 
+
+
+## fit the difference (corrections included)
+
+
+
+```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
+dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_rew/"
+namefit <- paste0(dir, "a_w0_a_fpi")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+cat("\n\n")
+make_table_fit_result(fit)
+
+gg <- myggplot(repeat_color = 1)
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 14,
+  data_type = c(
+    "data"
+    # ,"B", "C", "D"
+  ),
+  width = 1e-4,
+  gg = gg,
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+gg <- gg + geom_hline(yintercept = 0)
+fig <- myplotly(gg, "", "$a^2$", "$a[w_0]-a[f_\\pi]$", to_print = TRUE, legend_position = c(0.9, 0.8))
+```
+
+# ratio a_w0 / a_fpi
+
+
+```{r, echo=FALSE, results='asis', dev='tikz', warning=FALSE}
+df_AIC <- data.frame(
+  "v" = numeric(),
+  "err" = numeric(),
+  "chi2dof" = numeric(),
+  "dof" = numeric(),
+  "npar" = numeric(),
+  "multiplicity" = numeric()
+)
+dir <- "/home/garofalo/analysis/g-2_new_stat/fit_all_rew/"
+namefit <- paste0(dir, "ratio_a_w0_a_fpi")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+df_AIC <- rbind(df_AIC, data.frame(
+  "v" = fit$P[1, 2],
+  "err" = fit$P[1, 3],
+  "chi2dof" = fit$chi2dof,
+  "dof" = fit$dof,
+  "npar" = fit$npar,
+  "multiplicity" = 1
+))
+cat("\n\n")
+make_table_fit_result(fit)
+
+gg <- myggplot(repeat_color = 1)
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 14,
+  data_type = c(
+    "data"
+    # ,"B", "C", "D"
+  ),
+  width = 1e-4,
+  gg = gg,
+  labelfit = "",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+namefit <- paste0(dir, "ratio_a_w0_a_fpi_A")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+df_AIC <- rbind(df_AIC, data.frame(
+  "v" = fit$P[1, 2],
+  "err" = fit$P[1, 3],
+  "chi2dof" = fit$chi2dof,
+  "dof" = fit$dof,
+  "npar" = fit$npar,
+  "multiplicity" = 1
+))
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 14,
+  data_type = c(
+    "data-with-A"
+    # ,"B", "C", "D"
+  ),
+  width = 1e-4,
+  gg = gg,
+  labelfit = "with-A",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+namefit <- paste0(dir, "ratio_a_w0_a_fpi_A_a4")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+df_AIC <- rbind(df_AIC, data.frame(
+  "v" = fit$P[1, 2],
+  "err" = fit$P[1, 3],
+  "chi2dof" = fit$chi2dof,
+  "dof" = fit$dof,
+  "npar" = fit$npar,
+  "multiplicity" = 1
+))
+
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 14,
+  data_type = c(
+    "data-with-A-a4"
+    # ,"B", "C", "D"
+  ),
+  width = 1e-4,
+  gg = gg,
+  labelfit = "with-A-a4",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+namefit <- paste0(dir, "ratio_a_w0_a_fpi_CDE")
+file <- paste0(namefit, "_fit_P.dat")
+fit <- read_fit_P_file(file)
+df_AIC <- rbind(df_AIC, data.frame(
+  "v" = fit$P[1, 2],
+  "err" = fit$P[1, 3],
+  "chi2dof" = fit$chi2dof,
+  "dof" = fit$dof,
+  "npar" = fit$npar,
+  "multiplicity" = 1
+))
+
+gg <- plot_fit(
+  basename = namefit,
+  var = "xi",
+  id_x = 14,
+  data_type = c(
+    "data-CDE"
+    # ,"B", "C", "D"
+  ),
+  width = 1e-4,
+  gg = gg,
+  labelfit = "with-CDE",
+  # , single_name_for_fit = "fit"
+  # , nolabel_for_fit = TRUE
+  noline = TRUE
+)
+
+mean_BAIC<-BAIC(v=df_AIC$v, err = df_AIC$err, chi2dof = df_AIC$chi2dof, dof = df_AIC$dof, npar = df_AIC$npar, multiplicity = 1)
+w0_fm =0.17236
+fpi_MeV = 130.5
+cat("BAIC average ratio of a: ",mean_print(mean_BAIC$m,mean_BAIC$dm),"\n\n")
+cat("w0 from fpi FLAG: ",mean_print(w0_fm/mean_BAIC$m, w0_fm*mean_BAIC$dm/mean_BAIC$m^2),"\n\n")
+cat("fpi from w0 WP25: ",mean_print(fpi_MeV/mean_BAIC$m, fpi_MeV*mean_BAIC$dm/mean_BAIC$m^2),"\n\n")
+
+
+fig <- myplotly(gg, "", "$a^2$", "$a[w_0]/a[f_\\pi]$", to_print = TRUE, legend_position = c(0.9, 0.8))
 ```

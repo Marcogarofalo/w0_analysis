@@ -31,8 +31,7 @@
 #include <string>
 #include <vector>
 
-enum enum_ensembles
-{
+enum enum_ensembles {
     B72_64,
     B72_96,
     C06,
@@ -47,8 +46,7 @@ constexpr double Mpi_MeV = 135;
 constexpr double Mpi_MeV_err = 0.2;
 // #include "do_analysis_charm.hpp"
 
-generic_header read_header(FILE *stream)
-{
+generic_header read_header(FILE* stream) {
     generic_header header;
     int ir = 0;
     ir += fread(&header.T, sizeof(int), 1, stream);
@@ -56,14 +54,12 @@ generic_header read_header(FILE *stream)
     int s;
     ir += fread(&s, sizeof(int), 1, stream);
     header.mus = std::vector<double>(s);
-    for (int i = 0; i < s; i++)
-    {
+    for (int i = 0; i < s; i++) {
         ir += fread(&header.mus[i], sizeof(double), 1, stream);
     }
     ir += fread(&s, sizeof(int), 1, stream);
     header.thetas = std::vector<double>(s);
-    for (int i = 0; i < s; i++)
-    {
+    for (int i = 0; i < s; i++) {
         ir += fread(&header.thetas[i], sizeof(double), 1, stream);
     }
 
@@ -72,8 +68,7 @@ generic_header read_header(FILE *stream)
     return header;
 }
 
-double read_single_Nobs(FILE *stream, int header_size, int Njack)
-{
+double read_single_Nobs(FILE* stream, int header_size, int Njack) {
     int Nobs;
     long int tmp;
     int s = header_size;
@@ -93,8 +88,7 @@ double read_single_Nobs(FILE *stream, int header_size, int Njack)
     return Nobs;
 }
 
-data_single read_single_dataj(FILE *stream)
-{
+data_single read_single_dataj(FILE* stream) {
 
     int Njack;
     int Nobs;
@@ -111,25 +105,22 @@ data_single read_single_dataj(FILE *stream)
 
     //
     size_t i = 0;
-    for (int obs = 0; obs < dj.Nobs; obs++)
-    {
+    for (int obs = 0; obs < dj.Nobs; obs++) {
         i += fread(dj.jack[obs], sizeof(double), dj.Njack, stream);
     }
     return dj;
 }
 
-data_all read_all_the_files(std::vector<std::string> files, const char *resampling)
-{
+data_all read_all_the_files(std::vector<std::string> files, const char* resampling) {
     data_all jackall;
     jackall.resampling = resampling;
     // jackall->en = (data_single*)malloc(sizeof(data_single) * files.size());
     jackall.en = new data_single[files.size()];
     jackall.ens = files.size();
     int count = 0;
-    for (std::string s : files)
-    {
+    for (std::string s : files) {
         printf("reading %s\n", s.c_str());
-        FILE *f = open_file(s.c_str(), "r");
+        FILE* f = open_file(s.c_str(), "r");
 
         // read_single_dataj(f, params, &(jackall->en[count]));
         jackall.en[count] = read_single_dataj(f);
@@ -140,8 +131,7 @@ data_all read_all_the_files(std::vector<std::string> files, const char *resampli
     return jackall;
 }
 
-double lhs_fun(int n, int e, int j, data_all gjack, struct fit_type fit_info)
-{
+double lhs_fun_f(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     // if (j==fit_info.Njack-1) {
     //     printf("lhs_fun: n=%d e=%d j=%d fit_info.corr_id[0]=%d fit_info.corr_id[1]=%d fit_info.corr_id[2]=%d\n",
     //            n, e, j, fit_info.corr_id[0], fit_info.corr_id[1], fit_info.corr_id[2]);
@@ -154,67 +144,71 @@ double lhs_fun(int n, int e, int j, data_all gjack, struct fit_type fit_info)
     r /= gjack.en[e].jack[fit_info.corr_id[2]][j] / hbarc; // a
     return r;
 }
-double lhs_fun_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info)
-{
+double lhs_fun_ratio(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    // if (j==fit_info.Njack-1) {
+    //     printf("lhs_fun: n=%d e=%d j=%d fit_info.corr_id[0]=%d fit_info.corr_id[1]=%d fit_info.corr_id[2]=%d\n",
+    //            n, e, j, fit_info.corr_id[0], fit_info.corr_id[1], fit_info.corr_id[2]);
+    //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[0]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[0]][j]);
+    //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[1]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[1]][j]);
+    //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[2]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[2]][j]);
+    // }
+    double r = gjack.en[e].jack[fit_info.corr_id[0]][j];   // fpi
+    r *= gjack.en[e].jack[fit_info.corr_id[1]][j];         // amu_l
+    // r /= gjack.en[e].jack[fit_info.corr_id[2]][j] / hbarc; // a
+    return r;
+}
+
+double lhs_fun_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
 
     double r = gjack.en[e].jack[fit_info.corr_id[0]][j]; // fpi
     return r;
 }
-double rhs_1overamu(int n, int Nvar, double *x, int Npar, double *P)
-{
+double rhs_1overamu(int n, int Nvar, double* x, int Npar, double* P) {
     double amu = x[0];
     double r = P[0] / amu;
     return r;
 }
 
-double rhs_1overamu_mu2_mu3(int n, int Nvar, double *x, int Npar, double *P)
-{
+double rhs_1overamu_mu2_mu3(int n, int Nvar, double* x, int Npar, double* P) {
     double amu = x[0];
     double r = P[0] / amu + P[1] / (amu * amu) + P[2] / (amu * amu * amu);
     return r;
 }
 
-double rhs_1overamu_1overamu2(int n, int Nvar, double *x, int Npar, double *P)
-{
+double rhs_1overamu_1overamu2(int n, int Nvar, double* x, int Npar, double* P) {
     double amu = x[0];
     double r = P[0] / amu + P[1] / (amu * amu);
     return r;
 }
-double rhs_1overamu2(int n, int Nvar, double *x, int Npar, double *P)
-{
+double rhs_1overamu2(int n, int Nvar, double* x, int Npar, double* P) {
     double amu = x[0];
     double r = P[0] / (amu * amu);
     return r;
 }
 
-double rhs_1overamu_1overamu2_1overamu3(int n, int Nvar, double *x, int Npar, double *P)
-{
+double rhs_1overamu_1overamu2_1overamu3(int n, int Nvar, double* x, int Npar, double* P) {
     double amu = x[0];
     double r = P[0] / amu + P[1] / (amu * amu) + P[2] / (amu * amu * amu);
     return r;
 }
-struct file_out_name
-{
+struct file_out_name {
     char path[NAMESIZE];
     char basename[NAMESIZE];
     char namefile[NAMESIZE];
     char label[NAMESIZE];
-    file_out_name(const char *path, const char *label)
-    {
+    file_out_name(const char* path, const char* label) {
         mysprintf(this->path, NAMESIZE, "%s", path);
         mysprintf(this->basename, NAMESIZE, "%s", path);
         mysprintf(this->label, NAMESIZE, "%s", label);
         mysprintf(this->namefile, NAMESIZE, "%s/%s_fit_extra.txt", path, label);
     }
-    file_out_name(const file_out_name &other)
-    {
+    file_out_name(const file_out_name& other) {
         mysprintf(this->path, NAMESIZE, "%s", other.path);
         mysprintf(this->basename, NAMESIZE, "%s", other.basename);
         mysprintf(this->label, NAMESIZE, "%s", other.label);
         mysprintf(this->namefile, NAMESIZE, "%s", other.namefile);
     }
-    file_out_name &operator=(const file_out_name &other)
-    {
+    file_out_name& operator=(const file_out_name& other) {
         mysprintf(this->path, NAMESIZE, "%s", other.path);
         mysprintf(this->basename, NAMESIZE, "%s", other.basename);
         mysprintf(this->label, NAMESIZE, "%s", other.label);
@@ -222,59 +216,54 @@ struct file_out_name
         return *this;
     }
 
-    ~file_out_name()
-    {
+    ~file_out_name() {
         // free(this->namefile);
         // free(this->path);
         // free(this->basename);
     }
 };
 
-void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_res, int id_dfpi, file_out_name f_name)
-{
+void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_res, int id_dfpi, file_out_name f_name) {
     int Njack = jackall.en[0].Njack;
     error(fit_info.Njack != jackall.en[0].Njack, 1, "compute_fpi_at_mciso", "fit_info.Njack != jackall.en[0].Njack");
     error(fit_info.Njack != myres->Njack, 1, "compute_fpi_at_mciso", "fit_info.Njack != myres->Njack");
-    double *fpi_mciso = (double *)malloc(sizeof(double) * Njack);
+    double* fpi_mciso = (double*)malloc(sizeof(double) * Njack);
     // double *fpi_mcisochi = (double *)malloc(sizeof(double) * Njack);
-    double *relative_error = (double *)malloc(sizeof(double) * Njack);
-    double *tmp_x = (double *)malloc(sizeof(double) * fit_info.Nvar);
-    double *tif = (double *)malloc(sizeof(double) * fit_info.Npar);
+    double* relative_error = (double*)malloc(sizeof(double) * Njack);
+    double* tmp_x = (double*)malloc(sizeof(double) * fit_info.Nvar);
+    double* tif = (double*)malloc(sizeof(double) * fit_info.Npar);
 
-    double *fpi_sim_mev = myres->create_copy(jackall.en[0].jack[id_dfpi]);
+    double* fpi_sim_mev = myres->create_copy(jackall.en[0].jack[id_dfpi]);
 
-    double *fpi_mcisochidof = (double *)malloc(sizeof(double) * Njack);
-    double *muder_l_MeV = (double *)malloc(sizeof(double) * Njack);
-    double *muder_s_MeV = (double *)malloc(sizeof(double) * Njack);
-    double *muder_c_MeV = (double *)malloc(sizeof(double) * Njack);
-    double **Pchidof = malloc_2<double>(fit_info.Npar, Njack);
-    double *relative_error_chidof = (double *)malloc(sizeof(double) * Njack);
+    double* fpi_mcisochidof = (double*)malloc(sizeof(double) * Njack);
+    double* muder_l_MeV = (double*)malloc(sizeof(double) * Njack);
+    double* muder_s_MeV = (double*)malloc(sizeof(double) * Njack);
+    double* muder_c_MeV = (double*)malloc(sizeof(double) * Njack);
+    double** Pchidof = malloc_2<double>(fit_info.Npar, Njack);
+    double* relative_error_chidof = (double*)malloc(sizeof(double) * Njack);
     for (int p = 0; p < fit_info.Npar; p++)
         myres->mult_error(Pchidof[p], fit_res.P[p], std::sqrt(fit_res.chi2[Njack - 1]));
-    double **tifchidof = swap_indices(fit_info.Npar, Njack, Pchidof);
+    double** tifchidof = swap_indices(fit_info.Npar, Njack, Pchidof);
 
-    double *fpi_mcisochi = (double *)malloc(sizeof(double) * Njack);
-    double **Pchi = malloc_2<double>(fit_info.Npar, Njack);
-    double *relative_error_chi = (double *)malloc(sizeof(double) * Njack);
+    double* fpi_mcisochi = (double*)malloc(sizeof(double) * Njack);
+    double** Pchi = malloc_2<double>(fit_info.Npar, Njack);
+    double* relative_error_chi = (double*)malloc(sizeof(double) * Njack);
     for (int p = 0; p < fit_info.Npar; p++)
         myres->mult_error(Pchi[p], fit_res.P[p], std::sqrt(fit_res.chi2[Njack - 1] * fit_res.dof));
-    double **tifchi = swap_indices(fit_info.Npar, Njack, Pchi);
+    double** tifchi = swap_indices(fit_info.Npar, Njack, Pchi);
 
     printf("Pchidof:\n");
-    for (int p = 0; p < fit_info.Npar; p++)
-    {
+    for (int p = 0; p < fit_info.Npar; p++) {
         printf("P[%d]      : %g   %g\n", p, fit_res.P[p][Njack - 1], myres->comp_error(fit_res.P[p]));
         printf("Pchidof[%d]: %g   %g\n", p, Pchidof[p][Njack - 1], myres->comp_error(Pchidof[p]));
         printf("Pchi[%d]   : %g   %g\n", p, Pchi[p][Njack - 1], myres->comp_error(Pchi[p]));
     }
-    for (int n = 0; n < fit_info.N; n++)
-    {
+    for (int n = 0; n < fit_info.N; n++) {
         int id = fit_info.Nxen[n][0];
         myres->copy(fpi_sim_mev, jackall.en[id].jack[id_dfpi]);                         // fpi
         myres->div(fpi_sim_mev, fpi_sim_mev, jackall.en[id].jack[fit_info.corr_id[2]]); // convert to fm^-1
         myres->mult(fpi_sim_mev, fpi_sim_mev, hbarc);                                   // convert to MeV
-        for (int j = 0; j < Njack; j++)
-        {
+        for (int j = 0; j < Njack; j++) {
             double amuliso = jackall.en[id].jack[fit_info.corr_id[1]][j];
             double amuliso_check = jackall.en[id].jack[13][j];
             double amusiso = jackall.en[id].jack[14][j];
@@ -286,7 +275,7 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
 
             double a_fm = jackall.en[id].jack[fit_info.corr_id[2]][j]; // a
             error(fabs(amuliso - amuliso_check) > 1e-10, 1, "compute_fpi_at_mciso",
-                  "amuliso=%g amuliso_check=%g", amuliso, amuliso_check);
+                "amuliso=%g amuliso_check=%g", amuliso, amuliso_check);
 
             for (int p = 0; p < fit_info.Npar; p++)
                 tif[p] = fit_res.P[p][j];
@@ -323,7 +312,7 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
         mysprintf(nameextra, NAMESIZE, "%s/%s_fit_extra_n%d.txt", f_name.path, f_name.label, n);
         printf("writing in file %s\n", nameextra);
 
-        FILE *f = open_file(nameextra, "w+");
+        FILE* f = open_file(nameextra, "w+");
         fprintf(f, "%-20.12g %-20.12g\n", fpi_sim_mev[Njack - 1], myres->comp_error(fpi_sim_mev));
         fprintf(f, "%-20.12g %-20.12g\n", fpi_mciso[Njack - 1], myres->comp_error(fpi_mciso));
         fprintf(f, "%-20.12g %-20.12g\n", relative_error[Njack - 1], myres->comp_error(relative_error));
@@ -364,16 +353,14 @@ void compute_fpi_at_mciso(data_all jackall, fit_type fit_info, fit_result fit_re
     free(relative_error_chi);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
     error(argc != 5, 1, "main ",
-          "usage:./fit_all_phi4  jack/boot   path_to_jack   output_dir file_inputs");
+        "usage:./fit_all_phi4  jack/boot   path_to_jack   output_dir file_inputs");
     char namefile[NAMESIZE];
 
     std::vector<std::string> files;
     std::ifstream file(argv[4]);
-    if (!file.is_open())
-    {
+    if (!file.is_open()) {
         error(1, 1, "main", "Could not open file with input files: %s", argv[4]);
     }
     std::string line;
@@ -383,15 +370,13 @@ int main(int argc, char **argv)
     // std::vector<std::string> beta_names;
     std::vector<std::vector<int>> myen(1, std::vector<int>());
 
-    while (std::getline(file, line))
-    {
+    while (std::getline(file, line)) {
         if (!line.empty() && line[0] != '#') // skip empty lines and comments
         {
 
             std::vector<std::string> word = split(line, ' ');
 
-            if (word.size() == 2)
-            {
+            if (word.size() == 2) {
                 basename = word[0];
                 mysprintf(namefile, NAMESIZE, "%s/%s_%s_%s", argv[2], argv[1], word[0].c_str(), word[1].c_str());
                 printf("adding file %s\n", namefile);
@@ -399,24 +384,19 @@ int main(int argc, char **argv)
                 myen[beta_count].emplace_back(file_count);
                 file_count++;
             }
-            else if (word.size() == 1)
-            {
-                if (strcmp(word[0].c_str(), "new_beta") == 0)
-                {
+            else if (word.size() == 1) {
+                if (strcmp(word[0].c_str(), "new_beta") == 0) {
                     myen.emplace_back(std::vector<int>());
                     beta_count++;
                 }
-                else
-                {
+                else {
                     printf("impossible to give a meaning to the line: %s\n", word[0].c_str());
                     exit(1);
                 }
             }
-            else if (word.size() == 0)
-            {
+            else if (word.size() == 0) {
             }
-            else
-            {
+            else {
                 error(1, 1, "main", "Invalid line in input file: %s", line.c_str());
             }
         }
@@ -448,12 +428,10 @@ int main(int argc, char **argv)
     jackall_chi.create_generalised_resampling();
 
     int Njack = jackall.en[0].Njack;
-    if (strcmp(argv[1], "jack") == 0)
-    {
+    if (strcmp(argv[1], "jack") == 0) {
         myres = new resampling_jack(Njack - 1);
     }
-    else if (strcmp(argv[1], "boot") == 0)
-    {
+    else if (strcmp(argv[1], "boot") == 0) {
         myres = new resampling_boot(Njack - 1);
     }
 
@@ -461,15 +439,15 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
     //  read m^iso
     //////////////////////////////////////////////////////////////
-    char **option_read;
-    option_read = (char **)malloc(sizeof(char *) * 7);
-    option_read[0] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option_read[1] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option_read[2] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option_read[3] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option_read[4] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option_read[5] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option_read[6] = (char *)malloc(sizeof(char) * NAMESIZE);
+    char** option_read;
+    option_read = (char**)malloc(sizeof(char*) * 7);
+    option_read[0] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option_read[1] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option_read[2] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option_read[3] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option_read[4] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option_read[5] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option_read[6] = (char*)malloc(sizeof(char) * NAMESIZE);
 
     mysprintf(option_read[1], NAMESIZE, "read_plateaux");        // blind/see/read_plateaux
     mysprintf(option_read[2], NAMESIZE, "-p");                   // -p
@@ -504,6 +482,8 @@ int main(int argc, char **argv)
     int id_dMpi_diffplat_dmu = 20;
     int id_dfpi_diffplat_dmu = 21;
 
+    int id_ratio = 22;
+    int id_ratio_analytic = 23;
     int id_dfpi = 6;
     // ///// fillind D96
     // fit_type fit_info;
@@ -566,23 +546,25 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////
-    std::vector<std::string> der_name = {"fpi", "Mpi"};
-    std::vector<int> id_der = {id_dfpi_dmu, id_dMpi_dmu};
-    std::vector<int> id_der_diffplat = {id_dfpi_diffplat_dmu, id_dMpi_diffplat_dmu};
+    std::vector<std::string> der_name = { "fpi", "Mpi", "fpi_Mpi" };
+    std::vector<int> id_der = { id_dfpi_dmu, id_dMpi_dmu , id_ratio };
+    std::vector<int> id_der_diffplat = { id_dfpi_diffplat_dmu, id_dMpi_diffplat_dmu , id_ratio_analytic };
     int id_amuliso = 13;
     int id_a_fm = 16;
-    for (int i = 0; i < 2; i++)
-    {
+    for (int i = 0; i < der_name.size(); i++) {
+
+        double (*lhs_fun)(int, int, int, data_all, struct fit_type);
+
+        lhs_fun = lhs_fun_f;
+        if (i == 2)lhs_fun = lhs_fun_ratio;
         fit_type fit_info;
 
-        fit_info.corr_id = {id_der[i], id_amuliso, id_a_fm};
+        fit_info.corr_id = { id_der[i], id_amuliso, id_a_fm };
 
         fit_info.Nxen = std::vector<std::vector<int>>(2);
-        for (int n = 0; n < 2; n++)
-        {
+        for (int n = 0; n < 2; n++) {
             fit_info.Nxen[n].resize(myen[n].size());
-            for (int e = 0; e < myen[n].size(); e++)
-            {
+            for (int e = 0; e < myen[n].size(); e++) {
                 fit_info.Nxen[n][e] = myen[n][e];
             }
         }
@@ -603,12 +585,9 @@ int main(int argc, char **argv)
         printf("fit_info.Nvar=%d fit_info.entot=%d fit_info.Njack=%d\n", fit_info.Nvar, fit_info.entot, fit_info.Njack);
 
         int count = 0;
-        for (int n = 0; n < fit_info.N; n++)
-        {
-            for (int e : fit_info.Nxen[n])
-            {
-                for (int j = 0; j < Njack; j++)
-                {
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
                     // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
                     fit_info.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
                 }
@@ -624,7 +603,7 @@ int main(int argc, char **argv)
         std::string namefit("der_" + der_name[i] + "_vs_mu");
 
         fit_result der_fpi = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        fit_info.band_range = {0.1, 350};
+        fit_info.band_range = { 0.1, 350 };
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi, der_fpi, 0, fit_info.Nxen[0][0], 1, {});
 
         // // compute fpi at the charm point
@@ -635,11 +614,9 @@ int main(int argc, char **argv)
         // const fit
         //////////////////////////////////////////////////////////////
         fit_info.Nxen = std::vector<std::vector<int>>(2);
-        for (int n = 0; n < 2; n++)
-        {
+        for (int n = 0; n < 2; n++) {
             fit_info.Nxen[n].resize(myen[n].size() - 2);
-            for (int e = 0; e < myen[n].size() - 2; e++)
-            {
+            for (int e = 0; e < myen[n].size() - 2; e++) {
                 fit_info.Nxen[n][e] = myen[n][e];
             }
         }
@@ -648,12 +625,9 @@ int main(int argc, char **argv)
         fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
 
         count = 0;
-        for (int n = 0; n < fit_info.N; n++)
-        {
-            for (int e : fit_info.Nxen[n])
-            {
-                for (int j = 0; j < Njack; j++)
-                {
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
                     // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
                     fit_info.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
                 }
@@ -669,7 +643,7 @@ int main(int argc, char **argv)
         namefit = "der_" + der_name[i] + "_const";
 
         fit_result der_fpi_const = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        fit_info.band_range = {27, 350};
+        fit_info.band_range = { 27, 350 };
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const, der_fpi_const, 0, fit_info.Nxen[0][0], 1, {});
 
         // // compute fpi at the charm point
@@ -680,11 +654,9 @@ int main(int argc, char **argv)
         // 1/mu^2
         //////////////////////////////////////////////////////////////
         fit_info.Nxen = std::vector<std::vector<int>>(2);
-        for (int n = 0; n < 2; n++)
-        {
+        for (int n = 0; n < 2; n++) {
             fit_info.Nxen[n].resize(myen[n].size());
-            for (int e = 0; e < myen[n].size(); e++)
-            {
+            for (int e = 0; e < myen[n].size(); e++) {
                 fit_info.Nxen[n][e] = myen[n][e];
             }
         }
@@ -705,12 +677,9 @@ int main(int argc, char **argv)
         printf("fit_info.Nvar=%d fit_info.entot=%d fit_info.Njack=%d\n", fit_info.Nvar, fit_info.entot, fit_info.Njack);
 
         count = 0;
-        for (int n = 0; n < fit_info.N; n++)
-        {
-            for (int e : fit_info.Nxen[n])
-            {
-                for (int j = 0; j < Njack; j++)
-                {
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
                     // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
                     fit_info.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
                 }
@@ -726,7 +695,7 @@ int main(int argc, char **argv)
         namefit = "der_" + der_name[i] + "_vs_mu_mu2_mu3";
 
         fit_result der_fpi_mu_mu2_mu3 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        fit_info.band_range = {0.1, 350};
+        fit_info.band_range = { 0.1, 350 };
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_mu_mu2_mu3, der_fpi_mu_mu2_mu3, 0, fit_info.Nxen[0][0], 1, {});
 
         // // compute fpi at the charm point
@@ -740,11 +709,9 @@ int main(int argc, char **argv)
         //////////////////////////////////////////////////////////////
 
         fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
-        for (int n = 0; n < myen.size(); n++)
-        {
+        for (int n = 0; n < myen.size(); n++) {
             fit_info.Nxen[n].resize(myen[n].size());
-            for (int e = 0; e < myen[n].size(); e++)
-            {
+            for (int e = 0; e < myen[n].size(); e++) {
                 fit_info.Nxen[n][e] = myen[n][e];
             }
         }
@@ -755,12 +722,9 @@ int main(int argc, char **argv)
         fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
 
         count = 0;
-        for (int n = 0; n < fit_info.N; n++)
-        {
-            for (int e : fit_info.Nxen[n])
-            {
-                for (int j = 0; j < Njack; j++)
-                {
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
                     // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
                     fit_info.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
                 }
@@ -777,7 +741,7 @@ int main(int argc, char **argv)
         namefit = "der_" + der_name[i] + "_full_mu_mu2_mu3";
 
         fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        fit_info.band_range = {1, 350};
+        fit_info.band_range = { 1, 350 };
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
 
         // // compute fpi at the charm point
@@ -787,14 +751,12 @@ int main(int argc, char **argv)
         //////////////////////////////////////////////////////////////
         // fit all defferences
         //////////////////////////////////////////////////////////////
-        fit_info.corr_id = {id_der_diffplat[i], id_amuliso, id_a_fm};
+        fit_info.corr_id = { id_der_diffplat[i], id_amuliso, id_a_fm };
 
         fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
-        for (int n = 0; n < myen.size(); n++)
-        {
+        for (int n = 0; n < myen.size(); n++) {
             fit_info.Nxen[n].resize(myen[n].size());
-            for (int e = 0; e < myen[n].size(); e++)
-            {
+            for (int e = 0; e < myen[n].size(); e++) {
                 fit_info.Nxen[n][e] = myen[n][e];
             }
         }
@@ -805,12 +767,9 @@ int main(int argc, char **argv)
         fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
 
         count = 0;
-        for (int n = 0; n < fit_info.N; n++)
-        {
-            for (int e : fit_info.Nxen[n])
-            {
-                for (int j = 0; j < Njack; j++)
-                {
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
                     // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
                     fit_info.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
                 }
@@ -827,7 +786,7 @@ int main(int argc, char **argv)
         namefit = "der_" + der_name[i] + "_diffplat_full_mu_mu2_mu3";
 
         fit_result der_fpi_diffplat_const_full = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        fit_info.band_range = {1, 350};
+        fit_info.band_range = { 1, 350 };
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_diffplat_const_full, der_fpi_diffplat_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
 
         // // compute fpi at the charm point
@@ -843,17 +802,14 @@ int main(int argc, char **argv)
 
         std::vector<double> fin(Njack);
         std::vector<double> mul(Njack);
-        for (int n = 0; n < fit_info.N; n++)
-        {
-            for (int e : fit_info.Nxen[n])
-            {
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
 
                 double chi2_dof = der_fpi_diffplat_const_full.chi2[Njack - 1];
 
                 int id = fit_info.corr_id[0];
 
-                for (int j = 0; j < Njack; j++)
-                {
+                for (int j = 0; j < Njack; j++) {
                     fin[j] = lhs_fun(n, e, j, jackall, fit_info);
                 }
                 // // to a quantity a we want to sum b  such that
@@ -865,8 +821,7 @@ int main(int argc, char **argv)
                 // double sigma_b = std::sqrt(sigma_a * sigma_a * (chi2_dof - 1));
                 // double *b = myres->create_fake(0, sigma_b, 2);
                 myres->mult_error(fin.data(), fin.data(), std::sqrt(chi2_dof));
-                for (int j = 0; j < Njack; j++)
-                {
+                for (int j = 0; j < Njack; j++) {
                     // fin[j] += b[j];
                     // reverse lhs_fun to get the jacknife for the derivative
                     jackall_chi.en[e].jack[id][j] = fin[j] * (jackall.en[e].jack[fit_info.corr_id[2]][j] / hbarc) / jackall.en[e].jack[fit_info.corr_id[1]][j]; //
@@ -881,14 +836,12 @@ int main(int argc, char **argv)
             }
         }
         fit_type fit_info_chi;
-        fit_info_chi.corr_id = {id_der_diffplat[i], id_amuliso, id_a_fm};
+        fit_info_chi.corr_id = { id_der_diffplat[i], id_amuliso, id_a_fm };
 
         fit_info_chi.Nxen = std::vector<std::vector<int>>(myen.size());
-        for (int n = 0; n < myen.size(); n++)
-        {
+        for (int n = 0; n < myen.size(); n++) {
             fit_info_chi.Nxen[n].resize(myen[n].size());
-            for (int e = 0; e < myen[n].size(); e++)
-            {
+            for (int e = 0; e < myen[n].size(); e++) {
                 fit_info_chi.Nxen[n][e] = myen[n][e];
             }
         }
@@ -901,12 +854,9 @@ int main(int argc, char **argv)
         fit_info_chi.x = double_malloc_3(fit_info_chi.Nvar, fit_info_chi.entot, fit_info_chi.Njack);
 
         count = 0;
-        for (int n = 0; n < fit_info_chi.N; n++)
-        {
-            for (int e : fit_info_chi.Nxen[n])
-            {
-                for (int j = 0; j < Njack; j++)
-                {
+        for (int n = 0; n < fit_info_chi.N; n++) {
+            for (int e : fit_info_chi.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
                     // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
                     fit_info_chi.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
                 }
@@ -921,10 +871,8 @@ int main(int argc, char **argv)
         fit_info_chi.compute_cov1_fit();
 
         printf("chi2 = %g\n", der_fpi_diffplat_const_full.chi2[Njack - 1]);
-        for (int i = 0; i < fit_info.entot; i++)
-        {
-            for (int j = 0; j < fit_info.entot; j++)
-            {
+        for (int i = 0; i < fit_info.entot; i++) {
+            for (int j = 0; j < fit_info.entot; j++) {
                 // printf("%-15g ", fit_info_chi.cov1[i][j] / fit_info.cov1[i][j]);
                 printf("%-15g ", fit_info_chi.cov[i][j] / std::sqrt(fit_info_chi.cov[i][i] * fit_info_chi.cov[j][j]));
             }
@@ -933,14 +881,62 @@ int main(int argc, char **argv)
         namefit = "der_" + der_name[i] + "_diffplat_full_mu_mu2_mu3_chi2d1";
 
         fit_result der_fpi_diffplat_const_full_chi21 = fit_all_data(argv, jackall_chi, lhs_fun, fit_info_chi, namefit.c_str());
-        fit_info_chi.band_range = {1, 350};
+        fit_info_chi.band_range = { 1, 350 };
         print_fit_band(argv, jackall_chi, fit_info_chi, fit_info_chi, namefit.c_str(), "amu", der_fpi_diffplat_const_full_chi21, der_fpi_diffplat_const_full_chi21, 0, fit_info_chi.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
 
         // // compute fpi at the charm point
         file_out_name f_name_diffplat_c_full_chi21(argv[3], namefit.c_str());
         compute_fpi_at_mciso(jackall_chi, fit_info_chi, der_fpi_diffplat_const_full_chi21, id_dfpi, f_name_diffplat_c_full_chi21);
 
+
+        //////////////////////////////////////////////////////////////
+        // constant fit light
+        //////////////////////////////////////////////////////////////
+        fit_info.N = 3;
+        fit_info.Nxen = { {5},{11},{15} };// light
+        // fit_info.N=1;
+        // fit_info.Nxen = { {5,11,15} };// light
+
+        // fit_info.Nxen = {{3,9,14}};// strange
+        fit_info.function = rhs_const;
+
+        fit_info.Npar = 1;
+        fit_info.Nvar = 1;
+        fit_info.Njack = Njack;
+        fit_info.init_N_etot_form_Nxen();
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+        printf("fit_info.Nvar=%d fit_info.entot=%d fit_info.Njack=%d\n", fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+        count = 0;
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
+                    // printf(" %g  %d  %d\n", jackall.en[e].jack[11][j], e, j);
+                    fit_info.x[0][count][j] = jackall.en[e].jack[11][j] / jackall.en[e].jack[id_amuliso][j]; // mu/muliso
+                }
+                count++;
+            }
+        }
+        fit_info.linear_fit = true;
+        // fit_info.verbosity = 1;
+        fit_info.covariancey = false;
+        // fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+        // fit_info.make_covariance_block_diagonal_in_n();
+        // fit_info.compute_cov1_fit();
+        namefit = "der_" + der_name[i] + "_diffplat_full_mul_const";
+
+
+        fit_result der_fpi_l = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+        fit_info.band_range = { 0.1, 2 };
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_l, der_fpi_l, 0, 0, 0.1, {});
+
+        // // compute fpi at the charm point
+        // file_out_name f_name(argv[3], namefit.c_str());
+        // compute_fpi_at_mciso(jackall, fit_info, der_fpi_l, der_fpi_l, f_name);
+
+
         fit_info_chi.restore_default();
         fit_info.restore_default();
+
     }
 }
