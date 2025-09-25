@@ -630,7 +630,7 @@ int main(int argc, char** argv) {
     // f_PS_rew.P[0] = myres->create_fake(f_PS_rew.P[0][Njack-1], myres->comp_error(f_PS_rew.P[0]), 1); 
     for (int j = 0; j < fit_info.Njack; j++) {
         derM[j] = (f_PS_rew.P[0][j] - f_PS.P[0][j]) / dmu;
-        printf("%d  %.12g  %.12g   %.12g   %.12g\n",j, f_PS_rew.P[0][j]- f_PS.P[0][j], f_PS_rew.P[0][j], f_PS.P[0][j], dmu);
+        // printf("%d  %.12g  %.12g   %.12g   %.12g\n", j, f_PS_rew.P[0][j] - f_PS.P[0][j], f_PS_rew.P[0][j], f_PS.P[0][j], dmu);
     }
     mysprintf(name_rew, NAMESIZE, "df_{PS}/d%s", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
@@ -771,6 +771,25 @@ int main(int argc, char** argv) {
     print_result_in_file(outfile, d_ratio, "der_ratio_analytic", 0, 0, 0);
     write_jack(d_ratio, Njack, jack_file); check_correlatro_counter(23);
 
+    char file_fpi_jack[NAMESIZE];
+    mysprintf(file_fpi_jack, NAMESIZE, "%s/out/fpi_%s_%s_jack", option[3], option[6], argv[7]);
+    printf("writing file: %s\n",file_fpi_jack);
+    myres->write_jack_in_file(f_PS.P[0], file_fpi_jack);
+
+    mysprintf(file_fpi_jack, NAMESIZE, "%s/out/fpi_rew_%s_%s_jack", option[3], option[6], argv[7]);
+    printf("writing file: %s\n",file_fpi_jack);
+    myres->write_jack_in_file(f_PS_rew.P[0], file_fpi_jack);
 
 
+    double *mu_mul = (double*) malloc(sizeof(double)*Njack);
+    for (int j = 0; j < Njack;j++) {
+        mu_mul[j] = head_rew.mus[0]/amuiso[0][j];
+    }
+    print_result_in_file(outfile, mu_mul, "mu/mul", 0, 0, 0);
+    for (int j = 0; j < Njack;j++) {
+        mu_mul[j] = head_rew.mus[0];
+    }
+    print_result_in_file(outfile, mu_mul, "mu", 0, 0, 0);
+    print_result_in_file(outfile, amuiso[0], "muliso", 0, 0, 0);
+    print_result_in_file(outfile, a_fm, "a_fm", 0, 0, 0);
 }
