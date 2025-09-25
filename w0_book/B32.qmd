@@ -1,0 +1,139 @@
+# B32
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+```{r, echo=FALSE,results='asis'}
+dir <- "/home/garofalo/analysis/flow/data/out/"
+file <- "onlinemeas_B32.dat_reweight_charm_OS_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-NULL
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df)
+df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df )
+
+gg<-plot_df_corr_ggplot(df)
+# fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+#######
+file <- "onlinemeas_B32.dat_reweight_strange_OS_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+# df<-NULL
+df<-add_corr_to_df("plateau_dM/drewsOS",all_obs ,mt, df)
+df<-add_corr_to_df("plateau_df/drewsOS",all_obs ,mt,df )
+#######
+file <- "onlinemeas_B32.dat_reweight_light_OS_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+# df<-NULL
+df<-add_corr_to_df("plateau_dM/drewlOS",all_obs ,mt, df)
+df<-add_corr_to_df("plateau_df/drewlOS",all_obs ,mt,df )
+
+
+####
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+
+```
+
+
+
+```{r, echo=FALSE, results='asis'}
+df <- data.frame(
+  "e" = numeric(),
+  "mu/mul" = numeric(),
+  "der_Mpi" = numeric(),
+  "dder_Mpi" = numeric(),
+  "der_fpi" = numeric(),
+  "dder_fpi" = numeric(),
+  "der_M_f" = numeric(),
+  "dder_M_f" = numeric(),
+  "mu" = numeric(),
+  "muliso" = numeric(),
+  "a_fm" = numeric()
+)
+
+dir <- "/home/garofalo/analysis/flow/data/out/"
+file <- "onlinemeas_B32.dat_reweight_strange_OS_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+fit <- get_full_res("plateau_dM/drewsOS", all_obs, mt)
+fit_f <- get_full_res("plateau_df/drewsOS", all_obs, mt)
+fit_d <- get_full_res("d_ratio", all_obs, mt)
+fit_m_mul <- get_full_res("mu/mul", all_obs, mt)
+fit_m <- get_full_res("mu", all_obs, mt)
+fit_muliso <- get_full_res("muliso", all_obs, mt)
+fit_a <- get_full_res("a_fm", all_obs, mt)
+new_row <- list(
+  "B32", fit_m_mul[1, 1], fit[1, 1], fit[1, 2], fit_f[1, 1], fit_f[1, 2],
+  fit_d[1, 1], fit_d[1, 2], fit_m[1, 1], fit_muliso[1, 1],
+  fit_a[1, 1]
+)
+names(new_row) <- names(df)
+df <- rbind(df, new_row)
+##################
+file <- "onlinemeas_B32.dat_reweight_charm_OS_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+fit <- get_full_res("plateau_dM/drewcOS", all_obs, mt)
+fit_f <- get_full_res("plateau_df/drewcOS", all_obs, mt)
+fit_d <- get_full_res("d_ratio", all_obs, mt)
+fit_m_mul <- get_full_res("mu/mul", all_obs, mt)
+fit_m <- get_full_res("mu", all_obs, mt)
+fit_muliso <- get_full_res("muliso", all_obs, mt)
+fit_a <- get_full_res("a_fm", all_obs, mt)
+new_row <- list(
+  "B32", fit_m_mul[1, 1], fit[1, 1], fit[1, 2], fit_f[1, 1], fit_f[1, 2],
+  fit_d[1, 1], fit_d[1, 2], fit_m[1, 1], fit_muliso[1, 1],
+  fit_a[1, 1]
+)
+names(new_row) <- names(df)
+df <- rbind(df, new_row)
+
+###
+
+
+### plot
+gg <- myggplot()
+gg <- gg + geom_pointrange(aes(
+  x = df$mu.mul, y = df$muliso * df$der_M_f,
+  ymin = df$muliso * (df$der_M_f - df$dder_M_f),
+  ymax = df$muliso * (df$der_M_f + df$dder_M_f),
+  color=df$e
+  
+))
+
+fig <- myplotly(gg, "", "mu/mul", "muliso*d(Mpi/fpi)/dmu", to_print = TRUE)
+
+gg <- myggplot()
+gg <- gg + geom_pointrange(aes(
+  x = df$mu.mul, y = (df$muliso / df$a_fm) * df$der_fpi,
+  ymin = (df$muliso / df$a_fm) * (df$der_fpi - df$dder_fpi),
+  ymax = (df$muliso / df$a_fm) * (df$der_fpi + df$dder_fpi),
+  color=df$e
+))
+
+fig <- myplotly(gg, "", "mu/mul", " (a*muliso/a)d(fpi)/dmu", to_print = TRUE)
+```
+```
