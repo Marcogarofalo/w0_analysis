@@ -111,6 +111,12 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_strange_p2dmu_h10_OS_C80_LMA.dat rewsOS_p2dmu_h10
 ./pion_rew  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_strange_mdmu_h10_OS_C80_LMA.dat rewsOS_mdmu_h10
 
+###### B32
+./pion_rew  -p ../../data/ onlinemeas_B32.dat  -bin 100 jack reweight_light_OS_B32.dat rewlOS
+./pion_rew  -p ../../data/ onlinemeas_B32.dat  -bin 100 jack reweight_strange_OS_B32.dat rewsOS
+./pion_rew  -p ../../data/ onlinemeas_B32.dat  -bin 100 jack reweight_charm_OS_B32.dat rewcOS
+
+
 ## w0 C80
 ./w0_rew  -p ../../data/ flow_C80_LMA.dat  -bin 20 jack reweight_charm_0.1_OS_C80_LMA.dat rewcOS_0.1
 ./w0_rew  -p ../../data/ flow_C80_LMA.dat  -bin 20 jack reweight_strange_OS_C80_LMA.dat rewsOS
@@ -143,6 +149,12 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_strange_OS_D96.dat rewsOS
 ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_light_OS_D96.dat rewlOS.1
 ##
+
+## w0 B32
+./w0_rew  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_charm_OS_B32.dat rewcOS
+./w0_rew  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_strange_OS_B32.dat rewsOS
+./w0_rew  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_light_OS_B32.dat rewlOS
+
 
 ### rations
 ./pion_rew_ratio  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_light_OS_B64_LMA.dat reweight_light_OS_B64_LMA.dat
