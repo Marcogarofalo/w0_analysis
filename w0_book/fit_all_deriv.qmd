@@ -309,7 +309,7 @@ for (j in seq_along(basenames)) {
   make_table_fit_result(fit)
   gg <- plot_fit(basenames[j], "amu",
     # noline = TRUE,
-    data_type = c("B64", "C80","D96","B32-260MeV"),
+    data_type = c("B64", "C80","D96","B32-260MeV","B24-260MeV"),
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j]
@@ -361,7 +361,7 @@ for (j in seq_along(basenames)) {
   make_table_fit_result(fit)
   gg <- plot_fit(basenames[j], "amu",
     # noline = TRUE,
-    data_type = c("B64", "C80","D96","B32-260MeV"),
+    data_type = c("B64", "C80","D96","B32-260MeV","B24-260MeV"),
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j]
@@ -448,7 +448,7 @@ for (j in seq_along(basenames)) {
   make_table_fit_result(fit)
   gg <- plot_fit(basenames[j], "amu",
     # noline = TRUE,
-    data_type = c("B64", "C80","D96","B32-260MeV"),
+    data_type = c("B64", "C80","D96","B32-260MeV","B24-260MeV"),
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j]
