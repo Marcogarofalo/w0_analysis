@@ -12,6 +12,7 @@ book:
     - B64.qmd
     - statistical_investigation_B64.qmd
     - B32.qmd
+    - C48.qmd
     - pion_B64.qmd
     - pion_C80.qmd
     - pion_D96.qmd

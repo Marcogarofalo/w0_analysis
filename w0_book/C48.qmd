@@ -1,0 +1,107 @@
+# C48
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+```{r, echo=FALSE,results='asis'}
+dir <- "/home/garofalo/analysis/flow/data/out/"
+file <- "onlinemeas_C48.dat_reweight_charm_OS_C48.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-NULL
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df)
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df)
+
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df)
+df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df )
+
+
+#######
+file <- "onlinemeas_C48.dat_reweight_charm_OS_C48_low_prec.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+# df<-NULL
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,rename="plateau_dM/drewcOS_1e-18")
+df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df,rename="plateau_df/drewcOS_1e-18" )
+
+#######
+file <- "onlinemeas_C48.dat_reweight_strange_OS_C48.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+# df<-NULL
+df<-add_corr_to_df("plateau_dM/drewsOS",all_obs ,mt, df)
+df<-add_corr_to_df("plateau_df/drewsOS",all_obs ,mt,df )
+#######
+file <- "onlinemeas_C48.dat_reweight_light_OS_C48.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+# df<-NULL
+df<-add_corr_to_df("plateau_dM/drewlOS",all_obs ,mt, df)
+df<-add_corr_to_df("plateau_df/drewlOS",all_obs ,mt,df )
+
+####
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+
+```
+
+
+
+
+```{r, echo=FALSE,results='asis'}
+dir <- "/home/garofalo/analysis/flow/data/out/"
+file <- "onlinemeas_C48.dat_reweight_charm_OS_C48.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-NULL
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df,rename="M-C48")
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df,rename="f-C48")
+
+#gg<-plot_df_corr_ggplot(df)
+# fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+#######
+file <- "onlinemeas_B32.dat_reweight_strange_OS_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df,rename="M-B32")
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df,rename="f-B32")
+#######
+file <- "onlinemeas_B24.dat_reweight_strange_OS_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df,rename="M-B24")
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df,rename="f-B24")
+a_C<-0.06819/197.37
+a_B<-0.07948/197.37
+# df <- df %>%
+#   mutate(y = ifelse(grepl("C", label), y / a_C, y))
+# df <- df %>%
+#   mutate(y = ifelse(grepl("B", label), y / a_B, y))
+df[grepl("C", df$label), c(2,3,5,6)]<- df[grepl("C", df$label),c(2,3,5,6)]/a_C
+df[grepl("B", df$label), c(2,3,5,6)]<- df[grepl("B", df$label),c(2,3,5,6)]/a_B
+####
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+
+```

@@ -33,7 +33,7 @@ df<-NULL
 df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df)
 df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df )
 
-gg<-plot_df_corr_ggplot(df)
+#gg<-plot_df_corr_ggplot(df)
 # fig<-myplotly(gg,"","t/a","",to_print = TRUE)
 #######
 file <- "onlinemeas_B32.dat_reweight_strange_OS_B32.dat_output"
@@ -49,7 +49,34 @@ all_obs <- Rose::get_all_corr(mt)
 # df<-NULL
 df<-add_corr_to_df("plateau_dM/drewlOS",all_obs ,mt, df)
 df<-add_corr_to_df("plateau_df/drewlOS",all_obs ,mt,df )
+##################################
+## B24
+#########################
+file <- "onlinemeas_B24.dat_reweight_charm_OS_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+nameM<-"plateau_dM/drewcOS"
+namef<-"plateau_df/drewcOS"
+df<-add_corr_to_df(nameM,all_obs ,mt, df, rename = paste0(nameM,"B24"))
+df<-add_corr_to_df(namef,all_obs ,mt,df, rename = paste0(namef,"B24") )
 
+#######
+file <- "onlinemeas_B24.dat_reweight_strange_OS_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+nameM<-"plateau_dM/drewsOS"
+namef<-"plateau_df/drewsOS"
+df<-add_corr_to_df(nameM,all_obs ,mt, df, rename = paste0(nameM,"B24"))
+df<-add_corr_to_df(namef,all_obs ,mt,df, rename = paste0(namef,"B24") )
+
+#######
+file <- "onlinemeas_B24.dat_reweight_light_OS_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+nameM<-"plateau_dM/drewlOS"
+namef<-"plateau_df/drewlOS"
+df<-add_corr_to_df(nameM,all_obs ,mt, df, rename = paste0(nameM,"B24"))
+df<-add_corr_to_df(namef,all_obs ,mt,df, rename = paste0(namef,"B24") )
 
 ####
 gg<-plot_df_corr_ggplot(df)

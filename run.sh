@@ -115,10 +115,20 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_B32.dat  -bin 100 jack reweight_light_OS_B32.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_B32.dat  -bin 100 jack reweight_strange_OS_B32.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_B32.dat  -bin 100 jack reweight_charm_OS_B32.dat rewcOS
+
+./pion_rew  -p ../../data/ onlinemeas_mu1_B32.dat  -bin 100 jack reweight_light_OS_B32.dat rewlOS
+./pion_rew  -p ../../data/ onlinemeas_mu1_B32.dat  -bin 100 jack reweight_strange_OS_B32.dat rewsOS
+./pion_rew  -p ../../data/ onlinemeas_mu1_B32.dat  -bin 100 jack reweight_charm_OS_B32.dat rewcOS
 ###### B24
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_light_OS_B24.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_strange_OS_B24.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_charm_OS_B24.dat rewcOS
+###### C48
+./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_light_OS_C48.dat rewlOS
+./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_strange_OS_C48.dat rewsOS
+./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_charm_OS_C48.dat rewcOS
+
+./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_charm_OS_C48_low_prec.dat rewcOS
 
 
 
@@ -163,6 +173,10 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_charm_OS_B24.dat rewcOS
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_strange_OS_B24.dat rewsOS
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_light_OS_B24.dat rewlOS
+##
+./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_charm_OS_C48.dat rewcOS
+./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_strange_OS_C48.dat rewsOS
+./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_light_OS_C48.dat rewlOS
 
 ### rations
 ./pion_rew_ratio  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_light_OS_B64_LMA.dat reweight_light_OS_B64_LMA.dat
