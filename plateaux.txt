@@ -610,7 +610,7 @@ onlinemeas_D96_LMA.dat mu_out_rewlOS    0.00054   1e-20 26
 
 
 onlinemeas_E112_LMA.dat mulsim  0.000439999875        1e-20      31
-onlinemeas_E112_LMA.dat mussim  0.01162416     1e-20      32
+onlinemeas_E112_LMA.dat mussim  0.01207711518     1e-20      32
 onlinemeas_E112_LMA.dat mucsim  0.142700769256 1e-20      33
 onlinemeas_E112_LMA.dat muliso  0.0004306      0.0000023  31
 onlinemeas_E112_LMA.dat musiso  0.011787       0.000055   32
@@ -668,7 +668,7 @@ onlinemeas_B32.dat  plateau_df/drewcOS 9 30 1
 ################################################
 
 
-onlinemeas_mu1_B32.dat mulsim  0.0025    1e-20      1
+onlinemeas_mu1_B32.dat mulsim  0.0042    1e-20      1
 onlinemeas_mu1_B32.dat mussim  0.017846601   0.000053   2
 onlinemeas_mu1_B32.dat mucsim  0.2285992  1e-20      3
 onlinemeas_mu1_B32.dat m0sim   -0.4138863   1e-20      3
@@ -737,7 +737,6 @@ onlinemeas_B24.dat  plateau_df/drewcOS 10 23 1
 
 ################################################
 
-
 onlinemeas_C48.dat mulsim  0.0020        1e-20      11
 onlinemeas_C48.dat mussim  0.0166472533   0.000053   12
 onlinemeas_C48.dat mucsim  0.194775730329 1e-20      13
@@ -769,3 +768,37 @@ onlinemeas_C48.dat  plateau_dM/drewsOS 12 47 1
 onlinemeas_C48.dat  plateau_df/drewsOS 12 47 1
 onlinemeas_C48.dat  plateau_dM/drewcOS 12 47 1
 onlinemeas_C48.dat  plateau_df/drewcOS 12 47 1
+
+################################################
+
+onlinemeas_C48_therm.dat mulsim  0.0020        1e-20      11
+onlinemeas_C48_therm.dat mussim  0.0166472533   0.000053   12
+onlinemeas_C48_therm.dat mucsim  0.194775730329 1e-20      13
+onlinemeas_C48_therm.dat m0sim  -0.396474310465 1e-20      13
+
+onlinemeas_C48_therm.dat muliso  0.0005864      0.0000034  11
+onlinemeas_C48_therm.dat musiso  0.016053       0.000067   12
+onlinemeas_C48_therm.dat muciso  0.19849        0.00064    13
+onlinemeas_C48_therm.dat m0     -0.3964534         0.0000041  14
+onlinemeas_C48_therm.dat m0iso  -0.3964534         0.0000041  16
+onlinemeas_C48_therm.dat a       0.06819           0.00014    15
+
+onlinemeas_C48_therm.dat M_{PS}          23 47 1
+onlinemeas_C48_therm.dat M_{PS}_rewlOS   23 47 1
+onlinemeas_C48_therm.dat M_{PS}_rewsOS   23 47 1
+onlinemeas_C48_therm.dat M_{PS}_rewcOS   23 47 1
+onlinemeas_C48_therm.dat f_{PS}          23 47 1
+onlinemeas_C48_therm.dat f_{PS}_rewlOS   23 47 1
+onlinemeas_C48_therm.dat f_{PS}_rewsOS   23 47 1
+onlinemeas_C48_therm.dat f_{PS}_rewcOS   23 47 1
+onlinemeas_C48_therm.dat mpcac           14 47 1
+onlinemeas_C48_therm.dat mpcac_rewlOS    14 47 1
+onlinemeas_C48_therm.dat mpcac_rewcOS    14 47 1
+onlinemeas_C48_therm.dat mpcac_rewsOS    14 47 1
+
+onlinemeas_C48_therm.dat  plateau_dM/drewlOS 12 47 1
+onlinemeas_C48_therm.dat  plateau_df/drewlOS 12 47 1
+onlinemeas_C48_therm.dat  plateau_dM/drewsOS 12 47 1
+onlinemeas_C48_therm.dat  plateau_df/drewsOS 12 47 1
+onlinemeas_C48_therm.dat  plateau_dM/drewcOS 12 47 1
+onlinemeas_C48_therm.dat  plateau_df/drewcOS 12 47 1
