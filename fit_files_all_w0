@@ -26,6 +26,10 @@ flow_B24.dat reweight_charm_OS_B24.dat
 flow_B24.dat reweight_strange_OS_B24.dat
 flow_B24.dat reweight_light_OS_B24.dat
 new_beta
-flow_C48.dat reweight_charm_OS_C48.dat
-flow_C48.dat reweight_strange_OS_C48.dat
-flow_C48.dat reweight_light_OS_C48.dat
+flow_C48_therm.dat reweight_charm_OS_C48_therm.dat
+flow_C48_therm.dat reweight_strange_OS_C48_therm.dat
+flow_C48_therm.dat reweight_light_OS_C48_therm.dat
+new_beta
+flow_A32.dat reweight_charm_OS_A32.dat
+flow_A32.dat reweight_strange_OS_A32.dat
+flow_A32.dat reweight_light_OS_A32.dat

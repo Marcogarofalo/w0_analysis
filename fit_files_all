@@ -26,10 +26,18 @@ onlinemeas_B24.dat reweight_charm_OS_B24.dat
 onlinemeas_B24.dat reweight_strange_OS_B24.dat
 onlinemeas_B24.dat reweight_light_OS_B24.dat
 new_beta
-onlinemeas_C48.dat reweight_charm_OS_C48.dat
-onlinemeas_C48.dat reweight_strange_OS_C48.dat
-onlinemeas_C48.dat reweight_light_OS_C48.dat
+onlinemeas_C48_therm.dat reweight_charm_OS_C48_therm.dat
+onlinemeas_C48_therm.dat reweight_strange_OS_C48_therm.dat
+onlinemeas_C48_therm.dat reweight_light_OS_C48_therm.dat
 new_beta
 onlinemeas_mu1_B32.dat reweight_charm_OS_B32.dat
 onlinemeas_mu1_B32.dat reweight_strange_OS_B32.dat
 onlinemeas_mu1_B32.dat reweight_light_OS_B32.dat
+new_beta
+onlinemeas_E112_LMA.dat reweight_strange_OS_E112_LMA.dat
+onlinemeas_E112_LMA.dat reweight_light_OS_E112_LMA.dat
+new_beta
+onlinemeas_A32.dat reweight_charm_OS_A32.dat
+onlinemeas_A32.dat reweight_strange_OS_A32.dat
+onlinemeas_A32.dat reweight_light_OS_A32.dat
+

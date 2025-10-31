@@ -621,15 +621,57 @@ onlinemeas_E112_LMA.dat a       0.04892        0.00011    35
 onlinemeas_E112_LMA.dat m0iso   -0.3613136    0.0000026   26
 onlinemeas_E112_LMA.dat m0sim   -0.361330902896  1e-20    26
 
+onlinemeas_E112_LMA.dat M_{PS}          33 98 1
+onlinemeas_E112_LMA.dat M_{PS}_rewlOS   33 98 1
+onlinemeas_E112_LMA.dat M_{PS}_rewsOS   33 98 1
+onlinemeas_E112_LMA.dat M_{PS}_rewcOS   33 98 1
+onlinemeas_E112_LMA.dat f_{PS}          33 98 1
+onlinemeas_E112_LMA.dat f_{PS}_rewlOS   33 98 1
+onlinemeas_E112_LMA.dat f_{PS}_rewsOS   33 98 1
+onlinemeas_E112_LMA.dat f_{PS}_rewcOS   33 98 1
+onlinemeas_E112_LMA.dat mpcac           15 98 1
+onlinemeas_E112_LMA.dat mpcac_rewlOS    15 98 1
+onlinemeas_E112_LMA.dat mpcac_rewcOS    15 98 1
+onlinemeas_E112_LMA.dat mpcac_rewsOS    15 98 1
 
-onlinemeas_A12.dat mulsim  0.000747122712203    8.0335446948e-06        41
-onlinemeas_A12.dat mussim  0.01162416     1e-20                         42
-onlinemeas_A12.dat mucsim  0.142700769256 1e-20                         43
-onlinemeas_A12.dat muliso  0.0012             0.0000023                     41
-onlinemeas_A12.dat musiso  0.011787       0.000055                      42
-onlinemeas_A12.dat muciso  0.14154        0.00054                       43
-onlinemeas_A12.dat m0     -0.3613136      0.0000075                     44
-onlinemeas_A12.dat a       0.0902508163222         0.000789055161891    45
+onlinemeas_E112_LMA.dat  plateau_dM/drewlOS 14 98 1
+onlinemeas_E112_LMA.dat  plateau_df/drewlOS 14 98 1
+onlinemeas_E112_LMA.dat  plateau_dM/drewsOS 14 98 1
+onlinemeas_E112_LMA.dat  plateau_df/drewsOS 14 98 1
+onlinemeas_E112_LMA.dat  plateau_dM/drewcOS 14 98 1
+onlinemeas_E112_LMA.dat  plateau_df/drewcOS 14 98 1
+
+
+######
+
+onlinemeas_A32.dat mulsim  0.0030             1e-20        41
+onlinemeas_A32.dat mussim  0.0198281          1e-20                         42
+onlinemeas_A32.dat mucsim  0.2617834637104646 1e-20                         43
+onlinemeas_A32.dat muliso  0.0007471          0.0000080                     41
+onlinemeas_A32.dat musiso  0.198          0.000055                      42
+onlinemeas_A32.dat muciso  0.26           0.00054                       43
+onlinemeas_A32.dat m0     -0.3613136      0.0000075                     44
+onlinemeas_A32.dat a       0.0902508163222         0.000789055161891    45
+
+onlinemeas_A32.dat M_{PS}          18 30 1
+onlinemeas_A32.dat M_{PS}_rewlOS   18 30 1
+onlinemeas_A32.dat M_{PS}_rewsOS   18 30 1
+onlinemeas_A32.dat M_{PS}_rewcOS   18 30 1
+onlinemeas_A32.dat f_{PS}          18 30 1
+onlinemeas_A32.dat f_{PS}_rewlOS   18 30 1
+onlinemeas_A32.dat f_{PS}_rewsOS   18 30 1
+onlinemeas_A32.dat f_{PS}_rewcOS   18 30 1
+onlinemeas_A32.dat mpcac           11 31 1
+onlinemeas_A32.dat mpcac_rewlOS    11 31 1
+onlinemeas_A32.dat mpcac_rewcOS    11 31 1
+onlinemeas_A32.dat mpcac_rewsOS    11 31 1
+
+onlinemeas_A32.dat  plateau_dM/drewlOS 8 30 1
+onlinemeas_A32.dat  plateau_df/drewlOS 8 30 1
+onlinemeas_A32.dat  plateau_dM/drewsOS 8 30 1
+onlinemeas_A32.dat  plateau_df/drewsOS 8 30 1
+onlinemeas_A32.dat  plateau_dM/drewcOS 8 30 1
+onlinemeas_A32.dat  plateau_df/drewcOS 8 30 1
 
 ################################################
 
