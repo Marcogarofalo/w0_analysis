@@ -499,7 +499,8 @@ int main(int argc, char **argv)
     {
         fit_type fit_info;
 
-        fit_info.corr_id = {id_dw0_dmu, id_m0iso, id_a_fm};
+        // fit_info.corr_id = {id_dw0_dmu, id_m0iso, id_a_fm};
+        fit_info.corr_id = {id_dw0_dmu, id_amuliso, id_a_fm};
 
         fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
         for (int n = 0; n < myen.size(); n++)
