@@ -26,13 +26,14 @@ book:
     - references.qmd
 
 bibliography: references.bib
+# prefer-html: true
 
 format:
   html:
     theme: cosmo
     html-math-method: katex
-  pdf:
-    documentclass: scrreprt
+  # pdf:
+  #  documentclass: scrreprt
 
 
 

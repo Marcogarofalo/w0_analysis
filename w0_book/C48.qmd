@@ -37,13 +37,6 @@ df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df)
 df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df )
 
 
-#######
-file <- "onlinemeas_C48.dat_reweight_charm_OS_C48_low_prec.dat_output"
-mt <- read_df(paste0(dir, file))
-all_obs <- Rose::get_all_corr(mt)
-# df<-NULL
-df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,rename="plateau_dM/drewcOS_1e-18")
-df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df,rename="plateau_df/drewcOS_1e-18" )
 
 #######
 file <- "onlinemeas_C48.dat_reweight_strange_OS_C48.dat_output"
@@ -67,6 +60,103 @@ fig<-myplotly(gg,"","t/a","",to_print = TRUE)
 ```
 
 
+## Compare charm precision
+
+```{r, echo=FALSE,results='asis'}
+dir <- "/home/garofalo/analysis/flow/data/out/"
+file <- "onlinemeas_C48.dat_reweight_charm_OS_C48.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-NULL
+# df<-add_corr_to_df("M_{PS}",all_obs ,mt, df)
+# df<-add_corr_to_df("f_{PS}",all_obs ,mt, df)
+
+# df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df)
+# df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df )
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,rename="plateau_dM/drewcOS_1e-28")
+df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df,rename="plateau_df/drewcOS_1e-28" )
+
+
+#######
+file <- "onlinemeas_C48.dat_reweight_charm_OS_C48_low_prec.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+# df<-NULL
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,rename="plateau_dM/drewcOS_1e-18")
+df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df,rename="plateau_df/drewcOS_1e-18" )
+
+
+####
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+
+```
+
+## Check thermalization
+
+label no[0-500]a means that we remove the configurations from 0 to 500 in replica a
+
+```{r, echo=FALSE,results='asis'}
+dir <- "/home/garofalo/analysis/flow/data/out/"
+file <- "onlinemeas_C48.dat_reweight_charm_OS_C48.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-NULL
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df)
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df)
+
+# df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df)
+# df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df )
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,rename="plateau_dM/drewcOS")
+df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df,rename="plateau_df/drewcOS" )
+
+
+#######
+file <- "onlinemeas_C48_therm.dat_reweight_charm_OS_C48_therm.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df, rename ="M_{PS}_no[0-500]a" )
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df, rename ="f_{PS}_no[0-500]a")
+
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,rename="plateau_dM/drewcOS_no[0-500]a")
+df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df,rename="plateau_df/drewcOS_no[0-500]a" )
+
+
+####
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+
+```
+
+## History
+
+the vertical line is at the configuration 0001_r1 the order of the confs
+is (_r0 backward) (_r1 forward)
+
+```{r, echo=FALSE,results='asis'}
+dfl<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C48.dat_reweight_light_OS_C48.dat_history.txt", header = TRUE)
+dfs<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C48.dat_reweight_strange_OS_C48.dat_history.txt", header = TRUE)
+dfc<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C48.dat_reweight_charm_OS_C48.dat_history.txt", header = TRUE)
+
+gg<-ggplot()+theme_bw()
+gg<- gg+ geom_line(aes(x=dfl$conf_id , y=dfl$r, color= "l"))
+gg<- gg+ geom_line(aes(x=dfs$conf_id , y=dfs$r, color= "s"))
+gg<- gg+ geom_line(aes(x=dfc$conf_id , y=dfc$r, color= "c"))
+gg<- gg+ geom_vline(xintercept = dfc$conf_id[ dfc$conf_name == "0001_r1" ])
+fig<-myplotly(gg,"","id","r", to_print = TRUE)
+gg<-ggplot()+theme_bw()
+gg<- gg+ geom_line(aes(x=dfl$conf_id , y=dfl$M_PS, color= "l"))
+# gg<- gg+ geom_line(aes(x=dfs$conf_id , y=dfs$M_PS, color= "s"))
+# gg<- gg+ geom_line(aes(x=dfc$conf_id , y=dfc$M_PS, color= "c"))
+gg<- gg+ geom_vline(xintercept = dfc$conf_id[ dfc$conf_name == "0001_r1" ])
+fig<-myplotly(gg,"","id","Mpi", to_print = TRUE)
+
+
+```
+
+
+## compare values with B32 and B24
 
 
 ```{r, echo=FALSE,results='asis'}
