@@ -342,6 +342,26 @@ int main(int argc, char** argv) {
     //         data[i][0][tt][0] * (1 - data_rew[i][0][0][1] / rtot));
     // }
 
+    /// to check the thermalization we print the history 
+
+    FILE* dev_null = open_file("/dev/null", "w");
+
+    double* M_PS_hist = plateau_correlator_function(
+        option, kinematic_2pt, (char*)"P5P5", data, confs,
+        namefile_plateaux, dev_null, 0, "M_{PS}", M_eff_log/* M_eff_T */, dev_null);
+
+    char name_hist[NAMESIZE];
+    mysprintf(name_hist, NAMESIZE, "%s/out/%s_%s_history.txt", option[3], option[6], argv[7]);
+    printf("writing history in :\n %s \n", name_hist);
+    FILE* history_out = open_file(name_hist, "w+");
+    fprintf(history_out, "conf_id  conf_name  r   M_PS  \n");
+    for (int i = 0; i < head.Nconf; i++) {
+        fprintf(history_out, "%d  %s %-20.12g %-20.12g\n", i, head_rew.smearing[i].c_str(), data_rew[i][0][0][1], M_PS_hist[i]);
+    }
+    fclose(history_out);
+    free(M_PS_hist);
+
+
     //////////////////////////////////////////////////////////////
     // making custom jackknifes
     //////////////////////////////////////////////////////////////
@@ -389,7 +409,7 @@ int main(int argc, char** argv) {
     char save_option[NAMESIZE];
     sprintf(save_option, "%s", option[1]);
     sprintf(option[1], "blind");
-    FILE* dev_null = open_file("/dev/null", "w");
+
     struct fit_type fit_info_silent;
     fit_info_silent.verbosity = -1;
     fit_info_silent.chi2_gap_jackboot = 1e+6;
@@ -773,17 +793,17 @@ int main(int argc, char** argv) {
 
     char file_fpi_jack[NAMESIZE];
     mysprintf(file_fpi_jack, NAMESIZE, "%s/out/fpi_%s_%s_jack", option[3], option[6], argv[7]);
-    printf("writing file: %s\n",file_fpi_jack);
+    printf("writing file: %s\n", file_fpi_jack);
     myres->write_jack_in_file(f_PS.P[0], file_fpi_jack);
 
     mysprintf(file_fpi_jack, NAMESIZE, "%s/out/fpi_rew_%s_%s_jack", option[3], option[6], argv[7]);
-    printf("writing file: %s\n",file_fpi_jack);
+    printf("writing file: %s\n", file_fpi_jack);
     myres->write_jack_in_file(f_PS_rew.P[0], file_fpi_jack);
 
 
-    double *mu_mul = (double*) malloc(sizeof(double)*Njack);
+    double* mu_mul = (double*)malloc(sizeof(double) * Njack);
     for (int j = 0; j < Njack;j++) {
-        mu_mul[j] = head_rew.mus[0]/amuiso[0][j];
+        mu_mul[j] = head_rew.mus[0] / amuiso[0][j];
     }
     print_result_in_file(outfile, mu_mul, "mu/mul", 0, 0, 0);
     for (int j = 0; j < Njack;j++) {
