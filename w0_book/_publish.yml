@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: 089a88a2-9b10-424b-8a32-87fc14985af8
+      url: https://mgarofalo.quarto.pub/w0_book
