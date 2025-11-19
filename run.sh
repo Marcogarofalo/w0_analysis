@@ -145,6 +145,20 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_A32.dat  -bin 100 jack reweight_charm_OS_A32.dat rewcOS
 
 
+## fake D96
+# ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_charm_OS_D96_LMA.dat rewcOS
+# ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_strange_p2dmu_OS_D96_LMA.dat rewsOS_p2dmu
+# ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_strange_pdmu_OS_D96_LMA.dat rewsOS_pdmu
+#./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_charm_dmu_OS_D96.dat rewcOS_dmu
+#./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_strange_pdmu_OS_D96.dat rewsOS_pdmu
+./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_strange_OS_D96.dat rewsOS
+# ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_strange_mdmu_OS_D96_LMA.dat rewsOS_mdmu
+./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_light_OS_D96.dat rewlOS
+
+./fit_all_beta_rew_der  jack ../../data/jackknife/  ../../data/fit_all_beta  ../fit_files_all
+
+
+
 ############################
 
 
@@ -159,24 +173,12 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ##
 
 # ./fit_all_rew_der_C80_LMA   jack ../../data/jackknife/  ../../data/fit_all_C80_LMA
-./fit_all_rew_der  jack ../../data/jackknife/  ../../data/fit_all_C80_LMA  ../fit_files_C80_LMA
-
-## fake D96
-# ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_charm_OS_D96_LMA.dat rewcOS
-# ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_strange_p2dmu_OS_D96_LMA.dat rewsOS_p2dmu
-# ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_strange_pdmu_OS_D96_LMA.dat rewsOS_pdmu
-./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_charm_dmu_OS_D96.dat rewcOS_dmu
-./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_strange_pdmu_OS_D96.dat rewsOS_pdmu
-./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_strange_OS_D96.dat rewsOS
-# ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_strange_mdmu_OS_D96_LMA.dat rewsOS_mdmu
-./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_light_OS_D96.dat rewlOS
-
-./fit_all_beta_rew_der  jack ../../data/jackknife/  ../../data/fit_all_beta  ../fit_files_all
+# ./fit_all_rew_der  jack ../../data/jackknife/  ../../data/fit_all_C80_LMA  ../fit_files_C80_LMA
 
 
 ## w0 D96
-./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_charm_dmu_OS_D96.dat rewcOS_dmu
-./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_strange_pdmu_OS_D96.dat rewsOS_pdmu
+# ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_charm_dmu_OS_D96.dat rewcOS_dmu
+# ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_strange_pdmu_OS_D96.dat rewsOS_pdmu
 ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_strange_OS_D96.dat rewsOS
 ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_light_OS_D96.dat rewlOS.1
 ##
@@ -185,7 +187,7 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0_rew  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_charm_OS_B32.dat rewcOS
 ./w0_rew  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_strange_OS_B32.dat rewsOS
 ./w0_rew  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_light_OS_B32.dat rewlOS
-##
+## w0 B24
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_charm_OS_B24.dat rewcOS
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_strange_OS_B24.dat rewsOS
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_light_OS_B24.dat rewlOS
