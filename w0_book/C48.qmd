@@ -64,7 +64,7 @@ fig<-myplotly(gg,"","t/a","",to_print = TRUE)
 
 ```{r, echo=FALSE,results='asis'}
 dir <- "/home/garofalo/analysis/flow/data/out/"
-file <- "onlinemeas_C48.dat_reweight_charm_OS_C48.dat_output"
+file <- "onlinemeas_C48.dat.not_thermalized_reweight_charm_OS_C48.dat.not_thermalized_output"
 mt <- read_df(paste0(dir, file))
 all_obs <- Rose::get_all_corr(mt)
 df<-NULL
@@ -98,7 +98,7 @@ label no[0-500]a means that we remove the configurations from 0 to 500 in replic
 
 ```{r, echo=FALSE,results='asis'}
 dir <- "/home/garofalo/analysis/flow/data/out/"
-file <- "onlinemeas_C48.dat_reweight_charm_OS_C48.dat_output"
+file <- "onlinemeas_C48.dat.not_thermalized_reweight_charm_OS_C48.dat.not_thermalized_output"
 mt <- read_df(paste0(dir, file))
 all_obs <- Rose::get_all_corr(mt)
 df<-NULL
@@ -116,11 +116,11 @@ file <- "onlinemeas_C48_therm.dat_reweight_charm_OS_C48_therm.dat_output"
 mt <- read_df(paste0(dir, file))
 all_obs <- Rose::get_all_corr(mt)
 
-df<-add_corr_to_df("M_{PS}",all_obs ,mt, df, rename ="M_{PS}_no[0-500]a" )
-df<-add_corr_to_df("f_{PS}",all_obs ,mt, df, rename ="f_{PS}_no[0-500]a")
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df, rename ="M_{PS}_no[0-500]a+more stat" )
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df, rename ="f_{PS}_no[0-500]a+more stat")
 
-df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,rename="plateau_dM/drewcOS_no[0-500]a")
-df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df,rename="plateau_df/drewcOS_no[0-500]a" )
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,rename="plateau_dM/drewcOS_no[0-500]aa+more stat")
+df<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,df,rename="plateau_df/drewcOS_no[0-500]aa+more stat" )
 
 
 ####
@@ -135,9 +135,9 @@ the vertical line is at the configuration 0001_r1 the order of the confs
 is (_r0 backward) (_r1 forward)
 
 ```{r, echo=FALSE,results='asis'}
-dfl<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C48.dat_reweight_light_OS_C48.dat_history.txt", header = TRUE)
-dfs<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C48.dat_reweight_strange_OS_C48.dat_history.txt", header = TRUE)
-dfc<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C48.dat_reweight_charm_OS_C48.dat_history.txt", header = TRUE)
+dfl<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C48.dat.not_thermalized_reweight_light_OS_C48.dat.not_thermalized_history.txt", header = TRUE)
+dfs<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C48.dat.not_thermalized_reweight_strange_OS_C48.dat.not_thermalized_history.txt", header = TRUE)
+dfc<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_C48.dat.not_thermalized_reweight_charm_OS_C48.dat.not_thermalized_history.txt", header = TRUE)
 
 gg<-ggplot()+theme_bw()
 gg<- gg+ geom_line(aes(x=dfl$conf_id , y=dfl$r, color= "l"))

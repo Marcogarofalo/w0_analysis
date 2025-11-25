@@ -50,6 +50,7 @@ for (j in seq_along(basenames)) {
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j],
+    width = 5
   )
   lat <- c("B64", "C","D","B32-260MeV")
   # for (i in seq_along(lat)) {
@@ -100,7 +101,7 @@ for (j in seq_along(basenames)) {
   make_table_fit_result(fit)
   gg <- plot_fit(basenames[j], "amu",
     # noline = TRUE,
-    data_type = c("B64", "C80","D96","B32-260MeV","B24-260MeV","C48-248MeV","B32.042","E112","A32"),
+    data_type = c("B64", "C80","D96","B32-260MeV","B24-260MeV","C48-248MeV","B32.042-334MeV","E112","A32"),
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j]
@@ -174,8 +175,9 @@ for (j in seq_along(basenames)) {
   make_table_fit_result(fit)
   gg <- plot_fit(basenames[j], "amu",
     # noline = TRUE,
-    data_type = 
-           c("B64", "C80","D96","B32-260MeV","B24-260MeV","C48-248MeV","B32.042","E112","A32"),
+    data_type = c("B64","C80","D96",
+                  "B32-260MeV","B24-260MeV",
+                  "C48-248MeV","B32.042-334MeV","E112","A32"),
 # c("B64", "C80","D96","B32-260MeV","B24-260MeV","B32.042"),
     gg = gg,
     id_x = 1,

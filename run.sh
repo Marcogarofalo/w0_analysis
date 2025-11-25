@@ -129,9 +129,9 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_charm_OS_C48.dat rewcOS
 
 
-./pion_rew  -p ../../data/ onlinemeas_C48_therm.dat  -bin 100 jack reweight_light_OS_C48_therm.dat rewlOS
-./pion_rew  -p ../../data/ onlinemeas_C48_therm.dat  -bin 100 jack reweight_strange_OS_C48_therm.dat rewsOS
-./pion_rew  -p ../../data/ onlinemeas_C48_therm.dat  -bin 100 jack reweight_charm_OS_C48_therm.dat rewcOS
+./pion_rew  -p ../../data/ onlinemeas_C48.dat.not_thermalized  -bin 100 jack reweight_light_OS_C48.dat.not_thermalized rewlOS
+./pion_rew  -p ../../data/ onlinemeas_C48.dat.not_thermalized  -bin 100 jack reweight_strange_OS_C48.dat.not_thermalized rewsOS
+./pion_rew  -p ../../data/ onlinemeas_C48.dat.not_thermalized  -bin 100 jack reweight_charm_OS_C48.dat.not_thermalized rewcOS
 
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_charm_OS_C48_low_prec.dat rewcOS
 ##### E112
@@ -149,7 +149,8 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 # ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_charm_OS_D96_LMA.dat rewcOS
 # ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_strange_p2dmu_OS_D96_LMA.dat rewsOS_p2dmu
 # ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_strange_pdmu_OS_D96_LMA.dat rewsOS_pdmu
-#./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_charm_dmu_OS_D96.dat rewcOS_dmu
+# ./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_charm_dmu_OS_D96.dat rewcOS_dmu
+./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_charm_OS_D96.dat rewcOS
 #./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_strange_pdmu_OS_D96.dat rewsOS_pdmu
 ./pion_rew  -p ../../data/ onlinemeas_D96.dat  -bin 100 jack reweight_strange_OS_D96.dat rewsOS
 # ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_strange_mdmu_OS_D96_LMA.dat rewsOS_mdmu
@@ -179,6 +180,7 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ## w0 D96
 # ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_charm_dmu_OS_D96.dat rewcOS_dmu
 # ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_strange_pdmu_OS_D96.dat rewsOS_pdmu
+./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_charm_OS_D96.dat rewcOS
 ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_strange_OS_D96.dat rewsOS
 ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_light_OS_D96.dat rewlOS.1
 ##
@@ -196,9 +198,14 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_strange_OS_C48.dat rewsOS
 ./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_light_OS_C48.dat rewlOS
 
-./w0_rew  -p ../../data/ flow_C48_therm.dat  -bin 20 jack reweight_charm_OS_C48_therm.dat rewcOS
-./w0_rew  -p ../../data/ flow_C48_therm.dat  -bin 20 jack reweight_strange_OS_C48_therm.dat rewsOS
-./w0_rew  -p ../../data/ flow_C48_therm.dat  -bin 20 jack reweight_light_OS_C48_therm.dat rewlOS
+./w0_rew  -p ../../data/ flow_C48.dat.not_thermalized  -bin 20 jack reweight_charm_OS_C48.dat.not_thermalized rewcOS
+./w0_rew  -p ../../data/ flow_C48.dat.not_thermalized  -bin 20 jack reweight_strange_OS_C48.dat.not_thermalized rewsOS
+./w0_rew  -p ../../data/ flow_C48.dat.not_thermalized  -bin 20 jack reweight_light_OS_C48.dat.not_thermalized rewlOS
+
+
+# ./w0_rew  -p ../../data/ flow_C48_therm.dat  -bin 20 jack reweight_charm_OS_C48_therm.dat rewcOS
+# ./w0_rew  -p ../../data/ flow_C48_therm.dat  -bin 20 jack reweight_strange_OS_C48_therm.dat rewsOS
+# ./w0_rew  -p ../../data/ flow_C48_therm.dat  -bin 20 jack reweight_light_OS_C48_therm.dat rewlOS
 ## E112
 ./w0_rew  -p ../../data/ flow_E112_LMA.dat  -bin 20 jack reweight_strange_OS_E112_LMA.dat rewsOS
 ./w0_rew  -p ../../data/ flow_E112_LMA.dat  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS
