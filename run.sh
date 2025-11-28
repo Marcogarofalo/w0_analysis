@@ -207,6 +207,7 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 # ./w0_rew  -p ../../data/ flow_C48_therm.dat  -bin 20 jack reweight_strange_OS_C48_therm.dat rewsOS
 # ./w0_rew  -p ../../data/ flow_C48_therm.dat  -bin 20 jack reweight_light_OS_C48_therm.dat rewlOS
 ## E112
+./w0_rew  -p ../../data/ flow_E112_LMA.dat  -bin 20 jack reweight_charm_OS_E112_LMA.dat rewcOS
 ./w0_rew  -p ../../data/ flow_E112_LMA.dat  -bin 20 jack reweight_strange_OS_E112_LMA.dat rewsOS
 ./w0_rew  -p ../../data/ flow_E112_LMA.dat  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS
 

@@ -31,6 +31,7 @@ flow_C48.dat reweight_charm_OS_C48.dat
 flow_C48.dat reweight_strange_OS_C48.dat
 flow_C48.dat reweight_light_OS_C48.dat
 new_beta
+flow_E112_LMA.dat reweight_charm_OS_E112_LMA.dat
 flow_E112_LMA.dat reweight_strange_OS_E112_LMA.dat
 flow_E112_LMA.dat reweight_light_OS_E112_LMA.dat
 new_beta
