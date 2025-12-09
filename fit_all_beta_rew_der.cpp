@@ -871,13 +871,13 @@ int main(int argc, char** argv) {
         fit_info_chi.compute_cov1_fit();
 
         printf("chi2 = %g\n", der_fpi_diffplat_const_full.chi2[Njack - 1]);
-        for (int i = 0; i < fit_info.entot; i++) {
-            for (int j = 0; j < fit_info.entot; j++) {
-                // printf("%-15g ", fit_info_chi.cov1[i][j] / fit_info.cov1[i][j]);
-                printf("%-15g ", fit_info_chi.cov[i][j] / std::sqrt(fit_info_chi.cov[i][i] * fit_info_chi.cov[j][j]));
-            }
-            printf("\n");
-        }
+        // for (int i = 0; i < fit_info.entot; i++) {
+        //     for (int j = 0; j < fit_info.entot; j++) {
+        //         // printf("%-15g ", fit_info_chi.cov1[i][j] / fit_info.cov1[i][j]);
+        //         printf("%-15g ", fit_info_chi.cov[i][j] / std::sqrt(fit_info_chi.cov[i][i] * fit_info_chi.cov[j][j]));
+        //     }
+        //     printf("\n");
+        // }
         namefit = "der_" + der_name[i] + "_diffplat_full_mu_mu2_mu3_chi2d1";
 
         fit_result der_fpi_diffplat_const_full_chi21 = fit_all_data(argv, jackall_chi, lhs_fun, fit_info_chi, namefit.c_str());
