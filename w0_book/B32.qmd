@@ -86,6 +86,32 @@ fig<-myplotly(gg,"","t/a","",to_print = TRUE)
 
 
 
+```{r, echo=FALSE,results='asis'}
+dir <- "/home/garofalo/analysis/flow/data/out/"
+file <- "onlinemeas_B32.dat_reweight_charm_OS_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-NULL
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df)
+df<-add_corr_to_df("f_{PS}",all_obs ,mt,df )
+
+##################################
+## B24
+#########################
+file <- "onlinemeas_B24.dat_reweight_charm_OS_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+nameM<-"M_{PS}"
+namef<-"f_{PS}"
+df<-add_corr_to_df(nameM,all_obs ,mt, df, rename = paste0(nameM,"B24"))
+df<-add_corr_to_df(namef,all_obs ,mt,df, rename = paste0(namef,"B24") )
+
+####
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+
+```
+
 <!-- ```{r, echo=FALSE, results='asis'} -->
 <!-- df <- data.frame( -->
 <!--   "e" = numeric(), -->
