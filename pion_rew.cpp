@@ -771,7 +771,7 @@ int main(int argc, char** argv) {
         outfile, lhs_plateau_df_dmu, name_rew, fit_info,
         jack_file);
     check_correlatro_counter(21);
-
+    printf("mu_\ell d f / d %s = %g +- %g\n",argv[8] ,fit_df_dmu.P[0][Njack - 1]*amuiso[0][Njack-1]*hbarc/a_fm[Njack-1], myres->comp_error(fit_df_dmu.P[0])*amuiso[0][Njack-1]*hbarc/a_fm[Njack-1]);
 
     double* d_ratio = (double*)malloc(sizeof(double*) * Njack);
     for (int j = 0; j < Njack;j++) {
