@@ -100,6 +100,7 @@ add_target_with_libs(w0_m0 w0_m0.cpp)
 
 add_target_with_libs(pion_rew pion_rew.cpp)
 add_target_with_libs(pion pion.cpp)
+add_target_with_libs(rew_other_data rew_other_data.cpp)
 add_target_with_libs(fit_all_rew_der fit_all_rew_der.cpp)
 
 add_target_with_libs(create_fake_jack create_fake_jack.cpp)

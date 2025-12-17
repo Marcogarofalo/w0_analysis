@@ -123,6 +123,9 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_light_OS_B24.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_strange_OS_B24.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_charm_OS_B24.dat rewcOS
+
+./rew_other_data  -p ../../data/ Marcos_P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin  -bin 100 jack reweight_charm_OS_B24.dat rewcOS  onlinemeas_B24.dat
+
 ###### C48
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_light_OS_C48.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_strange_OS_C48.dat rewsOS
