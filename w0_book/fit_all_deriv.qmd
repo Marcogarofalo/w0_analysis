@@ -74,9 +74,9 @@ gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed",
                       alpha=0.3)
 gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed",
                       alpha=0.3)
-fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell df_\\pi)/d\\mu [\\mbox{MeV}]$",
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell/f_\\pi) df_\\pi/d\\mu$",
   to_print = TRUE,
-  yrange = c(-1, 4),
+  yrange = c(-0.005, 0.02),
   legend_position = c(0.7, 0.98)
 )
 ```
@@ -113,7 +113,7 @@ gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed",
                       alpha=0.3)
 gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed",
                       alpha=0.3)
-fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell dM_\\pi)/d\\mu [\\mbox{MeV}]$",
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell /M_\\pi) dM_\\pi/d\\mu$",
   to_print = TRUE,
   yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
@@ -151,7 +151,7 @@ for (j in seq_along(basenames)) {
 
 # gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed")
 # gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed")
-fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell df_\\pi)/d\\mu [\\mbox{MeV}]$",
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell/f_\\pi) df_\\pi/d\\mu$",
   to_print = TRUE,
   yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
@@ -191,7 +191,7 @@ gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed",
                       alpha=0.3)
 gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed",
                       alpha=0.3)
-fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell dM_\\pi/f_\\pi)/d\\mu$",
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell )d(M_\\pi/f_\\pi)/d\\mu$",
   to_print = TRUE,
   #yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)

@@ -195,3 +195,44 @@ gg<-plot_df_corr_ggplot(df)
 fig<-myplotly(gg,"","t/a","",to_print = TRUE)
 
 ```
+
+
+## autocorrelation
+
+### confs every 2
+
+```{r}
+df<-read.table("/home/garofalo/analysis/flow/data/out/autocorr_C48_every2_confs.txt",header = TRUE)
+gg<-myggplot()
+Nconfs<- 867 #df$Nbins[length(df$Nbins)]
+gg<- gg + geom_pointrange(data=df,aes(x=Nconfs/Nbins, y=Mpi, ymin=Mpi-dMpi, ymax=Mpi+dMpi))+xlim(0,20)
+gg
+#############################
+gg<-myggplot()
+gg<- gg + geom_pointrange(data=df,aes(x=Nconfs/Nbins, y=fpi, ymin=fpi-dfpi, ymax=fpi+dfpi))+xlim(0,20)
+gg
+#############################
+gg<-myggplot()
+gg<- gg + geom_pointrange(data=df,aes(x=Nconfs/Nbins, y=dfpi.dmul, ymin=dfpi.dmul-d.dfpi.dmul., ymax=dfpi.dmul+d.dfpi.dmul.))+xlim(0,20)
+gg
+
+```
+
+
+### confs every 4 
+
+```{r}
+df<-read.table("/home/garofalo/analysis/flow/data/out/autocorr_C48_every4_confs.txt",header = TRUE)
+gg<-myggplot()
+Nconfs<- 434 #df$Nbins[length(df$Nbins)]
+gg<- gg + geom_pointrange(data=df,aes(x=Nconfs/Nbins, y=Mpi, ymin=Mpi-dMpi, ymax=Mpi+dMpi))+xlim(0,20)
+gg
+#############################
+gg<-myggplot()
+gg<- gg + geom_pointrange(data=df,aes(x=Nconfs/Nbins, y=fpi, ymin=fpi-dfpi, ymax=fpi+dfpi))+xlim(0,20)
+gg
+#############################
+gg<-myggplot()
+gg<- gg + geom_pointrange(data=df,aes(x=Nconfs/Nbins, y=dfpi.dmul, ymin=dfpi.dmul-d.dfpi.dmul., ymax=dfpi.dmul+d.dfpi.dmul.))+xlim(0,20)+ylim(0,0.1)
+gg
+```

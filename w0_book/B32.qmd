@@ -112,6 +112,91 @@ fig<-myplotly(gg,"","t/a","",to_print = TRUE)
 
 ```
 
+
+
+## compare online messurament with plegma
+
+
+```{r, echo=FALSE,results='asis'}
+dir <- "/home/garofalo/analysis/flow/data/out/"
+file <- "onlinemeas_B24.dat_reweight_charm_OS_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-NULL
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df, rename="Mpi online B24")
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df, rename="fpi online B24")
+#df<-add_corr_to_df("f_{PS}",all_obs ,mt,df )
+
+file <- "onlinemeas_B32.dat_reweight_charm_OS_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df, rename="Mpi online B32 24s")
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df, rename="fpi online B32 24s")
+
+file <- "onlinemeas_more_B32.dat_reweight_charm_OS_more_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-add_corr_to_df("M_{PS}",all_obs ,mt, df, rename="Mpi online B32 72s")
+df<-add_corr_to_df("f_{PS}",all_obs ,mt, df, rename="fpi online B32 72s")
+
+##################################
+## B24
+#########################
+file <- "Marcos_P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin_reweight_charm_OS_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+nameM<-"M_{PS}"
+namef<-"f_{PS}"
+df<-add_corr_to_df(nameM,all_obs ,mt, df, rename = "Mpi PLEGMA B24", nudge = 0.1)
+df<-add_corr_to_df(namef,all_obs ,mt, df, rename = "fpi PLEGMA B24", nudge = 0.1)
+
+#########################
+file <- "marcos_format/B32/B32_Marcos_P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin_reweight_charm_OS_B32.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+nameM<-"M_{PS}"
+namef<-"f_{PS}"
+df<-add_corr_to_df(nameM,all_obs ,mt, df, rename = "Mpi PLEGMA B32", nudge = 0.1)
+df<-add_corr_to_df(namef,all_obs ,mt, df, rename = "fpi PLEGMA B32", nudge = 0.1)
+
+
+####
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+
+```
+
+
+## hystory B32
+
+```{r, echo=FALSE,results='asis'}
+dfl<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_B32.dat_reweight_light_OS_B32.dat_history.txt", header = TRUE)
+dfs<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_B32.dat_reweight_strange_OS_B32.dat_history.txt", header = TRUE)
+dfc<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_B32.dat_reweight_charm_OS_B32.dat_history.txt", header = TRUE)
+
+gg<-ggplot()+theme_bw()
+gg<- gg+ geom_line(aes(x=dfl$conf_id , y=dfl$r, color= "l"))
+gg<- gg+ geom_line(aes(x=dfs$conf_id , y=dfs$r, color= "s"))
+gg<- gg+ geom_line(aes(x=dfc$conf_id , y=dfc$r, color= "c"))
+fig<-myplotly(gg,"","id","r", to_print = TRUE)
+```
+
+
+## hystory B24
+
+```{r, echo=FALSE,results='asis'}
+dfl<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_B24.dat_reweight_light_OS_B24.dat_history.txt", header = TRUE)
+dfs<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_B24.dat_reweight_strange_OS_B24.dat_history.txt", header = TRUE)
+dfc<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_B24.dat_reweight_charm_OS_B24.dat_history.txt", header = TRUE)
+
+gg<-ggplot()+theme_bw()
+gg<- gg+ geom_line(aes(x=dfl$conf_id , y=dfl$r, color= "l"))
+gg<- gg+ geom_line(aes(x=dfs$conf_id , y=dfs$r, color= "s"))
+gg<- gg+ geom_line(aes(x=dfc$conf_id , y=dfc$r, color= "c"))
+fig<-myplotly(gg,"","id","r", to_print = TRUE)
+```
+
+
 <!-- ```{r, echo=FALSE, results='asis'} -->
 <!-- df <- data.frame( -->
 <!--   "e" = numeric(), -->

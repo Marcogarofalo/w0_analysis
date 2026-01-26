@@ -3,7 +3,7 @@ project:
 
 book:
   title: "w0_book"
-  author: "Norah Jones"
+  author: "MG"
   date: "1/21/2025"
   chapters:
     - index.qmd
@@ -13,6 +13,7 @@ book:
     - statistical_investigation_B64.qmd
     - B32.qmd
     - C48.qmd
+    - A32.qmd
     - pion_B64.qmd
     - pion_C80.qmd
     - pion_D96.qmd

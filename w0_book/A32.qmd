@@ -1,0 +1,59 @@
+# A32
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+## autocorrelation
+
+```{r}
+df<-read.table("/home/garofalo/analysis/flow/w0_analysis/build/autocorr_der_mul_A32.txt",header = TRUE)
+gg<-myggplot()
+Nconfs<- 1279 #df$Nbins[length(df$Nbins)]
+gg<- gg + geom_pointrange(data=df,aes(x=Nconfs/Nbins, y=Mpi, ymin=Mpi-dMpi, ymax=Mpi+dMpi))+xlim(0,20)
+gg
+#############################
+gg<-myggplot()
+gg<- gg + geom_pointrange(data=df,aes(x=Nconfs/Nbins, y=fpi, ymin=fpi-dfpi, ymax=fpi+dfpi))+xlim(0,20)
+gg
+#############################
+gg<-myggplot()
+gg<- gg + geom_pointrange(data=df,aes(x=Nconfs/Nbins, y=dfpi.dmul, ymin=dfpi.dmul-d.dfpi.dmul., ymax=dfpi.dmul+d.dfpi.dmul.))+xlim(0,20)
+gg
+
+```
+
+
+## hystory 
+
+```{r, echo=FALSE,results='asis'}
+dfl<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_A32.dat_reweight_light_OS_A32.dat_history.txt", header = TRUE)
+dfs<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_A32.dat_reweight_strange_OS_A32.dat_history.txt", header = TRUE)
+dfc<- read.table("/home/garofalo/analysis/flow/data/out/onlinemeas_A32.dat_reweight_charm_OS_A32.dat_history.txt", header = TRUE)
+
+gg<-ggplot()+theme_bw()
+gg<- gg+ geom_line(aes(x=dfl$conf_id , y=dfl$r, color= "l"))
+gg<- gg+ geom_line(aes(x=dfs$conf_id , y=dfs$r, color= "s"))
+gg<- gg+ geom_line(aes(x=dfc$conf_id , y=dfc$r, color= "c"))
+fig<-myplotly(gg,"","id","r", to_print = TRUE)
+```
