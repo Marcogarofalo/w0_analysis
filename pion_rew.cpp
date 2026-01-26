@@ -19,6 +19,7 @@
 
 #include "correlators_analysis.hpp"
 #include "functions_w0.hpp"
+#include "gamma_analysis.hpp"
 struct kinematic kinematic_2pt;
 generic_header read_head(FILE* stream) {
     generic_header header;
@@ -346,9 +347,12 @@ int main(int argc, char** argv) {
 
     FILE* dev_null = open_file("/dev/null", "w");
 
-    double* M_PS_hist = plateau_correlator_function(
-        option, kinematic_2pt, (char*)"P5P5", data, confs,
-        namefile_plateaux, dev_null, 0, "M_{PS}", M_eff_log/* M_eff_T */, dev_null);
+    char** option_r = argv_to_options(argv);
+    mysprintf(option_r[6], NAMESIZE, "/dev/null");
+    // double* M_PS_hist = plateau_correlator_function(
+    //     option, kinematic_2pt, (char*)"P5P5", data, confs,
+    //     namefile_plateaux, dev_null, 0, "M_{PS}", M_eff_log/* M_eff_T */, dev_null);
+    double* M_PS_hist = (double*)calloc(myres->Njack, sizeof(double));
 
     char name_hist[NAMESIZE];
     mysprintf(name_hist, NAMESIZE, "%s/out/%s_%s_history.txt", option[3], option[6], argv[7]);
@@ -361,6 +365,38 @@ int main(int argc, char** argv) {
     fclose(history_out);
     free(M_PS_hist);
 
+    //////////////////////////////////////////////////////////////
+    // gamma
+    //////////////////////////////////////////////////////////////
+    mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_gamma", option[3], option[6], argv[7]);
+    FILE* out_gamma = open_file(namefile, "w+");
+
+    for (int i = 1;i < file_head.l0 / 2;i++) 
+    {
+        // int i= head.T / 8;
+        double* datag;
+        // 2 component ot compute the mass
+        datag = (double*)malloc(sizeof(double) * confs * 2);
+        for (int j = 0;j < confs;j++) {
+            //store in the format for the gamma analysis
+            //two variables c(t) and c(t+1), order=0 
+            datag[j * 2] = data[j][0][i][0];
+            datag[1 + j * 2] = data[j][0][i + 1][0];
+        }
+
+        double* obs = analysis_gamma(2, 1, confs, i//time
+            , datag, mass_gamma);
+        // mt[i][0]=obs[0];
+        // mt[i][0]=obs[1];
+        fprintf(out_gamma, "%d   %.15e    %.15e   %.15e  %.15e  %.15e\n", i, obs[0], obs[1], obs[2], obs[3], obs[4]);
+        free(obs);
+        free(datag);
+
+    }
+
+    for (int t =0;t < head.T;t++) {
+        printf("%-5d  %-20.12g  %-20.12g\n", t, data[0][0][t][0], data[0][0][t][1]);
+    }
 
     //////////////////////////////////////////////////////////////
     // making custom jackknifes
@@ -398,9 +434,7 @@ int main(int argc, char** argv) {
     FILE* outfile_shifted_corr = open_file(namefile, "w+");
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_log_meff_shifted", option[3], option[6], argv[7]);
     FILE* outfile_log_meff_shifted = open_file(namefile, "w+");
-    mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_gamma", option[3], option[6], argv[7]);
-    FILE* out_gamma = open_file(namefile, "w+");
-
+    
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_HLT_kernel", option[3], option[6], argv[7]);
     FILE* outfile_HLT_kernel = open_file(namefile, "w+");
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_HLT_AoverB", option[3], option[6], argv[7]);
@@ -514,6 +548,7 @@ int main(int argc, char** argv) {
     fit_info.linear_fit = true;
     fit_info.T = head.T;
     fit_info.corr_id = { 1, 0 };
+    fit_info.ave_P = {head.mus[0]};
 
     struct fit_result fit_mpcac = fit_fun_to_fun_of_corr(
         option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
@@ -771,7 +806,7 @@ int main(int argc, char** argv) {
         outfile, lhs_plateau_df_dmu, name_rew, fit_info,
         jack_file);
     check_correlatro_counter(21);
-    printf("mu_\ell d f / d %s = %g +- %g\n",argv[8] ,fit_df_dmu.P[0][Njack - 1]*amuiso[0][Njack-1]*hbarc/a_fm[Njack-1], myres->comp_error(fit_df_dmu.P[0])*amuiso[0][Njack-1]*hbarc/a_fm[Njack-1]);
+    printf("mu_\ell d f / d %s = %g +- %g\n", argv[8], fit_df_dmu.P[0][Njack - 1] * amuiso[0][Njack - 1] * hbarc / a_fm[Njack - 1], myres->comp_error(fit_df_dmu.P[0]) * amuiso[0][Njack - 1] * hbarc / a_fm[Njack - 1]);
 
     double* d_ratio = (double*)malloc(sizeof(double*) * Njack);
     for (int j = 0; j < Njack;j++) {
