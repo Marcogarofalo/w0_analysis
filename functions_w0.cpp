@@ -298,10 +298,11 @@ double lhs_mpcac(int j, double ****in, int t, struct fit_type fit_info)
 {
     int id_V = fit_info.corr_id[0];
     int id_P = fit_info.corr_id[1];
+    double mu = fit_info.ave_P[0];
     // we should take -Im of V0P5 which is saved as real part in this data
     // double r = -(in[j][id_V][t + 1][0] - in[j][id_V][t][0]) / (2. * in[j][id_P][t][0]);
-    double r = -(in[j][id_V][t + 1][0] - in[j][id_V][t-1][0]) / (4. * in[j][id_P][t][0]);
-
+    //double r = -(in[j][id_V][t + 1][0] - in[j][id_V][t-1][0]) / (4. * in[j][id_P][t][0]);
+    double r = -(in[j][id_V][t + 1][0] - in[j][id_V][t-1][0]) / (4. * mu * in[j][id_P][t][0]);
     return r;
 }
 
