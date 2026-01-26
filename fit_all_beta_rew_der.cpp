@@ -141,7 +141,8 @@ double lhs_fun_f(int n, int e, int j, data_all gjack, struct fit_type fit_info) 
     // }
     double r = gjack.en[e].jack[fit_info.corr_id[0]][j];   // fpi
     r *= gjack.en[e].jack[fit_info.corr_id[1]][j];         // amu_l
-    r /= gjack.en[e].jack[fit_info.corr_id[2]][j] / hbarc; // a
+    // r /= gjack.en[e].jack[fit_info.corr_id[2]][j] / hbarc; // a
+    r /= gjack.en[e].jack[fit_info.corr_id[2]][j]; // fpi
     return r;
 }
 double lhs_fun_ratio(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
@@ -485,6 +486,8 @@ int main(int argc, char** argv) {
     int id_ratio = 22;
     int id_ratio_analytic = 23;
     int id_dfpi = 6;
+    int id_fpi = 6;
+    int id_Mpi = 1;
     // ///// fillind D96
     // fit_type fit_info;
     // fit_info.Nxen = std::vector<std::vector<int>>(1);
@@ -548,6 +551,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     std::vector<std::string> der_name = { "fpi", "Mpi", "fpi_Mpi" };
     std::vector<int> id_der = { id_dfpi_dmu, id_dMpi_dmu , id_ratio };
+    std::vector<int> id_X = { id_fpi, id_Mpi, id_fpi };
     std::vector<int> id_der_diffplat = { id_dfpi_diffplat_dmu, id_dMpi_diffplat_dmu , id_ratio_analytic };
     int id_amuliso = 13;
     int id_a_fm = 16;
@@ -559,7 +563,7 @@ int main(int argc, char** argv) {
         if (i == 2)lhs_fun = lhs_fun_ratio;
         fit_type fit_info;
 
-        fit_info.corr_id = { id_der[i], id_amuliso, id_a_fm };
+        fit_info.corr_id = { id_der[i], id_amuliso, id_X[i] };
 
         fit_info.Nxen = std::vector<std::vector<int>>(2);
         for (int n = 0; n < 2; n++) {
