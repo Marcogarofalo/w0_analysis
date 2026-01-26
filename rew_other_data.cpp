@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
     //     remove_from_the_bottom = std::stoi(argv[9]);
     // }
     // else
-        how_many_confs_to_analyse = head.Njack;
+    how_many_confs_to_analyse = head.Njack;
     error(head.Njack < how_many_confs_to_analyse, 1, "main", "Najck w0 = %d   while how_many_confs_to_analyse  = %d", head.Njack, how_many_confs_to_analyse);
     int minc = 0;
     int maxc = how_many_confs_to_analyse;
@@ -192,7 +192,7 @@ int main(int argc, char** argv) {
     int ncorr_new = head.ncorr;        // current number of correlators
     int Max_corr = head.ncorr * 2 + 1; // max number of correlators
 
-    double**** data = calloc_corr(head.Njack, Max_corr, (head.T-1)*2);
+    double**** data = calloc_corr(head.Njack, Max_corr, (head.T - 1) * 2);
 
     printf("confs=%d\n", head.Njack);
     printf("ncorr=%d\n", head.ncorr);
@@ -366,7 +366,9 @@ int main(int argc, char** argv) {
     // fclose(history_out);
     // free(M_PS_hist);
 
-
+    for (int t = 0;t < head.T;t++) {
+        printf("%-5d  %-20.12g  %-20.12g\n", t, data[0][0][t][0], data[0][0][t][1]);
+    }
     //////////////////////////////////////////////////////////////
     // making custom jackknifes
     //////////////////////////////////////////////////////////////
@@ -488,6 +490,17 @@ int main(int argc, char** argv) {
     line_read_param(option, "a", mean, err, seed, namefile_plateaux);
     double* a_fm = myres->create_fake(mean, err, seed);
 
+
+    int matches = how_many_matches_in_line_read_param(option, argv[3], namefile_plateaux);
+    double* mu_val;
+    // printf("matches = %d   %s\n", matches,argv[3]);exit(1);
+    if (matches == 1) {
+        line_read_param(option, argv[3], mean, err, seed, namefile_plateaux);
+        mu_val = myres->create_fake(mean, err, seed);
+    }
+    else {
+        mu_val = amusim[0];
+    }
     ////////////////////////////////////////////////////////////
     // start fitting
     //////////////////////////////
@@ -528,13 +541,13 @@ int main(int argc, char** argv) {
     // check_correlatro_counter(1);
     // // free_fit_result(fit_info, fit_out);
     // fit_info.restore_default();
-    fit_info_silent.codeplateaux =1;
-    fit_info_silent.tmin =3;
-    fit_info_silent.tmax =3;
+    fit_info_silent.codeplateaux = 1;
+    fit_info_silent.tmin = 3;
+    fit_info_silent.tmax = 3;
 
     double* M_PS_again = plateau_correlator_function(
         option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
-        namefile_plateaux, outfile, 0, "M_{PS}_again", M_eff_T, jack_file,fit_info_silent);
+        namefile_plateaux, outfile, 0, "M_{PS}_again", M_eff_T, jack_file, fit_info_silent);
     check_correlatro_counter(1);
     //////////////////////////////////////////////////////////////
     // rewighting
@@ -622,8 +635,8 @@ int main(int argc, char** argv) {
     fit_info.ext_P = malloc_2<double>(fit_info.n_ext_P, fit_info.Njack);
     for (int j = 0; j < fit_info.Njack; j++) {
         fit_info.ext_P[0][j] = M_PS[j];
-        fit_info.ext_P[1][j] = amusim[0][j];
-        fit_info.ext_P[2][j] = amusim[0][j];
+        fit_info.ext_P[1][j] = mu_val[j];
+        fit_info.ext_P[2][j] = mu_val[j];
     }
     fit_info.function = constant_fit;
     fit_info.linear_fit = true;
@@ -638,8 +651,8 @@ int main(int argc, char** argv) {
     fit_info.corr_id = { head.ncorr + 0 };
     for (int j = 0; j < fit_info.Njack; j++) {
         fit_info.ext_P[0][j] = M_PS_rew[j];
-        fit_info.ext_P[1][j] = amusim[0][j];
-        fit_info.ext_P[2][j] = amusim[0][j];
+        fit_info.ext_P[1][j] = mu_val[j];
+        fit_info.ext_P[2][j] = mu_val[j];
         // fit_info.ext_P[1][j] = head_rew.oranges[0];
         // fit_info.ext_P[2][j] = head_rew.oranges[0];
     }
@@ -774,8 +787,8 @@ int main(int argc, char** argv) {
     for (int j = 0; j < fit_info.Njack; j++) {
         fit_info.ext_P[0][j] = M_PS_rew[j];
         fit_info.ext_P[1][j] = M_PS[j];
-        fit_info.ext_P[2][j] = amusim[0][j];
-        fit_info.ext_P[3][j] = amusim[0][j];
+        fit_info.ext_P[2][j] = mu_val[j];
+        fit_info.ext_P[3][j] = mu_val[j];
     }
 
     mysprintf(name_rew, NAMESIZE, "plateau_df/d%s", argv[8]);
@@ -784,7 +797,7 @@ int main(int argc, char** argv) {
         outfile, lhs_plateau_df_dmu, name_rew, fit_info,
         jack_file);
     check_correlatro_counter(21);
-    printf("mu_\ell d f / d %s = %g +- %g\n",argv[8] ,fit_df_dmu.P[0][Njack - 1]*amuiso[0][Njack-1]*hbarc/a_fm[Njack-1], myres->comp_error(fit_df_dmu.P[0])*amuiso[0][Njack-1]*hbarc/a_fm[Njack-1]);
+    printf("mu_\ell d f / d %s = %g +- %g\n", argv[8], fit_df_dmu.P[0][Njack - 1] * amuiso[0][Njack - 1] * hbarc / a_fm[Njack - 1], myres->comp_error(fit_df_dmu.P[0]) * amuiso[0][Njack - 1] * hbarc / a_fm[Njack - 1]);
 
     double* d_ratio = (double*)malloc(sizeof(double*) * Njack);
     for (int j = 0; j < Njack;j++) {

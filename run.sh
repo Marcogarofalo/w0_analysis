@@ -119,6 +119,14 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_mu1_B32.dat  -bin 100 jack reweight_light_OS_B32.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_mu1_B32.dat  -bin 100 jack reweight_strange_OS_B32.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_mu1_B32.dat  -bin 100 jack reweight_charm_OS_B32.dat rewcOS
+
+./pion_rew  -p ../../data/ onlinemeas_B32.dat  -bin 100 jack reweight_charm_OS_more_B32.dat rewcOS
+./pion_rew  -p ../../data/ onlinemeas_more_B32.dat  -bin 100 jack reweight_charm_OS_B32.dat rewcOS
+./pion_rew  -p ../../data/ onlinemeas_more_B32.dat  -bin 100 jack reweight_charm_OS_more_B32.dat rewcOS
+
+./rew_other_data  -p ../../data/ marcos_format/B32/B32_Marcos_P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin  -bin 100 jack reweight_charm_OS_B32.dat rewcOS  onlinemeas_B32.dat
+
+
 ###### B24
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_light_OS_B24.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_strange_OS_B24.dat rewsOS
@@ -130,6 +138,8 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_light_OS_C48.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_strange_OS_C48.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_charm_OS_C48.dat rewcOS
+./pion_rew  -p ../../data/ onlinemeas_C48_confs434.dat  -bin 100 jack reweight_charm_OS_C48_confs434.dat rewcOS
+
 
 
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat.not_thermalized  -bin 100 jack reweight_light_OS_C48.dat.not_thermalized rewlOS
@@ -147,6 +157,10 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_A32.dat  -bin 100 jack reweight_strange_OS_A32.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_A32.dat  -bin 100 jack reweight_charm_OS_A32.dat rewcOS
 
+./rew_other_data  -p ../../data/  marcos_format/A32/A32_Marcos_P5P5_tm_mu3.0000e-03_mu3.0000e-03.bin  -bin 100 jack reweight_charm_OS_A32.dat rewcOS onlinemeas_A32.dat
+
+./rew_other_data  -p ../../data/  marcos_format/A32/A32_Marcos_P5P5_tm_mu3.0000e-03_mu3.0000e-03.bin  -bin 100 jack reweight_strange_OS_A32.dat rewsOS onlinemeas_A32.dat
+./rew_other_data  -p ../../data/  marcos_format/A32/A32_Marcos_P5P5_tm_mu5.0000e-03_mu5.0000e-03.bin  -bin 100 jack reweight_strange_OS_A32.dat rewsOS onlinemeas_A32.dat
 
 ## fake D96
 # ./create_fake_jack  -p ../../data/ onlinemeas_D96_LMA.dat  -bin 100 jack reweight_charm_OS_D96_LMA.dat rewcOS
