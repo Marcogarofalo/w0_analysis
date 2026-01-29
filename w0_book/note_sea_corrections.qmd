@@ -2,7 +2,7 @@
 
 Given the gluonic observable
 $$
-W(t)=t\frac{\partial (t^2\langle E\rangle)}{\partial t}=t^2\left( 2\langle E\rangle +t \frac{\partial\langle E\rangle}{\partial t}\right)
+W(t)=t\frac{\partial (t^2\langle E(t)\rangle)}{\partial t}=t^2\left( 2\langle E(t)\rangle +t \frac{\partial\langle E(t)\rangle}{\partial t}\right)
 $$
 
 For the $\delta \mu$ correction to a gluonic observable $W$, where the counterterm lagrangian ${\cal L}_c= \delta \mu \bar u u + \delta \mu \bar d d$  with $r_u=+1$ and
