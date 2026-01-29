@@ -212,6 +212,8 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_light_OS_B24.dat rewlOS
 ##
 ./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_charm_OS_C48.dat rewcOS
+./w0_rew  -p ../../data_p/ flow_C48.dat  -bin 20 jack reweight_charm_OS_C48.dat rewcOS
+
 ./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_strange_OS_C48.dat rewsOS
 ./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_light_OS_C48.dat rewlOS
 
@@ -241,3 +243,6 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 
 ##### fit all beta w0
 ./fit_all_beta_w0rew_der  jack ../../data/jackknife/  ../../data/fit_all_beta  ../fit_files_all_w0
+
+
+./set_w0_a  jack ../../data/jackknife/  ../../data/fit_all_beta  ../data_ens_E112   iso_param  E112
