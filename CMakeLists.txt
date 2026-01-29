@@ -42,12 +42,19 @@ MESSAGE("uncomment the lines after this message")
 # ############################################
 add_library(
   functions_w0 STATIC
-  functions_w0.hpp
+  # functions_w0.hpp
   functions_w0.cpp
+  # match_confs.hpp
+  match_confs.cpp
 )
 target_link_libraries(functions_w0 PUBLIC ${ANALYSIS_PROGRAM_LIBRARIES})
 target_include_directories(functions_w0 PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
-
+# Specify include directories
+target_include_directories(functions_w0
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
 
 # add_executable(w0 w0.cpp)
 # target_link_libraries(w0 PUBLIC functions_w0)
@@ -111,3 +118,5 @@ add_target_with_libs(pion_rew_ratio pion_rew_ratio.cpp)
 add_target_with_libs(fit_all_beta_w0rew_der fit_all_beta_w0rew_der.cpp)
 
 add_target_with_libs(fit_all_w0_m0 fit_all_w0_m0.cpp)
+
+add_target_with_libs(set_w0_a set_w0_a.cpp)
