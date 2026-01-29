@@ -21,6 +21,8 @@
 
 #include "correlators_analysis.hpp"
 #include "functions_w0.hpp"
+#include "match_confs.hpp"
+
 struct kinematic kinematic_2pt;
 
 generic_header read_head(FILE* stream) {
@@ -120,6 +122,13 @@ double poly1(int n, int Nvar, double* x, int Npar, double* P) {
     return P[0] + P[1] * tf;
 }
 
+std::string after_last_slash(const std::string& s) {
+    std::size_t pos = s.find_last_of('/');
+    if (pos == std::string::npos)
+        return s;          // no '/' found
+    return s.substr(pos + 1);
+}
+
 int main(int argc, char** argv) {
     error(argc != 8, 1, "nissa_mpcac ",
         "usage:./nissa_mpcac -p path file -bin $bin  jack/boot   loops\n separate "
@@ -168,9 +177,10 @@ int main(int argc, char** argv) {
     pos1 = mu.find(key);
     pos2 = mu.find(key, pos1 + 1);
 
-    std::string f_str = mu.substr(pos2 + 1, mu.size());
+    // std::string f_str = mu.substr(pos2 + 1, mu.size());
+    // printf("file bubbles name %s\n", f_str.c_str());
+    std::string f_str = after_last_slash(mu);
     printf("file bubbles name %s\n", f_str.c_str());
-
 
     double value = std::stod(num_str);  // convert to double
     printf("mu extracted from filename %g\n", value);
@@ -185,10 +195,14 @@ int main(int argc, char** argv) {
     fread(&tmp_st, sizeof(size_t), 1, infile_loop);printf("tmp_st %ld\n", tmp_st);
     head_loops.T = tmp_st;
     fread(&tmp_st, sizeof(size_t), 1, infile_loop);printf("tmp_st %ld\n", tmp_st);
+    double tmp_mu;
+    fread(&tmp_mu, sizeof(double), 1, infile_loop);printf("tmp_mu %f\n", tmp_mu);
+    error(fabs(tmp_mu - head_loops.mus[0]) > 1e-10, 1, "main", "mu in file %f differ from mu extracted %f", tmp_mu, head_loops.mus[0]);
+    fread(&tmp_mu, sizeof(double), 1, infile_loop);printf("tmp_mu %f\n", tmp_mu);
+    error(fabs(tmp_mu - head_loops.mus[0]) > 1e-10, 1, "main", "mu in file %f differ from mu extracted %f", tmp_mu, head_loops.mus[0]);
 
     head_loops.Njack = head_loops.Nconf;
     head_loops.ncorr = 1;
-    double**** data_loop = calloc_corr(head_loops.Njack, head_loops.ncorr, head_loops.T);
     char c[1];
     for (int i = 0;i < head_loops.Nconf;i++) {
         std::string v = "";
@@ -203,13 +217,9 @@ int main(int argc, char** argv) {
         printf("%s  ", head_loops.smearing[i].c_str());
     }
     printf("\n");
+    head_loops.struct_size = ftell(infile_loop);
 
-    for (int i = 0;i < head_loops.Nconf;i++) {
-        for (int t = 0; t < head_loops.T / 2 + 1;t++) {
-            fread(&tmp_d, sizeof(double), 1, infile_loop);
-            data_loop[i][0][t][0] = tmp_d;
-        }
-    }
+
     // std::string magic = read_string(infile_loop);    printf("magic %s\n",magic.c_str());
 
 
@@ -234,26 +244,73 @@ int main(int argc, char** argv) {
     // head_loops.read_header_debug(infile_loop);
     // error(head.Njack != head_loops.Njack, 1, "main", "Najck w0 = %d   while Njack loops  = %d", head.Njack, head_loops.Njack);
     // double ****data_loop = calloc_corr(head_loops.Njack, head_loops.ncorr, head_loops.T);
-    for (int iconf = 0; iconf < head_loops.Njack; iconf++) {
-        //     read_twopt(infile_loop, data_loop[iconf], head_loops);
-        error(head.smearing[iconf].compare(head_loops.smearing[iconf]) != 0, 2, "main",
-            "configuration order differ at %d\n flow file conf: %s\n loops conf: %s ", iconf,
-            head.smearing[iconf].c_str(), head_loops.smearing[iconf].c_str());
-    }
+
+    // merge the two lists
+
+    auto [idx_a, idx_b] = matching_indices(head.smearing, head_loops.smearing);
+
+
+
+    // for (int iconf = 0; iconf < head_loops.Njack; iconf++) {
+    //     //     read_twopt(infile_loop, data_loop[iconf], head_loops);
+    //     error(head.smearing[iconf].compare(head_loops.smearing[iconf]) != 0, 2, "main",
+    //         "configuration order differ at %d\n flow file conf: %s\n loops conf: %s ", iconf,
+    //         head.smearing[iconf].c_str(), head_loops.smearing[iconf].c_str());
+    // }
     //////////////////////////////////////////////////////////////
     // reading flow
     //////////////////////////////////////////////////////////////
     int ncorr_new = head.ncorr;                   // current number of correlators
     int Max_corr = head.ncorr + head_loops.ncorr; // max number of correlators
 
-    double**** data = calloc_corr(head.Njack, Max_corr, head.T);
 
     printf("confs=%d\n", head.Njack);
     printf("ncorr=%d\n", head.ncorr);
     printf("kappa=%g\n", head.kappa);
+
+    head_loops.Njack = idx_b.size();
+    head_loops.Nconf = idx_b.size();
+
+    head.Njack = idx_b.size();
+    head.Nconf = idx_b.size();
+
+    double**** data_loop = calloc_corr(head_loops.Njack, head_loops.ncorr, head_loops.T);
+    for (int i = 0;i < head_loops.Njack;i++) {
+        error(head.smearing[idx_a[i]].compare(head_loops.smearing[idx_b[i]]) != 0, 2, "main",
+            "configuration order differ at %d\n flow file conf: %s\n loops conf: %s ", i,
+            head.smearing[idx_a[i]].c_str(), head_loops.smearing[idx_b[i]].c_str());
+    }
+
+    printf("head_loops.size = %d\n", head_loops.struct_size);
+    printf("head.size = %d\n", head.struct_size);
+
+    for (int i = 0;i < head_loops.Nconf;i++) {
+
+        int seek_pos = head_loops.struct_size + idx_b[i] * (sizeof(double) * (head_loops.T / 2 + 1));
+        // check that works
+        // int seek_pos = head_loops.struct_size + i * (sizeof(double) *  (head_loops.T/2+1));
+        // error(ftell(infile_loop) != seek_pos, 1, "main", "ftell %ld  differ from seek_pos %d", ftell(infile_loop), seek_pos);
+        fseek(infile_loop, seek_pos, SEEK_SET);
+
+        for (int t = 0; t < head_loops.T / 2 + 1;t++) {
+            fread(&tmp_d, sizeof(double), 1, infile_loop);
+            data_loop[i][0][t][0] = tmp_d;
+        }
+
+    }
+
+    double**** data = calloc_corr(head.Njack, Max_corr, head.T);
+
+
     for (int iconf = 0; iconf < head.Njack; iconf++) {
+        int seek_pos = head.struct_size + idx_a[iconf] * (sizeof(double) * (head.T * head.ncorr * 2) + sizeof(int));
+        // check that works
+        // int seek_pos = head.struct_size + iconf * (sizeof(double) * (head.T* head.ncorr *2) + sizeof(int));
+        // error(ftell(infile) != seek_pos, 1, "main", "ftell %ld  differ from seek_pos %d", ftell(infile), seek_pos);
+        fseek(infile, seek_pos, SEEK_SET);
         read_twopt(infile, data[iconf], head);
     }
+    // exit(1);
 
 
     // {
@@ -475,8 +532,7 @@ int main(int argc, char** argv) {
     //     printf("%g  %g\n", fit_W.P[i][Njack - 1], myres->comp_error(fit_W.P[0]));
     // }
     // printf("%g  \n", fit_info.function(0, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[Njack - 1]));
-    for (size_t j = 0; j < Njack; j++)
-    {
+    for (size_t j = 0; j < Njack; j++) {
         w0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
         w0[j] = int2flowt(w0[j]);
         w0[j] = std::sqrt(w0[j]);
@@ -568,8 +624,8 @@ int main(int argc, char** argv) {
     std::vector<int> tminj(Njack);
     std::vector<int> tmaxj(Njack);
 
-    fit_info.Npar = 2;
-    fit_info.function = poly1;
+    fit_info.Npar = 4;
+    fit_info.function = poly3;
     for (int iq = 0; iq < Nquark; iq++) {
 
 
@@ -667,6 +723,11 @@ int main(int argc, char** argv) {
     print_result_in_file(outfile, deriv, name, 0.0, fit_info.tmin, fit_info.tmax);
     write_jack(deriv, Njack, jack_file);    check_correlatro_counter(2);
 
+    mysprintf(name, NAMESIZE, "der_w0_m0_%s_%s", argv[3], f_str.c_str());
+    printf("writing derivative in file %s\n", name);
+    myres->write_jack_in_file(deriv,name);
+
+
     write_jack(amuiso[0], Njack, jack_file);    check_correlatro_counter(3);
     write_jack(amuiso[1], Njack, jack_file);    check_correlatro_counter(4);
     write_jack(amuiso[2], Njack, jack_file);    check_correlatro_counter(5);
@@ -681,7 +742,7 @@ int main(int argc, char** argv) {
 
     write_jack(a_fm, Njack, jack_file);    check_correlatro_counter(12); // empty space to add all derivative
 
-    double *mu_loop = myres->create_fake(head_loops.mus[0], 1e-20,1 );
+    double* mu_loop = myres->create_fake(head_loops.mus[0], 1e-20, 1);
 
     write_jack(mu_loop, Njack, jack_file);    check_correlatro_counter(13);
 
