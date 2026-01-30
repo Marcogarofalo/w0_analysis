@@ -184,7 +184,7 @@ int main(int argc, char** argv) {
 
     double value = std::stod(num_str);  // convert to double
     printf("mu extracted from filename %g\n", value);
-    head_loops.mus.push_back(value);
+    // head_loops.mus.push_back(value);
 
     double tmp_d;
     int tmp_i;
@@ -197,9 +197,11 @@ int main(int argc, char** argv) {
     fread(&tmp_st, sizeof(size_t), 1, infile_loop);printf("tmp_st %ld\n", tmp_st);
     double tmp_mu;
     fread(&tmp_mu, sizeof(double), 1, infile_loop);printf("tmp_mu %f\n", tmp_mu);
-    error(fabs(tmp_mu - head_loops.mus[0]) > 1e-10, 1, "main", "mu in file %f differ from mu extracted %f", tmp_mu, head_loops.mus[0]);
+    // error(fabs(tmp_mu - head_loops.mus[0]) > 1e-10, 1, "main", "mu in file %f differ from mu extracted %f", tmp_mu, head_loops.mus[0]);
+    head_loops.mus.push_back(tmp_mu);
     fread(&tmp_mu, sizeof(double), 1, infile_loop);printf("tmp_mu %f\n", tmp_mu);
-    error(fabs(tmp_mu - head_loops.mus[0]) > 1e-10, 1, "main", "mu in file %f differ from mu extracted %f", tmp_mu, head_loops.mus[0]);
+    // error(fabs(tmp_mu - head_loops.mus[0]) > 1e-10, 1, "main", "mu in file %f differ from mu extracted %f", tmp_mu, head_loops.mus[0]);
+    head_loops.mus.push_back(tmp_mu);
 
     head_loops.Njack = head_loops.Nconf;
     head_loops.ncorr = 1;
@@ -614,10 +616,7 @@ int main(int argc, char** argv) {
     fit_info.malloc_ext_P();
     std::vector<double> w0pdmu(Njack);
 
-    // for (int i = 0; i<head_loops.gammas.size();i++){
-    //     if (strcmp(head_loops.gammas[i].c_str(),"std_g5")==0)
-    //         printf("id =%d %s %d\n", i,head_loops.gammas[i].c_str(), strcmp(head_loops.gammas[i].c_str(),"std_g5"));
-    // }
+    
     for (int j = 0; j < Njack; j++)
         fit_info.ext_P[0][j] = m0iso[j] - m0sim[j];
 
@@ -629,23 +628,10 @@ int main(int argc, char** argv) {
     for (int iq = 0; iq < Nquark; iq++) {
 
 
-        // printf("dmu%s= %g  %g\n", q_name[iq].c_str(), fit_info.ext_P[0][Njack - 1], myres->comp_error(fit_info.ext_P[0]));
-
         int Ng = head_loops.gammas.size();
         fit_info.corr_id = { 6, head.ncorr };
         fit_info.myen = { 0 }; // reim of corr_id[1] (the correction)
-        // for (int j = 0;j < Njack;j++) {
-        //     for (int t = 3; t < head.T; t++) {
-
-        //         if (lhs_function_Wt_p_dmcorr(j, conf_jack, t, fit_info) > 0.3) {
-        //             tminj[j] = t - 1;
-        //             tmaxj[j] = t;
-        //             break;
-        //         }
-        //     }
-        // }
-        // fit_info.tmin = tminj[Njack -1];
-        // fit_info.tmax = tmaxj[Njack -1];
+        
 
         for (int t = 1; t < head.T; t++) {
             if (lhs_function_Wt_p_dmcorr(Njack - 1, conf_jack, t, fit_info) > 0.3) {
@@ -656,7 +642,7 @@ int main(int argc, char** argv) {
         }
         char name[NAMESIZE];
         fit_info.linear_fit = true;
-        mysprintf(name, NAMESIZE, "W+m0%g", head_loops.mus[iq]);
+        mysprintf(name, NAMESIZE, "W+m0_%g", m0iso[Njack - 1]);
         struct fit_result fit_Wpdmu = fit_fun_to_fun_of_corr(
             option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
             outfile, lhs_function_Wt_p_dmcorr, name, fit_info,
@@ -667,35 +653,13 @@ int main(int argc, char** argv) {
         tif = swap_indices(fit_info.Npar, Njack, fit_Wpdmu.P);
 
         for (size_t j = 0; j < Njack; j++) {
-            // printf("j=%ld", j);
-            // for (int i = tminj[j]; i <= tmaxj[j]; i++) {
-            //     printf("t=%d  lhs= %g", i, lhs_function_Wt_p_dmcorr(j, conf_jack, i, fit_info));
-            //     swapped_x[0] = i;
-            //     printf("  fit= %g\n", fit_info.function(0, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j]));
-            // }
-            // swapped_x[0] = fit_info.tmin;
-            // double f1 = fit_info.function(0, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j]) - 0.3;
-            // swapped_x[0] = fit_info.tmax;
-            // double f2 = fit_info.function(0, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j]) - 0.3;
-            // tminj[j] = fit_info.tmin;
-            // tmaxj[j] = fit_info.tmax;
-            // while (f1 * f2 > 0) {
-            //     if (fabs(f1) < fabs(f2))
-            //         tminj[j]--;
-            //     else
-            //         tmaxj[j]++;
-            //     swapped_x[0] = tminj[j];
-            //     f1 = fit_info.function(0, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j]) - 0.3;
-            //     swapped_x[0] = tmaxj[j];
-            //     f2 = fit_info.function(0, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j]) - 0.3;
-            // }
-            // printf("j=%ld  tmin=%d  tmax=%d\n", j, tminj[j], tmaxj[j]);
+            
             w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
             w0pdmu[j] = int2flowt(w0pdmu[j]);
             w0pdmu[j] = std::sqrt(w0pdmu[j]);
         }
-        // mysprintf(name, NAMESIZE, "w0+mu%s_correction", q_name[iq].c_str());
-        mysprintf(name, NAMESIZE, "w0+m0%g", head_loops.mus[iq]);
+
+        mysprintf(name, NAMESIZE, "w0+m0_%g", m0iso[Njack - 1]);
         printf("%s = %g  %g\n", name, w0pdmu[Njack - 1], myres->comp_error(w0pdmu.data()));
         printf("unbiased %s = %g  %g\n", name, myres->comp_mean_unbias(w0pdmu.data()), myres->comp_error(w0pdmu.data()));
         print_result_in_file(outfile, w0pdmu.data(), name, 0.0, fit_info.tmin, fit_info.tmax);
@@ -723,7 +687,7 @@ int main(int argc, char** argv) {
     print_result_in_file(outfile, deriv, name, 0.0, fit_info.tmin, fit_info.tmax);
     write_jack(deriv, Njack, jack_file);    check_correlatro_counter(2);
 
-    mysprintf(name, NAMESIZE, "der_w0_m0_%s_%s", argv[3], f_str.c_str());
+    mysprintf(name, NAMESIZE, "deriv/der_w0_m0_%s_%s", argv[3], f_str.c_str());
     printf("writing derivative in file %s\n", name);
     myres->write_jack_in_file(deriv,name);
 
