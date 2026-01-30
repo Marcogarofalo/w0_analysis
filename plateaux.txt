@@ -677,6 +677,8 @@ onlinemeas_A32.dat  plateau_df/drewsOS 8 30 1
 onlinemeas_A32.dat  plateau_dM/drewcOS 8 30 1
 onlinemeas_A32.dat  plateau_df/drewcOS 8 30 1
 
+onlinemeas_A32.dat  marcos_format/A32/A32_Marcos_P5P5_tm_mu5.0000e-03_mu5.0000e-03.bin       0.0050       1e-20        41
+
 ################################################
 
 
@@ -711,8 +713,44 @@ onlinemeas_B32.dat  plateau_dM/drewsOS 9 30 1
 onlinemeas_B32.dat  plateau_df/drewsOS 9 30 1
 onlinemeas_B32.dat  plateau_dM/drewcOS 9 30 1
 onlinemeas_B32.dat  plateau_df/drewcOS 9 30 1
+
 ################################################
 
+
+
+onlinemeas_more_B32.dat mulsim  0.0025    1e-20      1
+onlinemeas_more_B32.dat mussim  0.017846601   0.000053   2
+onlinemeas_more_B32.dat mucsim  0.2285992  1e-20      3
+onlinemeas_more_B32.dat m0sim   -0.4138863   1e-20      3
+
+onlinemeas_more_B32.dat muliso  0.0006669  0.0000028  1
+onlinemeas_more_B32.dat musiso  0.018267   0.000053   2
+onlinemeas_more_B32.dat muciso  0.23134    0.00052    3
+onlinemeas_more_B32.dat m0  -0.4138934 0.0000046   4
+onlinemeas_more_B32.dat m0iso  -0.4138934 0.0000046   6
+onlinemeas_more_B32.dat a   0.07948    0.00011  5
+
+onlinemeas_more_B32.dat M_{PS}          20 30 1
+onlinemeas_more_B32.dat M_{PS}_rewlOS   20 30 1
+onlinemeas_more_B32.dat M_{PS}_rewsOS   20 30 1
+onlinemeas_more_B32.dat M_{PS}_rewcOS   20 30 1
+onlinemeas_more_B32.dat f_{PS}          20 30 1
+onlinemeas_more_B32.dat f_{PS}_rewlOS   20 30 1
+onlinemeas_more_B32.dat f_{PS}_rewsOS   20 30 1
+onlinemeas_more_B32.dat f_{PS}_rewcOS   20 30 1
+onlinemeas_more_B32.dat mpcac           12 31 1
+onlinemeas_more_B32.dat mpcac_rewlOS    12 31 1
+onlinemeas_more_B32.dat mpcac_rewcOS    12 31 1
+onlinemeas_more_B32.dat mpcac_rewsOS    12 31 1
+
+onlinemeas_more_B32.dat  plateau_dM/drewlOS 9 30 1
+onlinemeas_more_B32.dat  plateau_df/drewlOS 9 30 1
+onlinemeas_more_B32.dat  plateau_dM/drewsOS 9 30 1
+onlinemeas_more_B32.dat  plateau_df/drewsOS 9 30 1
+onlinemeas_more_B32.dat  plateau_dM/drewcOS 9 30 1
+onlinemeas_more_B32.dat  plateau_df/drewcOS 9 30 1
+
+################################################
 
 onlinemeas_mu1_B32.dat mulsim  0.0042    1e-20      1
 onlinemeas_mu1_B32.dat mussim  0.017846601   0.000053   2
@@ -848,3 +886,36 @@ onlinemeas_C48.dat  plateau_dM/drewsOS 12 47 1
 onlinemeas_C48.dat  plateau_df/drewsOS 12 47 1
 onlinemeas_C48.dat  plateau_dM/drewcOS 12 47 1
 onlinemeas_C48.dat  plateau_df/drewcOS 12 47 1
+
+
+
+################################################
+
+onlinemeas_C48_confs434.dat mulsim  0.0020        1e-20      11
+onlinemeas_C48_confs434.dat mussim  0.0166472533   0.000053   12
+onlinemeas_C48_confs434.dat mucsim  0.194775730329 1e-20      13
+onlinemeas_C48_confs434.dat m0sim  -0.396474310465 1e-20      13
+onlinemeas_C48_confs434.dat muliso  0.0005864      0.0000034  11
+onlinemeas_C48_confs434.dat musiso  0.016053       0.000067   12
+onlinemeas_C48_confs434.dat muciso  0.19849        0.00064    13
+onlinemeas_C48_confs434.dat m0     -0.3964534         0.0000041  14
+onlinemeas_C48_confs434.dat m0iso  -0.3964534         0.0000041  16
+onlinemeas_C48_confs434.dat a       0.06819           0.00014    15
+onlinemeas_C48_confs434.dat M_{PS}          23 47 1
+onlinemeas_C48_confs434.dat M_{PS}_rewlOS   23 47 1
+onlinemeas_C48_confs434.dat M_{PS}_rewsOS   23 47 1
+onlinemeas_C48_confs434.dat M_{PS}_rewcOS   23 47 1
+onlinemeas_C48_confs434.dat f_{PS}          23 47 1
+onlinemeas_C48_confs434.dat f_{PS}_rewlOS   23 47 1
+onlinemeas_C48_confs434.dat f_{PS}_rewsOS   23 47 1
+onlinemeas_C48_confs434.dat f_{PS}_rewcOS   23 47 1
+onlinemeas_C48_confs434.dat mpcac           14 47 1
+onlinemeas_C48_confs434.dat mpcac_rewlOS    14 47 1
+onlinemeas_C48_confs434.dat mpcac_rewcOS    14 47 1
+onlinemeas_C48_confs434.dat mpcac_rewsOS    14 47 1
+onlinemeas_C48_confs434.dat  plateau_dM/drewlOS 12 47 1
+onlinemeas_C48_confs434.dat  plateau_df/drewlOS 12 47 1
+onlinemeas_C48_confs434.dat  plateau_dM/drewsOS 12 47 1
+onlinemeas_C48_confs434.dat  plateau_df/drewsOS 12 47 1
+onlinemeas_C48_confs434.dat  plateau_dM/drewcOS 12 47 1
+onlinemeas_C48_confs434.dat  plateau_df/drewcOS 12 47 1
