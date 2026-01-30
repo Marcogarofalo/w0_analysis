@@ -211,11 +211,9 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_strange_OS_B24.dat rewsOS
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_light_OS_B24.dat rewlOS
 ##
-./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_charm_OS_C48.dat rewcOS
 ./w0_rew  -p ../../data_p/ flow_C48.dat  -bin 20 jack reweight_charm_OS_C48.dat rewcOS
-
-./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_strange_OS_C48.dat rewsOS
-./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_light_OS_C48.dat rewlOS
+./w0_rew  -p ../../data_p/ flow_C48.dat  -bin 20 jack reweight_strange_OS_C48.dat rewsOS
+#./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_light_OS_C48.dat rewlOS
 
 ./w0_rew  -p ../../data/ flow_C48.dat.not_thermalized  -bin 20 jack reweight_charm_OS_C48.dat.not_thermalized rewcOS
 ./w0_rew  -p ../../data/ flow_C48.dat.not_thermalized  -bin 20 jack reweight_strange_OS_C48.dat.not_thermalized rewsOS
@@ -231,9 +229,9 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0_rew  -p ../../data/ flow_E112_LMA.dat  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS
 
 ## A32
-./w0_rew  -p ../../data/ flow_A32.dat  -bin 20 jack reweight_charm_OS_A32.dat rewcOS
-./w0_rew  -p ../../data/ flow_A32.dat  -bin 20 jack reweight_strange_OS_A32.dat rewsOS
-./w0_rew  -p ../../data/ flow_A32.dat  -bin 20 jack reweight_light_OS_A32.dat rewlOS
+./w0_rew  -p ../../data_p/ flow_A32.dat  -bin 20 jack reweight_charm_OS_A32.dat rewcOS
+./w0_rew  -p ../../data_p/ flow_A32.dat  -bin 20 jack reweight_strange_OS_A32.dat rewsOS
+# ./w0_rew  -p ../../data/ flow_A32.dat  -bin 20 jack reweight_light_OS_A32.dat rewlOS
 
 
 ### rations
