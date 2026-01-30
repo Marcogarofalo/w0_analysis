@@ -555,7 +555,7 @@ int main(int argc, char **argv)
     check_correlatro_counter(1);
 
     char name_w0[NAMESIZE];
-    mysprintf(name_w0, NAMESIZE, "w0_%s",  argv[3]);
+    mysprintf(name_w0, NAMESIZE, "deriv/w0_%s",  argv[3]);
     myres->write_jack_in_file(w0.data(),name_w0);
 
 
@@ -677,7 +677,7 @@ int main(int argc, char **argv)
     write_jack(der.data(), Njack, jack_file);
     check_correlatro_counter(4);
 
-    mysprintf(name_rew, NAMESIZE, "der_%s_%s", argv[8], argv[3]);
+    mysprintf(name_rew, NAMESIZE, "deriv/der_%s_%s", argv[8], argv[3]);
     myres->write_jack_in_file(der.data(),name_rew);
 
     std::vector<double> zeros(Njack, 0.0);
