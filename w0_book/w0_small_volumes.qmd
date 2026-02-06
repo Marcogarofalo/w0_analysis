@@ -1,0 +1,67 @@
+# Fit all derivative w0
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+masses <- c(
+  0.0006669,
+  0.018267,
+  0.23134
+)
+```
+
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_w0_charm_small_volume_const",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_w0_strange_small_volume_const"
+)
+labels <- c(
+  "charm",
+  "strange"
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "L_a",
+    # noline = TRUE,
+    data_type = c(" "),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.5
+  )
+ 
+}
+
+# gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed",
+#                       alpha=0.3)
+# gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed",
+#                       alpha=0.3)
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell/ w_0)  dw_0/d\\mu$",
+  to_print = TRUE,
+  #yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```

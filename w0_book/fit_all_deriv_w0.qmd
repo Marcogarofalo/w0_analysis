@@ -73,7 +73,7 @@ gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed",
                       alpha=0.3)
 gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed",
                       alpha=0.3)
-fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell dw_0)/d\\mu[fm]$",
+fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell/ w_0)  dw_0/d\\mu$",
   to_print = TRUE,
   #yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
