@@ -162,7 +162,7 @@ double lhs_function_Wt_p_dmcorr(int j, double ****in, int t, struct fit_type fit
     double loop = in[j][id_cor][0][reim];
     double loop_Wt = in[j][id_cor][t][reim];
 
-    double r = Wt + dmu * (loop_Wt - loop * Wt);
+    double r = Wt - dmu * (loop_Wt - loop * Wt);
     // if(j==fit_info.Njack-1) printf("%d   %g   Wt=%g   dm=%g  loop_Wt=%g   loop=%g    der=%g  corr=%g \n",t,r,Wt, dmu, loop_Wt, loop,
     // (loop_Wt - loop * Wt), (loop_Wt - loop * Wt)*dmu );
     return r;
@@ -292,6 +292,10 @@ double lhs_function_Wt_p_dm_all_corr(int j, double ****in, int t, struct fit_typ
                dmuc * (loop_Wt_c - loop_c * Wt);
     // if(j==fit_info.Njack-1) printf("%d   %g\n",t,r);
     return r;
+}
+double lhs_zero(int j, double ****in, int t, struct fit_type fit_info)
+{
+    return 0;
 }
 
 double lhs_mpcac(int j, double ****in, int t, struct fit_type fit_info)
