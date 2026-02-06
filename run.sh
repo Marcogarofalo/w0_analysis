@@ -140,6 +140,7 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_charm_OS_C48.dat rewcOS
 ./pion_rew  -p ../../data/ onlinemeas_C48_confs434.dat  -bin 100 jack reweight_charm_OS_C48_confs434.dat rewcOS
 
+./rew_other_data  -p ../../data/  marcos_format/C48/C48_Marcos_P5P5_tm_mu2.0000e-03_mu2.0000e-03.bin  -bin 100 jack reweight_charm_OS_C48.dat rewcOS onlinemeas_C48.dat
 
 
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat.not_thermalized  -bin 100 jack reweight_light_OS_C48.dat.not_thermalized rewlOS
@@ -148,10 +149,12 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 
 ./pion_rew  -p ../../data/ onlinemeas_C48.dat  -bin 100 jack reweight_charm_OS_C48_low_prec.dat rewcOS
 ##### E112
-./pion_rew  -p ../../data/ onlinemeas_E112_LMA.dat  -bin 100 jack reweight_light_OS_E112_LMA.dat rewlOS
-./pion_rew  -p ../../data/ onlinemeas_E112_LMA.dat  -bin 100 jack reweight_strange_OS_E112_LMA.dat rewsOS
+#./pion_rew  -p ../../data/ onlinemeas_E112_LMA.dat  -bin 100 jack reweight_light_OS_E112_LMA.dat rewlOS
+#./pion_rew  -p ../../data/ onlinemeas_E112_LMA.dat  -bin 100 jack reweight_strange_OS_E112_LMA.dat rewsOS
 # ./pion_rew  -p ../../data/ onlinemeas_E112_LMA.dat  -bin 100 jack reweight_charm_OS_E112_LMA.dat rewcOS
-
+./pion_rew  -p ../../data/ onlinemeas_E112_LMA.dat  -bin 100 jack reweight_light_OS_E112_507.dat rewlOS
+./pion_rew  -p ../../data/ onlinemeas_E112_LMA.dat  -bin 100 jack reweight_strange_OS_E112_507.dat rewsOS
+./pion_rew  -p ../../data/ onlinemeas_E112_LMA.dat  -bin 100 jack reweight_charm_OS_E112_507.dat rewcOS
 ### A32
 ./pion_rew  -p ../../data/ onlinemeas_A32.dat  -bin 100 jack reweight_light_OS_A32.dat rewlOS
 ./pion_rew  -p ../../data/ onlinemeas_A32.dat  -bin 100 jack reweight_strange_OS_A32.dat rewsOS
@@ -210,9 +213,9 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_charm_OS_B24.dat rewcOS
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_strange_OS_B24.dat rewsOS
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_light_OS_B24.dat rewlOS
-##
-./w0_rew  -p ../../data_p/ flow_C48.dat  -bin 20 jack reweight_charm_OS_C48.dat rewcOS
-./w0_rew  -p ../../data_p/ flow_C48.dat  -bin 20 jack reweight_strange_OS_C48.dat rewsOS
+## C48
+./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_charm_OS_C48_1733.dat rewcOS
+./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_strange_OS_C48_1733.dat rewsOS
 #./w0_rew  -p ../../data/ flow_C48.dat  -bin 20 jack reweight_light_OS_C48.dat rewlOS
 
 ./w0_rew  -p ../../data/ flow_C48.dat.not_thermalized  -bin 20 jack reweight_charm_OS_C48.dat.not_thermalized rewcOS
@@ -234,6 +237,13 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 # ./w0_rew  -p ../../data/ flow_A32.dat  -bin 20 jack reweight_light_OS_A32.dat rewlOS
 
 
+#B64
+./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 100 jack reweight_charm_0.1_OS_B64_LMA.dat rewcOS
+./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 100 jack reweight_strange_OS_B64_LMA.dat rewsOS
+./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 100 jack reweight_light_OS_B64_LMA.dat rewlOS
+
+
+
 ### rations
 ./pion_rew_ratio  -p ../../data/ onlinemeas_B64_LMA.dat  -bin 100 jack reweight_light_OS_B64_LMA.dat reweight_light_OS_B64_LMA.dat
 ./pion_rew_ratio  -p ../../data/ onlinemeas_C80_LMA.dat  -bin 100 jack reweight_light_OS_C80_LMA.dat reweight_light_OS_C80_LMA.dat
@@ -241,6 +251,12 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 
 ##### fit all beta w0
 ./fit_all_beta_w0rew_der  jack ../../data/jackknife/  ../../data/fit_all_beta  ../fit_files_all_w0
+./fit_small_volume_w0   jack ../../data/jackknife/  ../../data/fit_all_beta  ../fit_files_small_volume_w0.txt
+
+./set_w0_a  jack ../../data/jackknife/  ../../data/fit_all_beta  ../data_ens_E112   
 
 
-./set_w0_a  jack ../../data/jackknife/  ../../data/fit_all_beta  ../data_ens_E112   iso_param  E112
+
+######## small AC
+
+./meson_smallAC  -p ../../data/  data_mesons/C48/P5P5_tm_mu2.0000e-03_mu2.0000e-03.bin -bin 20 jack  reweight_charm_OS_C48_1733.dat rewcOS onlinemeas_C48.dat
