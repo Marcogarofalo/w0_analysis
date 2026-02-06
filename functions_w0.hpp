@@ -17,7 +17,7 @@ double lhs_function_Wt_der_mu(int j, double ****in, int t, struct fit_type fit_i
 double lhs_dM_sea(int j, double**** in, int t, struct fit_type fit_info);
 double lhs_dfpi_sea(int j, double**** in, int t, struct fit_type fit_info);
 
-
+double lhs_zero(int j, double ****in, int t, struct fit_type fit_info);
 double lhs_mpcac(int j, double ****in, int t, struct fit_type fit_info);
 
 double lhs_function_M_PS_p_dmcorr(int j, double ****in, int t, struct fit_type fit_info);
