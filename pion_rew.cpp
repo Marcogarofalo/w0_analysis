@@ -352,7 +352,7 @@ int main(int argc, char** argv) {
     // double* M_PS_hist = plateau_correlator_function(
     //     option, kinematic_2pt, (char*)"P5P5", data, confs,
     //     namefile_plateaux, dev_null, 0, "M_{PS}", M_eff_log/* M_eff_T */, dev_null);
-    double* M_PS_hist = (double*)calloc(myres->Njack, sizeof(double));
+    double* M_PS_hist = (double*)calloc(head.Nconf, sizeof(double));
 
     char name_hist[NAMESIZE];
     mysprintf(name_hist, NAMESIZE, "%s/out/%s_%s_history.txt", option[3], option[6], argv[7]);
@@ -361,6 +361,7 @@ int main(int argc, char** argv) {
     fprintf(history_out, "conf_id  conf_name  r   M_PS  \n");
     for (int i = 0; i < head.Nconf; i++) {
         fprintf(history_out, "%d  %s %-20.12g %-20.12g\n", i, head_rew.smearing[i].c_str(), data_rew[i][0][0][1], M_PS_hist[i]);
+        // printf("%d  %s %-20.12g %-20.12g\n", i, head_rew.smearing[i].c_str(), data_rew[i][0][0][1], M_PS_hist[i]);
     }
     fclose(history_out);
     free(M_PS_hist);
@@ -807,6 +808,11 @@ int main(int argc, char** argv) {
         jack_file);
     check_correlatro_counter(21);
     printf("mu_\ell d f / d %s = %g +- %g\n", argv[8], fit_df_dmu.P[0][Njack - 1] * amuiso[0][Njack - 1] * hbarc / a_fm[Njack - 1], myres->comp_error(fit_df_dmu.P[0]) * amuiso[0][Njack - 1] * hbarc / a_fm[Njack - 1]);
+    double *RR=myres->create_copy(fit_df_dmu.P[0]);
+    for(int j = 0; j < Njack ;j++){
+        RR[j]= fit_df_dmu.P[0][j] * amuiso[0][j]  / f_PS.P[0][j];
+    }
+    printf("mu_\ell/fpi d f / d %s = %g +- %g\n", argv[8], RR[Njack - 1], myres->comp_error(RR));
 
     double* d_ratio = (double*)malloc(sizeof(double*) * Njack);
     for (int j = 0; j < Njack;j++) {
