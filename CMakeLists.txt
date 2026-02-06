@@ -120,3 +120,7 @@ add_target_with_libs(fit_all_beta_w0rew_der fit_all_beta_w0rew_der.cpp)
 add_target_with_libs(fit_all_w0_m0 fit_all_w0_m0.cpp)
 
 add_target_with_libs(set_w0_a set_w0_a.cpp)
+
+add_target_with_libs(fit_small_volume_w0 fit_small_volume_w0.cpp)
+
+add_target_with_libs(meson_smallAC meson_smallAC.cpp)
