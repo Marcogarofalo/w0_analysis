@@ -112,6 +112,12 @@ double poly3(int n, int Nvar, double* x, int Npar, double* P) {
     return P[0] + P[1] * tf + P[2] * tf * tf + P[3] * tf * tf * tf;
 }
 
+double lhs_0(int j, double ****in, int t, struct fit_type fit_info)
+{
+    return 0;
+}
+
+
 int main(int argc, char** argv) {
     error(!(argc == 10 || argc == 11), 1, "main ",
         "usage:././w0_rew -p path file -bin $bin  jack/boot   reweighting_factors  name_rew    [how_many_confs_to_analyse]\n separate "
@@ -583,7 +589,7 @@ int main(int argc, char** argv) {
     mysprintf(name_rew, NAMESIZE, "mpcac_%s", argv[8]);
     struct fit_result fit_mpcac_rew = fit_fun_to_fun_of_corr(
         option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
-        outfile, lhs_mpcac, name_rew, fit_info,
+        outfile, lhs_0, name_rew, fit_info,
         jack_file);
     check_correlatro_counter(3);
     // free_fit_result(fit_info, fit_out);
@@ -799,6 +805,12 @@ int main(int argc, char** argv) {
     check_correlatro_counter(21);
     printf("mu_\ell d f / d %s = %g +- %g\n", argv[8], fit_df_dmu.P[0][Njack - 1] * amuiso[0][Njack - 1] * hbarc / a_fm[Njack - 1], myres->comp_error(fit_df_dmu.P[0]) * amuiso[0][Njack - 1] * hbarc / a_fm[Njack - 1]);
 
+    double *RR=myres->create_copy(fit_df_dmu.P[0]);
+    for(int j = 0; j < Njack ;j++){
+        RR[j]= fit_df_dmu.P[0][j] * amuiso[0][j]  / f_PS.P[0][j];
+    }
+    printf("mu_\ell/fpi d f / d %s = %g +- %g\n", argv[8], RR[Njack - 1], myres->comp_error(RR));
+    
     double* d_ratio = (double*)malloc(sizeof(double*) * Njack);
     for (int j = 0; j < Njack;j++) {
         // d_ratio[j] = (f_PS_rew.P[0][j] / M_PS_rew[j] - f_PS.P[0][j] / M_PS[j]) / dmu;
