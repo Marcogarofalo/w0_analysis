@@ -1,0 +1,44 @@
+../../data_l/E112/MPi_sim.dat
+../../data_l/E112/MK_sim.dat
+../../data_l/E112/MDs_sim.dat
+../../data_l/E112/fpi_sim.dat
+deriv/w0_flow_E112_LMA.dat
+# ml valence derivatives
+../../data_l/E112/derivatives/valence/ml/E112_dRPi2_dml.dat
+../../data_l/E112/derivatives/valence/ml/E112_dRK2_dml.dat
+../../data_l/E112/derivatives/valence/ml/E112_dRDs_dml.dat
+../../data_l/E112/derivatives/valence/ml/E112_dfPi_dml.dat
+deriv/zero.dat
+# ms valence derivatives
+deriv/zero.dat
+../../data_l/E112/derivatives/valence/ms/E112_dMK2_dms.dat
+../../data_l/E112/derivatives/valence/ms/E112_dMDs_dms.dat
+deriv/zero.dat
+deriv/zero.dat
+# mc valence derivatives
+deriv/zero.dat
+deriv/zero.dat
+../../data_l/E112/derivatives/valence/mc/E112_dMDs_dmc.dat
+deriv/zero.dat
+deriv/zero.dat
+# ml sea derivatives
+../../data_l/E112/derivatives/sea/ml/E112_dMPi_dml.dat
+../../data_l/E112/derivatives/sea/ml/E112_dMK_dml.dat
+../../data_l/E112/derivatives/sea/ml/E112_dMDs_dml.dat
+../../data_l/E112/derivatives/sea/ml/E112_dfPi_dml.dat
+deriv/der_rewlOS_flow_E112_LMA.dat
+# ms valence derivatives 
+../../data_l/E112/derivatives/sea/ms/mul_over_RPi_dRPi_dms.dat
+../../data_l/E112/derivatives/sea/ms/mul_over_RK_dRK_dms.dat
+../../data_l/E112/derivatives/sea/ms/mul_over_RDs_dRDs_dms.dat
+../../data_l/E112/derivatives/sea/ms/mul_over_fPi_dfPi_dms.dat
+deriv/mul_w0_dw0_dmu_strange_small_volume_const_jack.txt
+# ms valence derivatives 
+../../data_l/E112/derivatives/sea/mc/mul_over_RPi_dRPi_dmc.dat
+../../data_l/E112/derivatives/sea/mc/mul_over_RK_dRK_dmc.dat
+../../data_l/E112/derivatives/sea/mc/mul_over_RDs_dRDs_dmc.dat
+../../data_l/E112/derivatives/sea/mc/mul_over_fPi_dfPi_dmc.dat
+deriv/mul_w0_dw0_dmu_charm_small_volume_const_jack.txt
+#  where to look in the plateau file
+onlinemeas_E112_LMA.dat
+E112

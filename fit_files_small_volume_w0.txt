@@ -1,0 +1,7 @@
+flow_B32.dat reweight_charm_OS_B32.dat
+flow_B32.dat reweight_strange_OS_B32.dat
+# flow_B32.dat reweight_light_OS_B32.dat
+new_beta
+flow_B24.dat reweight_charm_OS_B24.dat
+flow_B24.dat reweight_strange_OS_B24.dat
+# flow_B24.dat reweight_light_OS_B24.dat

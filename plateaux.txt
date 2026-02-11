@@ -919,3 +919,43 @@ onlinemeas_C48_confs434.dat  plateau_dM/drewsOS 12 47 1
 onlinemeas_C48_confs434.dat  plateau_df/drewsOS 12 47 1
 onlinemeas_C48_confs434.dat  plateau_dM/drewcOS 12 47 1
 onlinemeas_C48_confs434.dat  plateau_df/drewcOS 12 47 1
+
+######################
+onlinemeas_B64_LMA.dat  mpcac_over_mu   0.017197452229299366  0.017   101
+onlinemeas_C80_LMA.dat  mpcac_over_mu  -0.06687898089171976   0.013   102
+onlinemeas_D96.dat      mpcac_over_mu   0.010828025477707007  0.005   103
+onlinemeas_E112_LMA.dat mpcac_over_mu  -0.04904458598726115   0.001   104
+cB211.72.96             mpcac_over_mu  -0.015923566878980895  0.008
+cA211.53.24             mpcac_over_mu   0.043949044585987265  0.01
+cA211.40.24             mpcac_over_mu   0.03503184713375797   0.02
+cA211.30.32             mpcac_over_mu   0.010191082802547772  0.01
+cC211.06.112            mpcac_over_mu  -0.059235668789808925  0.015
+cB211.14.64             mpcac_over_mu   0.006369426751592357  0.003
+cB211.25.48             mpcac_over_mu   0.007006369426751593  0.003
+cC211.20.48             mpcac_over_mu  -0.002547770700636943  0.003
+cA211.12.48             mpcac_over_mu  -0.205833333333        0.0977062633042
+
+########
+
+onlinemeas_B64_LMA.dat  ZA  0.74296 0.00019   105
+onlinemeas_C80_LMA.dat  ZA  0.75814 0.00013   106
+onlinemeas_D96.dat      ZA  0.77367 0.00010   107
+onlinemeas_E112_LMA.dat ZA  0.78548 0.00009   108
+
+
+onlinemeas_B64_LMA.dat  seed  0  0   101
+onlinemeas_C80_LMA.dat  seed  0  0   102
+onlinemeas_D96.dat      seed  0  0   103
+onlinemeas_E112_LMA.dat seed  0  0   104
+
+onlinemeas_B64_LMA.dat  L  64  0   0
+onlinemeas_C80_LMA.dat  L  80  0   0
+onlinemeas_D96.dat      L  96  0   0
+onlinemeas_E112_LMA.dat L  112 0   0
+
+
+########
+E112_l1_c1.bin  M_{PS}  25 49 1
+E112_s_c1.bin  M_{PS}  25 49 1
+E112_s_c2.bin  M_{PS}  25 49 1
+E112_s_c3.bin  M_{PS}  25 49 1

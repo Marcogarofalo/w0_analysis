@@ -106,6 +106,7 @@ add_target_with_libs(w0_m0 w0_m0.cpp)
 
 
 add_target_with_libs(pion_rew pion_rew.cpp)
+add_target_with_libs(meson_rew meson_rew.cpp)
 add_target_with_libs(pion pion.cpp)
 add_target_with_libs(rew_other_data rew_other_data.cpp)
 add_target_with_libs(fit_all_rew_der fit_all_rew_der.cpp)
@@ -122,5 +123,8 @@ add_target_with_libs(fit_all_w0_m0 fit_all_w0_m0.cpp)
 add_target_with_libs(set_w0_a set_w0_a.cpp)
 
 add_target_with_libs(fit_small_volume_w0 fit_small_volume_w0.cpp)
+add_target_with_libs(fit_small_volume_Mpi_fpi fit_small_volume_Mpi_fpi.cpp)
 
 add_target_with_libs(meson_smallAC meson_smallAC.cpp)
+
+add_target_with_libs(fit_cont_w0_fpi fit_cont_w0_fpi.cpp)

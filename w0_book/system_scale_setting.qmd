@@ -1,0 +1,244 @@
+# system scale setting
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+masses <- c(
+  0.0006669,
+  0.018267,
+  0.23134
+)
+```
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+df<-read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_fpi.txt", header = TRUE)
+kable(df)
+df<-read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_w0.txt", header = TRUE)
+kable(df)
+
+```
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_cont_a2"
+)
+labels <- c(
+  "P[0]+ P[1]*a2 "
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c("data"),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001
+  )
+  
+}
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 [\\mbox{fm}]$",
+  to_print = TRUE,
+  #yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_cont_a2"
+)
+labels <- c(
+  "P[0]+ P[1]*a2 "
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c("data"),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001
+  )
+  
+}
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+  to_print = TRUE,
+  #yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_ms_over_ml_from_fpi_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_ms_over_ml_from_w0_cont_a2"
+
+)
+labels <- c(
+  "FLAG",
+  "wp25"
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c(labels[j]),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001
+  )
+  
+}
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$m_s/m_\\ell$",
+  to_print = TRUE,
+  #yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_mc_over_ms_from_fpi_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_mc_over_ms_from_w0_cont_a2"
+
+)
+labels <- c(
+  "FLAG",
+  "wp25"
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c(labels[j]),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001
+  )
+  
+}
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$m_c/m_s$",
+  to_print = TRUE,
+  #yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_afpi_over_aw0_cont_a2"
+
+)
+labels <- c(
+  "P[0]+P[1]a2"
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c(labels[j]),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001
+  )
+  
+}
+
+fig <- myplotly(gg, "", "$a^2_{FLAG} [\\mbox{fm}^2]$", "$a_{FLAG}/a_{wp25}$",
+  to_print = TRUE,
+  #yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_afpi_minus_aw0_cont_a2"
+
+)
+labels <- c(
+  "P[0]+P[1]a2"
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c(labels[j]),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001
+  )
+  
+}
+
+fig <- myplotly(gg, "", "$a^2_{FLAG} [\\mbox{fm}^2]$", "$a_{FLAG}-a_{wp25}$",
+  to_print = TRUE,
+  #yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```

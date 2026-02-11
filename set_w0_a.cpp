@@ -21,6 +21,8 @@
 #include "non_linear_fit.hpp"
 #include "resampling_new.hpp"
 #include "tower.hpp"
+#include "fve.hpp"
+#include "correlators_analysis.hpp"
 
 #include "functions_w0.hpp"
 
@@ -286,7 +288,7 @@ int main(int argc, char** argv) {
             }
         }
     }
-    error(files.size() != 36, 1, "main", "input files in  file %s must be 36 instead they are %d", argv[4], files.size());
+    error(files.size() != 37, 1, "main", "input files in  file %s must be 37 instead they are %d", argv[4], files.size());
 
 
     // mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_charm_0.1_OS_B64.dat", argv[2], argv[1]);
@@ -348,25 +350,42 @@ int main(int argc, char** argv) {
     mysprintf(namefile_plateaux, NAMESIZE, "plateaux.txt");
     double mean, err;
     int seed;
+    line_read_param(option_read, "seed", mean, err, seed, namefile_plateaux);
+    double* tmp = myres->create_fake(mean, err, seed); // just to set the seed
+    free(tmp);
+
     std::vector<double*> amuiso(3);
     line_read_param(option_read, "muliso", mean, err, seed, namefile_plateaux);
-    amuiso[0] = myres->create_fake(mean, err, seed);
+    amuiso[0] = myres->create_fake(mean, err, -1);
     line_read_param(option_read, "musiso", mean, err, seed, namefile_plateaux);
-    amuiso[1] = myres->create_fake(mean, err, seed);
+    amuiso[1] = myres->create_fake(mean, err, -1);
     line_read_param(option_read, "muciso", mean, err, seed, namefile_plateaux);
-    amuiso[2] = myres->create_fake(mean, err, seed);
+    amuiso[2] = myres->create_fake(mean, err, -1);
 
     std::vector<double*> amusim(3);
     line_read_param(option_read, "mulsim", mean, err, seed, namefile_plateaux);
-    amusim[0] = myres->create_fake(mean, err, seed);
+    amusim[0] = myres->create_fake(mean, err, -1);
     line_read_param(option_read, "mussim", mean, err, seed, namefile_plateaux);
-    amusim[1] = myres->create_fake(mean, err, seed);
+    amusim[1] = myres->create_fake(mean, err, -1);
     line_read_param(option_read, "mucsim", mean, err, seed, namefile_plateaux);
-    amusim[2] = myres->create_fake(mean, err, seed);
+    amusim[2] = myres->create_fake(mean, err, -1);
 
-    double *mpcac;
-    line_read_param(option_read, "mpcac", mean, err, seed, namefile_plateaux);
-    mpcac = myres->create_fake(mean, err, seed);
+    double* mpcac_over_mu;
+    line_read_param(option_read, "mpcac_over_mu", mean, err, seed, namefile_plateaux);
+    mpcac_over_mu = myres->create_fake(mean, err, -1);
+
+    double* ZA;
+    line_read_param(option_read, "ZA", mean, err, seed, namefile_plateaux);
+    ZA = myres->create_fake(mean, err, -1);
+
+    int L, Lerr;
+    line_read_param(option_read, "L", L, Lerr, seed, namefile_plateaux);
+
+    double* previous_a;
+    line_read_param(option_read, "a", mean, err, seed, namefile_plateaux);
+    previous_a = myres->create_fake(mean, err, -1);
+
+
 
     //////////////////////////////////////////////////////////////
     // read the jacks
@@ -399,13 +418,6 @@ int main(int argc, char** argv) {
             double df = data[3 + 5][j];
             if (i == 2) { // for the D2 we do not have the square but actually R
                 data[i + 5][j] = (dR2 + M * df / (fpi * fpi)) * fpi;
-                {
-                    printf("%d\n", j);
-                    printf("MDs valence ml derivative: %g\n", data[i + 5][j]);
-                    printf("RDs valence ml derivative: %g\n", dR2);
-                    printf("MDs valence ml derivative: %g\n", M);
-                    printf(" valence ml derivative: %g\n", M * df / (fpi * fpi));
-                }
             }
             else {
                 data[i + 5][j] = dR2 + 2.0 * M * M * df / (fpi * fpi * fpi);
@@ -436,7 +448,7 @@ int main(int argc, char** argv) {
     read_file_debug(data[0 + 5 * 4], files[0 + 5 * 4].c_str());// dMpi / dmul(sea)
     read_file_debug(data[1 + 5 * 4], files[1 + 5 * 4].c_str());// dMK  / dmul(sea)
     read_file_debug(data[2 + 5 * 4], files[2 + 5 * 4].c_str());// dMDs / dmul(sea)
-    read_file_debug(data[3 + 5 * 4], files[3 + 5 * 4].c_str());// ddpi / dmul(sea)
+    read_file_debug(data[3 + 5 * 4], files[3 + 5 * 4].c_str());// dpi / dmul(sea)
     read_file_debug(data[4 + 5 * 4], files[4 + 5 * 4].c_str());// dw0 / dmul(sea)
     for (int j = 0; j < Njack;j++) { // we need a factor 2 in w0 because of the two quarks u and d
         data[4 + 5 * 4][j] *= 2;
@@ -452,18 +464,21 @@ int main(int argc, char** argv) {
         double mul = amuiso[0][j];
         double f = data[3][j];
         double w0 = data[4][j];
-        for (int i = 0; i < 3; i++) {
-            // first we remove the prefacor
-            double* dR = &data[i + 5 * 5][j];
-            double M = data[i][j];
-            double df = data[3 + 5 * 5][j];
-            *dR = (*dR) * (M / f) / mul;
-            (*dR) = ((*dR) + M * df / (f * f)) * f;
-        }
         double* dR = &data[3 + 5 * 5][j]; // fpi
         *dR = (*dR) * (f) / mul;
         dR = &data[4 + 5 * 5][j]; // w0
         *dR = (*dR) * (w0) / mul;
+        for (int i = 0; i < 3; i++) {
+            // first we remove the prefacor
+            double* dR = &data[i + 5 * 5][j];
+            double M = data[i][j];
+            if (j == Njack - 1 && i == 2)    printf(" %g     %g   %g  %g \n", *dR, f, M, mul);
+            double df = data[3 + 5 * 5][j];
+            *dR = (*dR) * (M / f) / mul;
+            if (j == Njack - 1 && i == 2)    printf(" %g    %g \n", *dR, df);
+            (*dR) = ((*dR) + M * df / (f * f)) * f;
+            if (j == Njack - 1 && i == 2)    printf(" %g     \n", *dR);
+        }
     }
     // sea deriv mc
     printf("////////////// readding sea deriv mc jacks\n");
@@ -476,6 +491,10 @@ int main(int argc, char** argv) {
         double mul = amuiso[0][j];
         double f = data[3][j];
         double w0 = data[4][j];
+        double* dR = &data[3 + 5 * 6][j]; // femove prefactor in dfpi/dmc(sea)
+        *dR = (*dR) * (f) / mul;
+        dR = &data[4 + 5 * 6][j]; // remove prefactor in dw0/dmc(sea)
+        *dR = (*dR) * (w0) / mul;
         for (int i = 0; i < 3; i++) {
             // first we remove the prefacor
             double* dR = &data[i + 5 * 6][j];
@@ -484,11 +503,66 @@ int main(int argc, char** argv) {
             *dR = (*dR) * (M / f) / mul;
             (*dR) = ((*dR) + M * df / (f * f)) * f;
         }
-        double* dR = &data[3 + 5 * 6][j]; // femove prefactor in dfpi/dmc(sea)
-        *dR = (*dR) * (f) / mul;
-        dR = &data[4 + 5 * 6][j]; // remove prefactor in dw0/dmc(sea)
-        *dR = (*dR) * (w0) / mul;
     }
+
+    mysprintf(namefile, NAMESIZE, "%s/%s_scale_setting_system_%s", argv[2], argv[1], files[36].c_str());
+    FILE* jack_file = open_file(namefile, "w+");
+    generic_header head;
+    head.Njack = Njack;
+    head.T = L * 2;
+    head.L = L;
+    head.ncorr = 1;
+    head.beta = 0;
+    head.kappa = 0;
+    head.mus = std::vector<double>(0);
+    head.thetas = std::vector<double>(0);
+    head.rs = std::vector<double>(0);
+    head.gammas = std::vector<std::string>(0);
+    head.smearing = std::vector<std::string>(0);
+    head.bananas = std::vector<int>(0);
+    head.oranges = std::vector<double>(0);
+    head.size =head.ncorr * 2 * head.T;
+    // write_header_g2(jack_file, head);
+    head.write_header(jack_file);
+
+    corr_counter = -1;
+    for (int i = 0;i < 30;i++) {
+        write_jack(data[i], Njack, jack_file);
+    }
+
+    //////////////////////////////////////////////////////////////
+    // max twist correction
+    //////////////////////////////////////////////////////////////
+    printf("////////////// applying max twist correction\n");
+    printf("Mpi before max twist correction: %.12g  %.12g\n", data[0][Njack - 1], myres->comp_error(data[0]));
+    printf("fpi before max twist correction: %.12g  %.12g\n", data[3][Njack - 1], myres->comp_error(data[3]));
+    for (int j = 0; j < Njack;j++) {
+        double mr = ZA[j] * mpcac_over_mu[j];
+        double cl = sqrt(1 + mr * mr);
+        double* Mpi = &data[0][j];
+        double* fpi = &data[3][j];
+        *Mpi = *Mpi / sqrt(cl);
+        *fpi = *fpi * cl;
+    }
+    printf("Mpi after max twist correction: %.12g  %.12g\n", data[0][Njack - 1], myres->comp_error(data[0]));
+    printf("fpi after max twist correction: %.12g  %.12g\n", data[3][Njack - 1], myres->comp_error(data[3]));
+    //////////////////////////////////////////////////////////////
+    // FVE
+    //////////////////////////////////////////////////////////////
+    printf("////////////// applying max twist correction\n");
+    printf("Mpi before FVE correction: %.12g  %.12g\n", data[0][Njack - 1], myres->comp_error(data[0]));
+    printf("fpi before FVE correction: %.12g  %.12g\n", data[3][Njack - 1], myres->comp_error(data[3]));
+    for (int j = 0; j < Njack;j++) {
+        double* Mpi = &data[0][j];
+        double* fpi = &data[3][j];
+        double xi = (*Mpi) * (*Mpi) / ((*fpi) * (*fpi));
+        double delta_FVE = FVE_GL_Mpi(L, xi, (*fpi));
+        *Mpi /= (1 - 0.25 * delta_FVE);
+        *fpi /= (1 + delta_FVE);
+
+    }
+    printf("Mpi after FVE correction: %.12g  %.12g\n", data[0][Njack - 1], myres->comp_error(data[0]));
+    printf("fpi after FVE correction: %.12g  %.12g\n", data[3][Njack - 1], myres->comp_error(data[3]));
 
     //////////////////////////////////////////////////////////////
     // sistemone fpi
@@ -508,19 +582,22 @@ int main(int argc, char** argv) {
 
     for (int iM = 0; iM < 5; iM++) {
 
-        double M = data[id_deriv(iM, 0, 0, 0)][Njack - 1];
-        printf("Obs %d val=%-9.3g\t", iM, M);
+        double* M = data[id_deriv(iM, 0, 0, 0)];
+        printf("Obs %d val=%-8.3g (%-8.3g)\t", iM, M[Njack - 1], myres->comp_error(M));
         // valence
         for (int im = 0; im < 3; im++) {
-            double dM = data[id_deriv(iM, 1, im, 0)][Njack - 1];
-            printf(" dval%d = %-9.3g ", im, dM);
+            double* dM = data[id_deriv(iM, 1, im, 0)];
+            printf(" dval%d = %-8.3g (%-8.3g)", im, dM[Njack - 1], myres->comp_error(dM));
         }
         for (int im = 0; im < 3; im++) {
-            double dM = data[id_deriv(iM, 1, im, 1)][Njack - 1];
-            printf(" dsea%d = %-9.3g ", im, dM);
+            double* dM = data[id_deriv(iM, 1, im, 1)];
+            printf(" dsea%d = %-8.3g (%-8.3g)", im, dM[Njack - 1], myres->comp_error(dM));
         }
         printf("\n");
     }
+    double* Rds = myres->create_copy(data[id_deriv(2, 0, 0, 0)]);
+    myres->div(Rds, Rds, data[id_deriv(3, 0, 0, 0)]);
+    // printf("Rds = %.12g  %.12g\n", Rds[Njack-1], myres->comp_error(Rds));
 
     double** Mat = malloc_2<double>(3, 3);
     double* y = (double*)malloc(sizeof(double) * 3);
@@ -533,7 +610,27 @@ int main(int argc, char** argv) {
         int ifpi = 3;
         double f = data[id_deriv(ifpi, 0, 0, 0)][j];
 
-        for (int iM = 0; iM < 3; iM++) {
+        for (int iM = 0; iM < 2; iM++) {
+
+            double M = data[id_deriv(iM, 0, 0, 0)][j];
+
+            for (int im = 0; im < 3; im++) {
+                Mat[iM][im] = 0.0;
+                // valence
+                double dM = data[id_deriv(iM, 1, im, 0)][j];
+                double df = data[id_deriv(ifpi, 1, im, 0)][j];
+                Mat[iM][im] += 2 * M * dM / (f * f) - 2 * M * M * df / (f * f * f);
+                // sea
+                dM = data[id_deriv(iM, 1, im, 1)][j];
+                df = data[id_deriv(ifpi, 1, im, 1)][j];
+                Mat[iM][im] += 2 * M * dM / (f * f) - 2 * M * M * df / (f * f * f);
+            }
+            y[iM] *= y[iM];
+            // if (j==Njack-1) printf(" %.12g   %g   %g   %g\n ",y[iM], M / f, f, M);
+            y[iM] -= (M / f) * (M / f);
+
+        }
+        for (int iM = 2; iM < 3; iM++) {
 
             double M = data[id_deriv(iM, 0, 0, 0)][j];
 
@@ -548,13 +645,14 @@ int main(int argc, char** argv) {
                 df = data[id_deriv(ifpi, 1, im, 1)][j];
                 Mat[iM][im] += dM / f - M * df / (f * f);
             }
+            // if (j==Njack-1) printf(" %.12g   %g   %g   %g\n ",y[iM], M / f, f, M);
             y[iM] -= M / f;
 
         }
         double* P = LU_decomposition_solver(3, Mat, y);
-        miso[0][j] = amusim[0][j] - P[0];
-        miso[1][j] = amusim[1][j] - P[1];
-        miso[2][j] = amusim[2][j] - P[2];
+        miso[0][j] = (amusim[0][j] + P[0]);
+        miso[1][j] = (amusim[1][j] + P[1]);
+        miso[2][j] = (amusim[2][j] + P[2]);
         if (j == Njack - 1) {
             printf("Matrix for m^iso solution (jackknife %d):\n", j);
             for (int ii = 0; ii < 3; ii++) {
@@ -585,6 +683,9 @@ int main(int argc, char** argv) {
         printf("m^sim_%d = %g \n", i, myres->mean(amusim[i]));
     }
 
+
+
+
     double* a_fm = myres->create_copy(data[4]);
     double* w0_from_fpi = myres->create_copy(data[4]);
     for (int j = 0; j < Njack;j++) {
@@ -604,9 +705,23 @@ int main(int argc, char** argv) {
         a_fm[j] = af / (fpi_MeV / hbarc);
         w0_from_fpi[j] = w_a * a_fm[j];
     }
-    printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_fm), myres->comp_error(a_fm));
+    double* diff_a = myres->create_copy(a_fm);
+    myres->sub(diff_a, a_fm, previous_a);
+    printf("lattice spacing (fm): %g +/- %g   vs previous value %g +/- %g  diff %g +/- %g  \n", myres->mean(a_fm), myres->comp_error(a_fm),
+        myres->mean(previous_a), myres->comp_error(previous_a),
+        myres->mean(diff_a), myres->comp_error(diff_a));
     printf("w0 (fm): %g +/- %g\n", myres->mean(w0_from_fpi), myres->comp_error(w0_from_fpi));
+    char name_out[NAMESIZE];
+    mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_fpi.jack", files[36].c_str());
+    myres->write_jack_in_file(a_fm, name_out);
+    mysprintf(name_out, NAMESIZE, "scale_setting/%s_w0_from_fpi.jack", files[36].c_str());
+    myres->write_jack_in_file(w0_from_fpi, name_out);
 
+    write_jack(miso[0], Njack, jack_file);     check_correlatro_counter(30);
+    write_jack(miso[1], Njack, jack_file);     check_correlatro_counter(31);
+    write_jack(miso[2], Njack, jack_file);     check_correlatro_counter(32);
+    write_jack(a_fm, Njack, jack_file);     check_correlatro_counter(33);
+    write_jack(w0_from_fpi, Njack, jack_file);     check_correlatro_counter(34);
 
     printf("//////////////////////////////////////////////////////////////\n");
     printf("// w0 systemone\n");
@@ -640,9 +755,9 @@ int main(int argc, char** argv) {
 
         }
         double* P = LU_decomposition_solver(3, Mat, y);
-        miso_w0[0][j] = amusim[0][j] - P[0];
-        miso_w0[1][j] = amusim[1][j] - P[1];
-        miso_w0[2][j] = amusim[2][j] - P[2];
+        miso_w0[0][j] = (amusim[0][j] + P[0]);
+        miso_w0[1][j] = (amusim[1][j] + P[1]);
+        miso_w0[2][j] = (amusim[2][j] + P[2]);
         if (j == Njack - 1) {
             printf("Matrix for m^iso solution (jackknife %d):\n", j);
             for (int ii = 0; ii < 3; ii++) {
@@ -695,6 +810,16 @@ int main(int argc, char** argv) {
     printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_from_w0), myres->comp_error(a_from_w0));
     printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
 
+    mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0.jack", files[36].c_str());
+    myres->write_jack_in_file(a_from_w0, name_out);
+    mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0.jack", files[36].c_str());
+    myres->write_jack_in_file(fpi_from_w0, name_out);
+
+    write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(35);
+    write_jack(miso_w0[1], Njack, jack_file);     check_correlatro_counter(36);
+    write_jack(miso_w0[2], Njack, jack_file);     check_correlatro_counter(37);
+    write_jack(a_from_w0, Njack, jack_file);     check_correlatro_counter(38);
+    write_jack(fpi_from_w0, Njack, jack_file);     check_correlatro_counter(39);
 
 
     return 0;

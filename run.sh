@@ -202,7 +202,7 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 # ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_strange_pdmu_OS_D96.dat rewsOS_pdmu
 ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_charm_OS_D96.dat rewcOS
 ./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_strange_OS_D96.dat rewsOS
-./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_light_OS_D96.dat rewlOS.1
+./w0_rew  -p ../../data/ flow_D96.dat  -bin 20 jack reweight_light_OS_D96.dat rewlOS
 ##
 
 ## w0 B32
@@ -238,9 +238,9 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 
 
 #B64
-./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 100 jack reweight_charm_0.1_OS_B64_LMA.dat rewcOS
-./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 100 jack reweight_strange_OS_B64_LMA.dat rewsOS
-./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 100 jack reweight_light_OS_B64_LMA.dat rewlOS
+./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 20 jack reweight_charm_0.1_OS_B64_LMA.dat rewcOS
+./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 20 jack reweight_strange_OS_B64_LMA.dat rewsOS
+./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 20 jack reweight_light_OS_B64_LMA.dat rewlOS
 
 
 
@@ -253,10 +253,45 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./fit_all_beta_w0rew_der  jack ../../data/jackknife/  ../../data/fit_all_beta  ../fit_files_all_w0
 ./fit_small_volume_w0   jack ../../data/jackknife/  ../../data/fit_all_beta  ../fit_files_small_volume_w0.txt
 
-./set_w0_a  jack ../../data/jackknife/  ../../data/fit_all_beta  ../data_ens_E112   
 
 
 
 ######## small AC
 
 ./meson_smallAC  -p ../../data/  data_mesons/C48/P5P5_tm_mu2.0000e-03_mu2.0000e-03.bin -bin 20 jack  reweight_charm_OS_C48_1733.dat rewcOS onlinemeas_C48.dat
+
+########################### B32
+## pion
+./meson_smallAC  -p ../../data/  data_mesons/B32/P5P5_tm_mu1.8000e-03_mu1.8000e-03.bin -bin 20 jack  reweight_charm_OS_B32.dat rewcOS onlinemeas_B32.dat
+./meson_smallAC  -p ../../data/  data_mesons/B32/P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin -bin 20 jack  reweight_charm_OS_B32.dat rewcOS onlinemeas_B32.dat
+./meson_smallAC  -p ../../data/  data_mesons/B32/P5P5_tm_mu4.2000e-03_mu4.2000e-03.bin -bin 20 jack  reweight_charm_OS_B32.dat rewcOS onlinemeas_B32.dat
+./meson_smallAC  -p ../../data/  data_mesons/B32/P5P5_tm_mu5.9000e-03_mu5.9000e-03.bin -bin 20 jack  reweight_charm_OS_B32.dat rewcOS onlinemeas_B32.dat
+## kaon  
+# ./meson_smallAC  -p ../../data/  data_mesons/B32/P5P5_tm_mu1.8000e-03_mu1.8250e-02.bin -bin 20 jack  reweight_charm_OS_B32.dat rewcOS onlinemeas_B32.dat
+./meson_smallAC  -p ../../data/  data_mesons/B32/P5P5_tm_mu2.5000e-03_mu1.8250e-02.bin -bin 20 jack  reweight_charm_OS_B32.dat rewcOS onlinemeas_B32.dat
+./meson_smallAC  -p ../../data/  data_mesons/B32/P5P5_tm_mu4.2000e-03_mu1.8250e-02.bin -bin 20 jack  reweight_charm_OS_B32.dat rewcOS onlinemeas_B32.dat
+## Ds
+./meson_smallAC  -p ../../data/  data_mesons/B32/P5P5_tm_mu1.8250e-02_mu2.3140e-01.bin -bin 20 jack  reweight_charm_OS_B32.dat rewcOS onlinemeas_B32.dat
+########################### B24
+## pion
+# ./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu1.8000e-03_mu1.8000e-03.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
+./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
+./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu4.2000e-03_mu4.2000e-03.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
+./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu5.9000e-03_mu5.9000e-03.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
+## kaon  
+# ./meson_smallAC  -p ../../data/  data_mesons/B32/P5P5_tm_mu1.8000e-03_mu1.8250e-02.bin -bin 20 jack  reweight_charm_OS_B32.dat rewcOS onlinemeas_B32.dat
+./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu2.5000e-03_mu1.8250e-02.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
+./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu4.2000e-03_mu1.8250e-02.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
+## Ds
+./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu1.8250e-02_mu2.3140e-01.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
+
+./fit_small_volume_Mpi_fpi   jack ../../data/jackknife/  ../../data/fit_all_beta  ../fit_files_small_volume_Mpi_fpi.txt
+
+
+#########   mesons
+
+#./meson_rew  -p ../../data/  E112_l1_c1.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat  # this is the D not Ds
+./meson_rew  -p ../../data/  E112_s_c1.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
+./meson_rew  -p ../../data/  E112_s_c2.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
+./meson_rew  -p ../../data/  E112_s_c3.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
+./meson_rew  -p ../../data/  P5P5_tm_mu4.4000e-04_LMA.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat

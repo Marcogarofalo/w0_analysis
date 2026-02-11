@@ -1,0 +1,7 @@
+data_mesons/B32/P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin           reweight_charm_OS_B32.dat
+flow_B32.dat reweight_strange_OS_B32.dat
+# flow_B32.dat reweight_light_OS_B32.dat
+new_beta
+jack_data_mesons/B24/P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin           reweight_charm_OS_B24.dat
+flow_B24.dat reweight_strange_OS_B24.dat
+# flow_B24.dat reweight_light_OS_B24.dat

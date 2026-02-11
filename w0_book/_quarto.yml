@@ -23,6 +23,7 @@ book:
     - fit_all_deriv_w0.qmd
     - w0_scale_setting.qmd
     - w0_small_volumes.qmd
+    - system_scale_setting.qmd
     - params.qmd
     - summary.qmd
     - references.qmd
