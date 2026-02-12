@@ -521,7 +521,7 @@ int main(int argc, char** argv) {
     head.smearing = std::vector<std::string>(0);
     head.bananas = std::vector<int>(0);
     head.oranges = std::vector<double>(0);
-    head.size =head.ncorr * 2 * head.T;
+    head.size = head.ncorr * 2 * head.T;
     // write_header_g2(jack_file, head);
     head.write_header(jack_file);
 
@@ -555,7 +555,7 @@ int main(int argc, char** argv) {
     for (int j = 0; j < Njack;j++) {
         double* Mpi = &data[0][j];
         double* fpi = &data[3][j];
-        double xi = (*Mpi) * (*Mpi) / ((*fpi) * (*fpi));
+        double xi = (*Mpi) * (*Mpi) / ((4 * M_PI * *fpi) * (4 * M_PI * *fpi));
         double delta_FVE = FVE_GL_Mpi(L, xi, (*fpi));
         *Mpi /= (1 - 0.25 * delta_FVE);
         *fpi /= (1 + delta_FVE);
@@ -600,8 +600,11 @@ int main(int argc, char** argv) {
     // printf("Rds = %.12g  %.12g\n", Rds[Njack-1], myres->comp_error(Rds));
 
     double** Mat = malloc_2<double>(3, 3);
+    double*** Matj = malloc_3<double>(3, 3, Njack);
     double* y = (double*)malloc(sizeof(double) * 3);
+    double** yj = malloc_2<double>(3, Njack);
     double** miso = malloc_2<double>(3, Njack);
+    double** dm_fpi = malloc_2<double>(3, Njack);
     for (int j = 0; j < Njack;j++) {
 
         y[0] = Mpi_MeV / fpi_MeV;
@@ -624,10 +627,12 @@ int main(int argc, char** argv) {
                 dM = data[id_deriv(iM, 1, im, 1)][j];
                 df = data[id_deriv(ifpi, 1, im, 1)][j];
                 Mat[iM][im] += 2 * M * dM / (f * f) - 2 * M * M * df / (f * f * f);
+                Matj[iM][im][j] = Mat[iM][im];
             }
             y[iM] *= y[iM];
             // if (j==Njack-1) printf(" %.12g   %g   %g   %g\n ",y[iM], M / f, f, M);
             y[iM] -= (M / f) * (M / f);
+            yj[iM][j] = y[iM];
 
         }
         for (int iM = 2; iM < 3; iM++) {
@@ -644,26 +649,32 @@ int main(int argc, char** argv) {
                 dM = data[id_deriv(iM, 1, im, 1)][j];
                 df = data[id_deriv(ifpi, 1, im, 1)][j];
                 Mat[iM][im] += dM / f - M * df / (f * f);
+                Matj[iM][im][j] = Mat[iM][im];
+
             }
-            // if (j==Njack-1) printf(" %.12g   %g   %g   %g\n ",y[iM], M / f, f, M);
+            // if (j == Njack - 1) printf(" %.12g   %g   %g   %g\n ", y[iM], M / f, f, M);
             y[iM] -= M / f;
+            yj[iM][j] = y[iM];
 
         }
         double* P = LU_decomposition_solver(3, Mat, y);
         miso[0][j] = (amusim[0][j] + P[0]);
         miso[1][j] = (amusim[1][j] + P[1]);
         miso[2][j] = (amusim[2][j] + P[2]);
+        for (int im = 0; im < 3; im++) {
+            dm_fpi[im][j] = P[im];
+        }
         if (j == Njack - 1) {
             printf("Matrix for m^iso solution (jackknife %d):\n", j);
             for (int ii = 0; ii < 3; ii++) {
                 for (int jj = 0; jj < 3; jj++) {
-                    printf("%g ", Mat[ii][jj]);
+                    printf("%g (%g) ", Matj[ii][jj][Njack - 1], myres->comp_error(Matj[ii][jj]));
                 }
                 printf("\n");
             }
             printf("RHS:\n");
             for (int ii = 0; ii < 3; ii++) {
-                printf("%g\n", y[ii]);
+                printf("%g (%g)\n", yj[ii][Njack - 1], myres->comp_error(yj[ii]));
             }
             printf("solution:\n");
             for (int ii = 0; ii < 3; ii++) {
@@ -699,6 +710,7 @@ int main(int argc, char** argv) {
                 double dm = (miso[im][j] - amusim[im][j]);
                 af += dm * df;
                 double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                // if (val_sea != 2 && im != 2)
                 w_a += dm * dw;
             }
         }
@@ -728,6 +740,8 @@ int main(int argc, char** argv) {
     printf("//////////////////////////////////////////////////////////////\n");
 
     double** miso_w0 = malloc_2<double>(3, Njack);
+    double** dm_w0 = malloc_2<double>(3, Njack);
+
     for (int j = 0; j < Njack;j++) {
 
         y[0] = Mpi_MeV * w0_MeV;
@@ -749,6 +763,7 @@ int main(int argc, char** argv) {
                 // sea
                 dM = data[id_deriv(iM, 1, im, 1)][j];
                 dw = data[id_deriv(iw0, 1, im, 1)][j];
+                // if (im!=2) 
                 Mat[iM][im] += dM * w0 + M * dw;
             }
             y[iM] -= M * w0;
@@ -758,6 +773,9 @@ int main(int argc, char** argv) {
         miso_w0[0][j] = (amusim[0][j] + P[0]);
         miso_w0[1][j] = (amusim[1][j] + P[1]);
         miso_w0[2][j] = (amusim[2][j] + P[2]);
+        for (int im = 0; im < 3; im++) {
+            dm_w0[im][j] = P[im];
+        }
         if (j == Njack - 1) {
             printf("Matrix for m^iso solution (jackknife %d):\n", j);
             for (int ii = 0; ii < 3; ii++) {
@@ -801,6 +819,7 @@ int main(int argc, char** argv) {
                 double dm = (miso_w0[im][j] - amusim[im][j]);
                 af += dm * df;
                 double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                // if (val_sea != 2 && im != 2)
                 w_a += dm * dw;
             }
         }
@@ -821,6 +840,13 @@ int main(int argc, char** argv) {
     write_jack(a_from_w0, Njack, jack_file);     check_correlatro_counter(38);
     write_jack(fpi_from_w0, Njack, jack_file);     check_correlatro_counter(39);
 
+    write_jack(dm_fpi[0], Njack, jack_file);     check_correlatro_counter(40);
+    write_jack(dm_fpi[1], Njack, jack_file);     check_correlatro_counter(41);
+    write_jack(dm_fpi[2], Njack, jack_file);     check_correlatro_counter(42);
+
+    write_jack(dm_w0[0], Njack, jack_file);     check_correlatro_counter(43);
+    write_jack(dm_w0[1], Njack, jack_file);     check_correlatro_counter(44);
+    write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(45);
 
     return 0;
 }
