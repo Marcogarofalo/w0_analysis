@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     mysprintf(namefile, NAMESIZE, "%s/data_from_fpi.txt", argv[3]);
     FILE* summary_out = open_file(namefile, "w+");
-    fprintf(summary_out, "ens   a[fm] da[fm]  w0/a dw0/a  amul damul amus damus  amuc  damuc\n");
+    fprintf(summary_out, "ens   a[fm] da[fm]  w0/a dw0/a  amul damul amus damus  amuc  damuc   delta_amul  ddelta_amul  delta_amus  ddelta_amus  delta_amuc   ddelta_amuc\n");
     for (int i = 0;i < myen[0].size();i++) {
         size_t lastUnderscore = files[i].find_last_of('_');
 
@@ -234,12 +234,20 @@ int main(int argc, char** argv) {
         fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
         tmp = jackall.en[i].jack[32];
         fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        
+        tmp = jackall.en[i].jack[40];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[41];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[42];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
         fprintf(summary_out, "\n");
     }
     fclose(summary_out);
     mysprintf(namefile, NAMESIZE, "%s/data_from_w0.txt", argv[3]);
     summary_out = open_file(namefile, "w+");
-    fprintf(summary_out, "ens   a[fm] da[fm]  afpi dafpi  amul damul amus damus  amuc  damuc \n");
+    fprintf(summary_out, "ens   a[fm] da[fm]  afpi dafpi  amul damul amus damus  amuc  damuc    delta_amul  ddelta_amul  delta_amus  ddelta_amus  delta_amuc   ddelta_amuc\n");
     for (int i = 0;i < myen[0].size();i++) {
         size_t lastUnderscore = files[i].find_last_of('_');
 
@@ -257,6 +265,14 @@ int main(int argc, char** argv) {
         fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
         tmp = jackall.en[i].jack[37];
         fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+        tmp = jackall.en[i].jack[43];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[44];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[45];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        
         fprintf(summary_out, "\n");
     }
 
