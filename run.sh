@@ -294,4 +294,4 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./meson_rew  -p ../../data/  E112_s_c1.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
 ./meson_rew  -p ../../data/  E112_s_c2.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
 ./meson_rew  -p ../../data/  E112_s_c3.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
-./meson_rew  -p ../../data/  P5P5_tm_mu4.4000e-04_LMA.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
+./meson_smallAC  -p ../../data/  P5P5_tm_mu4.4000e-04_LMA.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
