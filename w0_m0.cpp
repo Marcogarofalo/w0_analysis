@@ -251,7 +251,8 @@ int main(int argc, char** argv) {
 
     auto [idx_a, idx_b] = matching_indices(head.smearing, head_loops.smearing);
 
-
+    error(idx_a.size()!=idx_b.size(),1,"main","cannot find matching confs");
+    printf("we found %ld confs matching",idx_a.size());
 
     // for (int iconf = 0; iconf < head_loops.Njack; iconf++) {
     //     //     read_twopt(infile_loop, data_loop[iconf], head_loops);
@@ -273,8 +274,8 @@ int main(int argc, char** argv) {
     head_loops.Njack = idx_b.size();
     head_loops.Nconf = idx_b.size();
 
-    head.Njack = idx_b.size();
-    head.Nconf = idx_b.size();
+    head.Njack = idx_a.size();
+    head.Nconf = idx_a.size();
 
     double**** data_loop = calloc_corr(head_loops.Njack, head_loops.ncorr, head_loops.T);
     for (int i = 0;i < head_loops.Njack;i++) {
@@ -378,6 +379,7 @@ int main(int argc, char** argv) {
     mysprintf(namefile, NAMESIZE, "%s/jackknife/%s_%s_%s", option[3], option[4], option[6], f_str.c_str());
 
     FILE* jack_file = open_file(namefile, "w+");
+    printf("opening jack file:  %s\n", namefile);
     // write_header_g2(jack_file, head);
     head.write_header(jack_file);
 
@@ -616,7 +618,7 @@ int main(int argc, char** argv) {
     fit_info.malloc_ext_P();
     std::vector<double> w0pdmu(Njack);
 
-    
+
     for (int j = 0; j < Njack; j++)
         fit_info.ext_P[0][j] = m0iso[j] - m0sim[j];
 
@@ -631,7 +633,7 @@ int main(int argc, char** argv) {
         int Ng = head_loops.gammas.size();
         fit_info.corr_id = { 6, head.ncorr };
         fit_info.myen = { 0 }; // reim of corr_id[1] (the correction)
-        
+
 
         for (int t = 1; t < head.T; t++) {
             if (lhs_function_Wt_p_dmcorr(Njack - 1, conf_jack, t, fit_info) > 0.3) {
@@ -649,11 +651,11 @@ int main(int argc, char** argv) {
             jack_file);
         check_correlatro_counter(1 + iq);
 
-        printf("fit dof =%d  chi2/dof = %g\n", fit_Wpdmu.dof, fit_Wpdmu.chi2[Njack - 1]);
+        // printf("fit dof =%d  chi2/dof = %g\n", fit_Wpdmu.dof, fit_Wpdmu.chi2[Njack - 1]);
         tif = swap_indices(fit_info.Npar, Njack, fit_Wpdmu.P);
 
         for (size_t j = 0; j < Njack; j++) {
-            
+
             w0pdmu[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
             w0pdmu[j] = int2flowt(w0pdmu[j]);
             w0pdmu[j] = std::sqrt(w0pdmu[j]);
@@ -689,7 +691,7 @@ int main(int argc, char** argv) {
 
     mysprintf(name, NAMESIZE, "deriv/der_w0_m0_%s_%s", argv[3], f_str.c_str());
     printf("writing derivative in file %s\n", name);
-    myres->write_jack_in_file(deriv,name);
+    myres->write_jack_in_file(deriv, name);
 
 
     write_jack(amuiso[0], Njack, jack_file);    check_correlatro_counter(3);
@@ -710,4 +712,6 @@ int main(int argc, char** argv) {
 
     write_jack(mu_loop, Njack, jack_file);    check_correlatro_counter(13);
 
+    write_jack(w0.data(), Njack, jack_file);    check_correlatro_counter(14);
+    write_jack(w0pdmu.data(), Njack, jack_file);    check_correlatro_counter(15);
 }
