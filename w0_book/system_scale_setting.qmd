@@ -27,10 +27,30 @@ masses <- c(
 ```
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
-df<-read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_fpi.txt", header = TRUE)
-kable(df)
-df<-read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_w0.txt", header = TRUE)
-kable(df)
+df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_fpi.txt", header = TRUE)
+start_indices <- seq(2, ncol(df), by = 2)
+new_df <- data.frame(df[,c(1,start_indices)])
+colnames(new_df) <- colnames(df)[c(1,start_indices)]
+new_df[,1]<- df[,1]
+for( i in seq_along(start_indices)){
+  for (row in seq_along(df[,1])){
+    new_df[row,i+1] <-mean_print(df[row,start_indices[i]], df[row,start_indices[i]+1])
+  }
+}
+kable(new_df)
+
+# kable(df)
+df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_w0.txt", header = TRUE)
+start_indices <- seq(2, ncol(df), by = 2)
+new_df <- data.frame(df[,c(1,start_indices)])
+colnames(new_df) <- colnames(df)[c(1,start_indices)]
+new_df[,1]<- df[,1]
+for( i in seq_along(start_indices)){
+  for (row in seq_along(df[,1])){
+    new_df[row,i+1] <-mean_print(df[row,start_indices[i]], df[row,start_indices[i]+1])
+  }
+}
+kable(new_df)
 
 ```
 
@@ -38,10 +58,14 @@ kable(df)
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta_no_charm_sea_w0/fit_w0_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta_nocorw0/fit_w0_cont_a2"
 )
 labels <- c(
-  "P[0]+ P[1]*a2 "
+  "P[0]+ P[1]*a2 ",
+  "-no-charm-sea-w0",
+  "sim-point"
 )
 
 
@@ -51,18 +75,20 @@ for (j in seq_along(basenames)) {
   make_table_fit_result(fit)
   gg <- plot_fit(basenames[j], "a2",
     # noline = TRUE,
-    data_type = c("data"),
+    data_type = c(labels[j]),
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j],
     width = 0.0001
   )
-  
 }
+w0_wp25 <- 0.17236
+gg <- gg + geom_hline(yintercept = w0_wp25, linetype = "dashed")
+gg <- gg + geom_point(aes(x = 0, y = w0_wp25, color = "wp25", shape = "wp25", fill = "wp25"))
 
 fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 [\\mbox{fm}]$",
   to_print = TRUE,
-  #yrange = c(-1, 4),
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
@@ -91,12 +117,14 @@ for (j in seq_along(basenames)) {
     single_name_for_fit = labels[j],
     width = 0.0001
   )
-  
 }
+fpi_FLAG <- 130.5
+gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
 
 fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
   to_print = TRUE,
-  #yrange = c(-1, 4),
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
@@ -109,7 +137,6 @@ gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_ms_over_ml_from_fpi_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_ms_over_ml_from_w0_cont_a2"
-
 )
 labels <- c(
   "FLAG",
@@ -129,12 +156,31 @@ for (j in seq_along(basenames)) {
     single_name_for_fit = labels[j],
     width = 0.0001
   )
-  
 }
+
+# Creazione del dataframe con valore centrale ed errore
+df <- data.frame(
+  x = 0,
+  y = 27.227,
+  incertezza = 0.081,
+  lab = "FLAG24"
+)
+
+gg <- gg + geom_point(data = df, aes(x = x, y = y, color = lab, shape = lab, fill = lab)) +
+  # Barra di errore (y +/- incertezza)
+  geom_errorbar(
+    data = df, aes(
+      x = x,
+      y = y,
+      ymin = y - incertezza,
+      ymax = y + incertezza, color = lab, shape = lab, fill = lab
+    ),
+    width = 0.0001
+  )
 
 fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$m_s/m_\\ell$",
   to_print = TRUE,
-  #yrange = c(-1, 4),
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
@@ -144,12 +190,13 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$m_s/m_\\ell$",
 gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_mc_over_ms_from_fpi_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_mc_over_ms_from_w0_cont_a2"
-
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_mc_over_ms_from_w0_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta_no_charm_sea_w0//fit_mc_over_ms_from_w0_cont_a2"
 )
 labels <- c(
   "FLAG",
-  "wp25"
+  "wp25",
+  "wp25-no-charm-sea-w0"
 )
 
 
@@ -165,12 +212,30 @@ for (j in seq_along(basenames)) {
     single_name_for_fit = labels[j],
     width = 0.0001
   )
-  
 }
+# Creazione del dataframe con valore centrale ed errore
+df <- data.frame(
+  x = 0,
+  y = 11.766,
+  incertezza = 0.030,
+  lab = "FLAG24"
+)
+
+gg <- gg + geom_point(data = df, aes(x = x, y = y, color = lab, shape = lab, fill = lab)) +
+  # Barra di errore (y +/- incertezza)
+  geom_errorbar(
+    data = df, aes(
+      x = x,
+      y = y,
+      ymin = y - incertezza,
+      ymax = y + incertezza, color = lab, shape = lab, fill = lab
+    ),
+    width = 0.0001
+  )
 
 fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$m_c/m_s$",
   to_print = TRUE,
-  #yrange = c(-1, 4),
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
@@ -180,7 +245,6 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$m_c/m_s$",
 gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_afpi_over_aw0_cont_a2"
-
 )
 labels <- c(
   "P[0]+P[1]a2"
@@ -199,12 +263,11 @@ for (j in seq_along(basenames)) {
     single_name_for_fit = labels[j],
     width = 0.0001
   )
-  
 }
 
 fig <- myplotly(gg, "", "$a^2_{FLAG} [\\mbox{fm}^2]$", "$a_{FLAG}/a_{wp25}$",
   to_print = TRUE,
-  #yrange = c(-1, 4),
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
@@ -213,11 +276,12 @@ fig <- myplotly(gg, "", "$a^2_{FLAG} [\\mbox{fm}^2]$", "$a_{FLAG}/a_{wp25}$",
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_afpi_minus_aw0_cont_a2"
-
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_afpi_minus_aw0_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta_no_charm_sea_w0//fit_afpi_minus_aw0_cont_a2"
 )
 labels <- c(
-  "P[0]+P[1]a2"
+  "P[0]+P[1]a2",
+  "wp25-no-charm-sea-w0"
 )
 
 
@@ -233,12 +297,11 @@ for (j in seq_along(basenames)) {
     single_name_for_fit = labels[j],
     width = 0.0001
   )
-  
 }
 
 fig <- myplotly(gg, "", "$a^2_{FLAG} [\\mbox{fm}^2]$", "$a_{FLAG}-a_{wp25}$",
   to_print = TRUE,
-  #yrange = c(-1, 4),
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
