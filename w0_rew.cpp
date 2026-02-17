@@ -573,8 +573,8 @@ int main(int argc, char **argv)
         {
             if (lhs_function_W_rew(Njack - 1, conf_jack, t, fit_info) > 0.3)
             {
-                fit_info.tmin = t - 3;
-                fit_info.tmax = t + 2;
+                fit_info.tmin = t - 2;
+                fit_info.tmax = t + 1;
                 break;
             }
             if (t == head.T - 1)
@@ -665,6 +665,7 @@ int main(int argc, char **argv)
 
     //// end reading onlinemeas parameters
     double dmu = head_rew.oranges[0] - head_rew.mus[0];
+    printf("dmu =   %.12g  -  %.12g  = %.12g\n",head_rew.oranges[0] , head_rew.mus[0], dmu);
     for (size_t j = 0; j < Njack; j++)
     {
         der[j] = (w0_rew[j] - w0[j]) / dmu;
