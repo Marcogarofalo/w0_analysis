@@ -150,8 +150,8 @@ double lhs_fun(int n, int e, int j, data_all gjack, struct fit_type fit_info)
     //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[2]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[2]][j]);
     // }
     double r = gjack.en[e].jack[fit_info.corr_id[0]][j]; // d(w0/a)/d(a*m0)
-    r *= gjack.en[e].jack[fit_info.corr_id[1]][j];       // a*m0_iso
-    r *= gjack.en[e].jack[fit_info.corr_id[2]][j];       // a
+    r *= gjack.en[e].jack[fit_info.corr_id[1]][j];       // a*mul_iso
+    r /= gjack.en[e].jack[fit_info.corr_id[2]][j];       // w0/a
     return r;
 }
 double lhs_fun_fpi(int n, int e, int j, data_all gjack, struct fit_type fit_info)
@@ -485,7 +485,7 @@ int main(int argc, char **argv)
     int id_amuliso = 3;
     int id_m0iso = 6;
     int id_a_fm = 11;
-    int id_w0 = 1;
+    int id_w0 = 14;
     int id_mu = 13;
 
     //////////////////////////////////////////////////////////////
@@ -500,7 +500,7 @@ int main(int argc, char **argv)
         fit_type fit_info;
 
         // fit_info.corr_id = {id_dw0_dmu, id_m0iso, id_a_fm};
-        fit_info.corr_id = {id_dw0_dmu, id_amuliso, id_a_fm};
+        fit_info.corr_id = {id_dw0_dmu, id_amuliso, id_w0};
 
         fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
         for (int n = 0; n < myen.size(); n++)
