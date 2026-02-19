@@ -234,7 +234,7 @@ int main(int argc, char** argv) {
         fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
         tmp = jackall.en[i].jack[32];
         fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
-        
+
         tmp = jackall.en[i].jack[40];
         fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
         tmp = jackall.en[i].jack[41];
@@ -272,7 +272,7 @@ int main(int argc, char** argv) {
         fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
         tmp = jackall.en[i].jack[45];
         fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
-        
+
         fprintf(summary_out, "\n");
     }
 
@@ -280,9 +280,9 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////
-    std::vector<std::string> obs = { "w0" ,"fpi" };
-    std::vector<int> id_obs = { 34, 39 };
-    std::vector<int> id_a = { 33, 38 };
+    std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid" };
+    std::vector<int> id_obs = { 34, 39, 46 ,47};
+    std::vector<int> id_a = { 33, 38 , 33, 33 };
 
     std::vector<std::string> obs2 = { "ms_over_ml" ,"mc_over_ms" };
     std::vector<std::vector<int>> id_obs_m = { {31,30}, {32,31}, {36,35}, {37,36} };
@@ -340,15 +340,16 @@ int main(int argc, char** argv) {
         fit_info.band_range = { 0, 0.008145209846823482 };
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
         der_fpi_const_full.clear();
-        for (size_t imr = 0; imr < obs2.size(); imr++) {
-            fit_info.corr_id = id_obs_m[imr + obs2.size() * i];
-            std::string namefit = "fit_" + obs2[imr] + "_from_" + obs[(i + 1) % 2] + "_cont_a2";
-            fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun_ratio, fit_info, namefit.c_str());
-            fit_info.band_range = { 0, 0.008145209846823482 };
-            print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
+        if (i < 2)
+            for (size_t imr = 0; imr < obs2.size(); imr++) {
+                fit_info.corr_id = id_obs_m[imr + obs2.size() * i];
+                std::string namefit = "fit_" + obs2[imr] + "_from_" + obs[(i + 1) % 2] + "_cont_a2";
+                fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun_ratio, fit_info, namefit.c_str());
+                fit_info.band_range = { 0, 0.008145209846823482 };
+                print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
 
-            der_fpi_const_full.clear();
-        }
+                der_fpi_const_full.clear();
+            }
         fit_info.restore_default();
 
     }
