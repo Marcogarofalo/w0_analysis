@@ -224,7 +224,7 @@ int main(int argc, char** argv) {
         for (int j = 0; j < head.Njack; j++) {
 
             for (int tf = 0; tf < head.T; tf++) {
-                data[j][i][tf][0] = data[j][i][tf][0] * head.kappa * head.kappa * 2.0;
+                data[j][i][tf][0] = data[j][i][tf][0] ;//* head.kappa * head.kappa * 2.0;
             }
         }
     }
