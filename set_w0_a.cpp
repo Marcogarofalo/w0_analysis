@@ -288,7 +288,7 @@ int main(int argc, char** argv) {
             }
         }
     }
-    error(files.size() != 37, 1, "main", "input files in  file %s must be 37 instead they are %d", argv[4], files.size());
+    // error(files.size() != 41, 1, "main", "input files in  file %s must be 41 instead they are %d", argv[4], files.size());
 
 
     // mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_charm_0.1_OS_B64.dat", argv[2], argv[1]);
@@ -346,6 +346,8 @@ int main(int argc, char** argv) {
     mysprintf(option_read[5], NAMESIZE, "no");                   // pdf
     mysprintf(option_read[6], NAMESIZE, "%s", files[35].c_str()); // infile
 
+    std::string ensemble = files[36];
+
     char namefile_plateaux[NAMESIZE];
     mysprintf(namefile_plateaux, NAMESIZE, "plateaux.txt");
     double mean, err;
@@ -390,7 +392,10 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // read the jacks
     //////////////////////////////////////////////////////////////
-    double** data = malloc_2<double>(5 * (1 + 3 * 2), Njack);
+    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2;
+    printf("%d\n", file_to_read);
+    error(files.size() - 2 != file_to_read, 1, "main", "No input files found in  file %s we need %d lines but we have %d", argv[4], file_to_read, files.size() - 2);
+    double** data = malloc_2<double>(file_to_read, Njack);
 
     // data_all jackall_chi = read_all_the_files(files, argv[1]);
     // jackall_chi.create_generalised_resampling();
@@ -505,6 +510,65 @@ int main(int argc, char** argv) {
         }
     }
 
+    // decorrelate jacks
+    // for (int iM = 0; iM < 5;iM++) {
+    //     for (int im = 0;im < 3;im++) {
+    //         for (int sv = 0;sv < 2;sv++) {
+    //             int idw0 = iM;
+    //             int id = id_deriv(idw0, 1, im, sv);
+    //             double* dw0 = data[id];
+    //             double m = dw0[Njack - 1];
+    //             double err = myres->comp_error(dw0);
+    //             printf("old jack = %g  %g\n", m, err);
+    //             free(dw0);
+    //             data[id] = myres->create_fake(m, err, -1);
+    //             printf("new jack = %g  %g\n", data[id][Njack - 1], myres->comp_error(data[id]));
+    //         }
+    //     }
+    // }
+
+    // printing
+    // std::vector<std::string>  obs = { "Mpi","MK","MDs","fpi","w0",
+    // "Mpi_ml_val","dMK_ml_val","MDs_ml_val","fpi_ml_val","w0_ml_val",
+    // "Mpi_ms_val","dMK_ms_val","MDs_ms_val","fpi_ms_val","w0_ms_val",
+    // "Mpi_mc_val","dMK_mc_val","MDs_mc_val","fpi_mc_val","w0_mc_val",
+    // "Mpi_ml_sea","dMK_ml_sea","MDs_ml_sea","fpi_ml_sea","w0_ml_sea",
+    // "Mpi_ms_sea","dMK_ms_sea","MDs_ms_sea","fpi_ms_sea","w0_ms_sea",
+    // "Mpi_mc_sea","dMK_mc_sea","MDs_mc_sea","fpi_mc_sea","w0_mc_sea"
+    // };
+    // double *md=(double*) malloc(sizeof(double)*35);
+    // double** cov = myres->comp_cov(35, data);
+    // for (int i = 0;i < 35;i++) {
+    //     for (int j = i + 1;j < 35;j++) {
+    //         double corr = cov[i][j] / sqrt(cov[i][i] * cov[j][j]);
+    //         if (std::fabs(corr) > 0.4)
+    //             printf("corr  %s   %s  %-7.3f\n", obs[i].c_str(), obs[j].c_str(), corr);
+    //     }
+    //     md[i] = myres->mean(data[i]); 
+    // }
+
+    // set off-diag to zero
+    // for (int i = 0;i < 35;i++) {
+    //     for (int j = 0 ;j < 35;j++) {
+    //         if (i!=j) cov[i][j]=0;
+    //         else cov[i][j]+=1e-14;
+    //     }
+    // }
+    // printf("after\n");
+
+    // regenerate fake jackk
+    // data = myres->create_fake_covariance(md,35,cov,-1);
+    // cov = myres->comp_cov(35, data);
+    // for (int i = 0;i < 35;i++) {
+    //     for (int j = i + 1;j < 35;j++) {
+    //         double corr = cov[i][j] / sqrt(cov[i][i] * cov[j][j]);
+    //         if (std::fabs(corr) > 0.4)
+    //             printf("corr  %s   %s  %-7.3f\n", obs[i].c_str(), obs[j].c_str(), corr);
+    //     }
+    //     md[i] = myres->mean(data[i]); 
+
+    // }
+
     mysprintf(namefile, NAMESIZE, "%s/%s_scale_setting_system_%s", argv[2], argv[1], files[36].c_str());
     FILE* jack_file = open_file(namefile, "w+");
     generic_header head;
@@ -526,9 +590,22 @@ int main(int argc, char** argv) {
     head.write_header(jack_file);
 
     corr_counter = -1;
-    for (int i = 0;i < 30;i++) {
+    for (int i = 0;i < 30;i++) { // why untill 30, now I can not change
         write_jack(data[i], Njack, jack_file);
     }
+
+    // read delta m0 and m0 derivative
+    read_file_debug(data[35], files[37].c_str());// dm0
+    read_file_debug(data[36], files[38].c_str());// dw0/dm0l
+    read_file_debug(data[37], files[39].c_str());// dw0/dm0s
+    read_file_debug(data[38], files[40].c_str());// dw0/dm0c
+
+    read_file_debug(data[39], files[41].c_str());// dw0/dms_sea
+    read_file_debug(data[40], files[42].c_str());// dw0/dmc_sea
+
+
+    static constexpr int iw0 = 4;
+
 
     //////////////////////////////////////////////////////////////
     // max twist correction
@@ -546,6 +623,14 @@ int main(int argc, char** argv) {
     }
     printf("Mpi after max twist correction: %.12g  %.12g\n", data[0][Njack - 1], myres->comp_error(data[0]));
     printf("fpi after max twist correction: %.12g  %.12g\n", data[3][Njack - 1], myres->comp_error(data[3]));
+
+    for (int j = 0; j < Njack;j++) {
+        double dm0 = data[35][j];
+        double dw0_dm0 = data[36][j] + 0.5 * (data[37][j] + data[38][j]);
+        double delta = dm0 * dw0_dm0;
+        data[iw0][j] += delta;
+    }
+
     //////////////////////////////////////////////////////////////
     // FVE
     //////////////////////////////////////////////////////////////
@@ -694,7 +779,13 @@ int main(int argc, char** argv) {
         printf("m^sim_%d = %g \n", i, myres->mean(amusim[i]));
     }
 
-
+    // decorrelate miso
+    // for (int i = 0; i < 3; i++) {
+    //     double mean = myres->mean(miso[i]);
+    //     double err = myres->comp_error(miso[i]);
+    //     free(miso[i]);
+    //     miso[i] = myres->create_fake(mean, err, -1);
+    // }
 
 
     double* a_fm = myres->create_copy(data[4]);
@@ -710,10 +801,11 @@ int main(int argc, char** argv) {
                 double dm = (miso[im][j] - amusim[im][j]);
                 af += dm * df;
                 double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
-                // if (val_sea != 2 && im != 2)
+                // if (val_sea != 1 && im != 2)
                 w_a += dm * dw;
             }
         }
+
         a_fm[j] = af / (fpi_MeV / hbarc);
         w0_from_fpi[j] = w_a * a_fm[j];
     }
@@ -735,6 +827,55 @@ int main(int argc, char** argv) {
     write_jack(a_fm, Njack, jack_file);     check_correlatro_counter(33);
     write_jack(w0_from_fpi, Njack, jack_file);     check_correlatro_counter(34);
 
+    // w0 from fpi with strange and charm deriv ensemble
+    double* w0_from_fpi_ensemble = myres->create_copy(data[iw0]);
+    for (int j = 0; j < Njack;j++) {
+        double dw = data[id_deriv(iw0, 1, 0, 1)][j];
+        double dm = (miso[0][j] - amusim[0][j]);
+        w0_from_fpi_ensemble[j] += dm * dw;
+        dw = data[39][j];
+        dm = (miso[1][j] - amusim[1][j]);
+        w0_from_fpi_ensemble[j] += dm * dw;
+        dw = data[40][j];
+        dm = (miso[2][j] - amusim[2][j]);
+        w0_from_fpi_ensemble[j] += dm * dw;
+
+        w0_from_fpi_ensemble[j] *= a_fm[j];
+    }
+    // hybrid approach
+    double* w0_from_fpi_hybrid = myres->create_copy(data[iw0]);
+    for (int j = 0; j < Njack;j++) {
+        double dw = data[id_deriv(iw0, 1, 0, 1)][j];
+        double dm = (miso[0][j] - amusim[0][j]);
+        w0_from_fpi_hybrid[j] += dm * dw;
+
+        if (ensemble.compare("C80") == 0 || ensemble.compare("B64") == 0) {
+            if (j == Njack - 1) printf("HYBRID APPROACH: USINGE SMALL VOLUME DERIV");
+            dw = data[id_deriv(iw0, 1, 1, 1)][j]; // small volume deriv strange
+            dm = (miso[1][j] - amusim[1][j]);
+            w0_from_fpi_hybrid[j] += dm * dw;
+            dw = data[id_deriv(iw0, 1, 2, 1)][j]; // small volume deriv charm
+            dm = (miso[2][j] - amusim[2][j]);
+            w0_from_fpi_hybrid[j] += dm * dw;
+
+            w0_from_fpi_hybrid[j] *= a_fm[j];
+        }
+        else { // add the ensemble deriv
+            dw = data[39][j];
+            dm = (miso[1][j] - amusim[1][j]);
+            w0_from_fpi_hybrid[j] += dm * dw;
+            dw = data[40][j];
+            dm = (miso[2][j] - amusim[2][j]);
+            w0_from_fpi_hybrid[j] += dm * dw;
+
+            w0_from_fpi_hybrid[j] *= a_fm[j];
+        }
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     printf("//////////////////////////////////////////////////////////////\n");
     printf("// w0 systemone\n");
     printf("//////////////////////////////////////////////////////////////\n");
@@ -847,6 +988,158 @@ int main(int argc, char** argv) {
     write_jack(dm_w0[0], Njack, jack_file);     check_correlatro_counter(43);
     write_jack(dm_w0[1], Njack, jack_file);     check_correlatro_counter(44);
     write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(45);
+
+
+    write_jack(w0_from_fpi_ensemble, Njack, jack_file);     check_correlatro_counter(46);
+    write_jack(w0_from_fpi_hybrid, Njack, jack_file);     check_correlatro_counter(47);
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    printf("//////////////////////////////////////////////////////////////\n");
+    printf("// w0 systemone hybrid\n");
+    printf("//////////////////////////////////////////////////////////////\n");
+
+    double** miso_w0_h = malloc_2<double>(3, Njack);
+    double** dm_w0_h = malloc_2<double>(3, Njack);
+
+    for (int j = 0; j < Njack;j++) {
+
+        y[0] = Mpi_MeV * w0_MeV;
+        y[1] = MK_MeV * w0_MeV;
+        y[2] = MDs_MeV * w0_MeV;
+        int iw0 = 4;
+        double w0 = data[id_deriv(iw0, 0, 0, 0)][j];
+
+        for (int iM = 0; iM < 3; iM++) {
+
+            double M = data[id_deriv(iM, 0, 0, 0)][j];
+
+            for (int im = 0; im < 3; im++) {
+                Mat[iM][im] = 0.0;
+                // valence
+                double dM = data[id_deriv(iM, 1, im, 0)][j];
+                double dw = data[id_deriv(iw0, 1, im, 0)][j];
+                Mat[iM][im] += dM * w0 + M * dw;
+                // sea
+                dM = data[id_deriv(iM, 1, im, 1)][j];
+                dw = data[id_deriv(iw0, 1, im, 1)][j]; // small volume deriv strange
+                if (!(ensemble.compare("C80") == 0 || ensemble.compare("B64") == 0)) {
+                    if (im == 1) dw = data[39][j]; // ensemble deriv    
+                    if (im == 2) dw = data[40][j]; // ensemble deriv    
+                }
+                Mat[iM][im] += dM * w0 + M * dw;
+                Matj[iM][im][j] = Mat[iM][im];
+
+            }
+            y[iM] -= M * w0;
+            yj[iM][j] = y[iM];
+
+        }
+        double* P = LU_decomposition_solver(3, Mat, y);
+        miso_w0_h[0][j] = (amusim[0][j] + P[0]);
+        miso_w0_h[1][j] = (amusim[1][j] + P[1]);
+        miso_w0_h[2][j] = (amusim[2][j] + P[2]);
+        for (int im = 0; im < 3; im++) {
+            dm_w0_h[im][j] = P[im];
+        }
+        if (j == Njack - 1) {
+            printf("Matrix for m^iso solution (jackknife %d):\n", j);
+            for (int ii = 0; ii < 3; ii++) {
+                for (int jj = 0; jj < 3; jj++) {
+                    printf("%g (%g) ", Matj[ii][jj][Njack - 1], myres->comp_error(Matj[ii][jj]));
+                }
+                printf("\n");
+            }
+            printf("RHS:\n");
+            for (int ii = 0; ii < 3; ii++) {
+                printf("%g (%g)\n", yj[ii][Njack - 1], myres->comp_error(yj[ii]));
+            }
+            printf("solution:\n");
+            for (int ii = 0; ii < 3; ii++) {
+                printf("%g\n", P[ii]);
+            }
+        }
+        free(P);
+    }
+    printf("Results for m^iso (MeV):\n");
+    for (int i = 0; i < 3; i++) {
+        double mean = myres->mean(miso_w0_h[i]);
+        double err = myres->comp_error(miso_w0_h[i]);
+        printf("m^iso_%d = %-12g +/- %-12g   starting from %-12g +/- %-12g\n", i, mean, err, myres->mean(amuiso[i]), myres->comp_error(amuiso[i]));
+    }
+    printf("sim values:\n");
+    for (int i = 0; i < 3; i++) {
+        printf("m^sim_%d = %g \n", i, myres->mean(amusim[i]));
+    }
+
+    double* a_from_w0_hybrid = myres->create_copy(data[iw0]);
+    for (int j = 0; j < Njack;j++) {
+        double dw = data[iw0][j];
+        double dm = (miso_w0_h[0][j] - amusim[0][j]);
+        double w0_hybrid = data[iw0][j];
+        w0_hybrid += dm * dw;
+
+        if (ensemble.compare("C80") == 0 || ensemble.compare("B64") == 0) {
+            if (j == Njack - 1) printf("HYBRID APPROACH: USINGE SMALL VOLUME DERIV\n");
+            dw = data[id_deriv(iw0, 1, 1, 1)][j]; // small volume deriv strange
+            dm = (miso_w0_h[1][j] - amusim[1][j]);
+            w0_hybrid += dm * dw;
+            dw = data[id_deriv(iw0, 1, 2, 1)][j]; // small volume deriv charm
+            dm = (miso_w0_h[2][j] - amusim[2][j]);
+            w0_hybrid += dm * dw;
+
+        }
+        else { // add the ensemble deriv
+            dw = data[39][j];
+            dm = (miso_w0_h[1][j] - amusim[1][j]);
+            w0_hybrid += dm * dw;
+            dw = data[40][j];
+            dm = (miso_w0_h[2][j] - amusim[2][j]);
+            w0_hybrid += dm * dw;
+
+        }
+        a_from_w0_hybrid[j] = w0_fm / w0_hybrid;
+    }
+
+    double* fpi_from_w0_h = myres->create_copy(data[4]);
+    for (int j = 0; j < Njack;j++) {
+        int ifpi = 3;
+        double af = data[id_deriv(ifpi, 0, 0, 0)][j];
+        int iw0 = 4;
+        double w_a = data[id_deriv(iw0, 0, 0, 0)][j];
+        for (int im = 0; im < 3; im++) {
+            for (int val_sea = 0; val_sea < 2; val_sea++) {
+                double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
+                double dm = (miso_w0[im][j] - amusim[im][j]);
+                af += dm * df;
+                double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                // if (val_sea != 2 && im != 2)
+                w_a += dm * dw;
+            }
+        }
+        fpi_from_w0_h[j] = af / (a_from_w0_hybrid[j] / hbarc);
+    }
+    printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_from_w0_hybrid), myres->comp_error(a_from_w0_hybrid));
+    printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0_h), myres->comp_error(fpi_from_w0_h));
+
+    mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_hybrid.jack", files[36].c_str());
+    myres->write_jack_in_file(a_from_w0_hybrid, name_out);
+    mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_hybrid.jack", files[36].c_str());
+    myres->write_jack_in_file(fpi_from_w0_h, name_out);
+
+    write_jack(miso_w0_h[0], Njack, jack_file);     check_correlatro_counter(48);
+    write_jack(miso_w0_h[1], Njack, jack_file);     check_correlatro_counter(49);
+    write_jack(miso_w0_h[2], Njack, jack_file);     check_correlatro_counter(50);
+    write_jack(a_from_w0_hybrid, Njack, jack_file);     check_correlatro_counter(51);
+    write_jack(fpi_from_w0_h, Njack, jack_file);     check_correlatro_counter(52);
+
+    write_jack(dm_w0_h[0], Njack, jack_file);     check_correlatro_counter(53);
+    write_jack(dm_w0_h[1], Njack, jack_file);     check_correlatro_counter(54);
+    write_jack(dm_w0_h[2], Njack, jack_file);     check_correlatro_counter(55);
+
 
     return 0;
 }
