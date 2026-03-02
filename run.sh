@@ -132,6 +132,8 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_strange_OS_B24.dat rewsOS
 ./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_charm_OS_B24.dat rewcOS
 
+./pion_rew  -p ../../data/ onlinemeas_B24.dat  -bin 100 jack reweight_charm_OS_more_sources_B24.dat rewcOS
+
 ./rew_other_data  -p ../../data/ Marcos_P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin  -bin 100 jack reweight_charm_OS_B24.dat rewcOS  onlinemeas_B24.dat
 
 ###### C48
@@ -276,6 +278,7 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ## pion
 # ./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu1.8000e-03_mu1.8000e-03.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
 ./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
+./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin -bin 20 jack  reweight_charm_OS_more_sources_B24.dat rewcOS onlinemeas_B24.dat
 ./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu4.2000e-03_mu4.2000e-03.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
 ./meson_smallAC  -p ../../data/  data_mesons/B24/P5P5_tm_mu5.9000e-03_mu5.9000e-03.bin -bin 20 jack  reweight_charm_OS_B24.dat rewcOS onlinemeas_B24.dat
 ## kaon  
@@ -294,4 +297,9 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./meson_rew  -p ../../data/  E112_s_c1.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
 ./meson_rew  -p ../../data/  E112_s_c2.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
 ./meson_rew  -p ../../data/  E112_s_c3.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
-./meson_smallAC  -p ../../data/  P5P5_tm_mu4.4000e-04_LMA.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
+# ./meson_smallAC  -p ../../data/  P5P5_tm_mu4.4000e-04_LMA.bin  -bin 20 jack reweight_light_OS_E112_LMA.dat rewlOS onlinemeas_E112_LMA.dat
+
+
+## D96 iso
+# ./meson_smallAC  -p ../../data/  P5P5_tm_mu5.4000e-04.bin  -bin 20 jack reweight_light_OS_D96.dat rewlOS onlinemeas_D96.dat
+./meson_rew  -p ../../data  D96_P5P5_l1_l1_LMA.bin  -bin 20 jack reweight_light_OS_D96.dat rewlOS onlinemeas_D96.dat
