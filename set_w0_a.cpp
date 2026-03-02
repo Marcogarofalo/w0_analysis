@@ -850,7 +850,7 @@ int main(int argc, char** argv) {
         w0_from_fpi_hybrid[j] += dm * dw;
 
         if (ensemble.compare("C80") == 0 || ensemble.compare("B64") == 0) {
-            if (j == Njack - 1) printf("HYBRID APPROACH: USINGE SMALL VOLUME DERIV");
+            if (j == Njack - 1) printf("HYBRID APPROACH: USINGE SMALL VOLUME DERIV\n");
             dw = data[id_deriv(iw0, 1, 1, 1)][j]; // small volume deriv strange
             dm = (miso[1][j] - amusim[1][j]);
             w0_from_fpi_hybrid[j] += dm * dw;
@@ -872,6 +872,23 @@ int main(int argc, char** argv) {
         }
     }
 
+    double** data_m_a = malloc_2<double>(4, Njack);
+    for (int j = 0; j < Njack;j++) {
+        data_m_a[0][j] = miso[0][j];
+        data_m_a[1][j] = miso[1][j];
+        data_m_a[2][j] = miso[2][j];
+        data_m_a[3][j] = a_fm[j];
+    }
+    double **cov_m_a = myres->comp_cov(4, data_m_a);
+    printf("covariance matrix for (in order) m^iso l,s,c and a, ens: %s\n", ensemble.c_str());
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            // double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
+            // if (std::fabs(corr) > 0.4)
+            printf("%-22.12g", cov_m_a[i][j] );
+        }
+        printf("\n");
+    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
