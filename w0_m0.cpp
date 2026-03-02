@@ -289,13 +289,24 @@ int main(int argc, char** argv) {
 
     for (int i = 0;i < head_loops.Nconf;i++) {
 
-        int seek_pos = head_loops.struct_size + idx_b[i] * (sizeof(double) * (head_loops.T / 2 + 1));
+        // int seek_pos = head_loops.struct_size + idx_b[i] * (sizeof(double) * (head_loops.T / 2 + 1));
+        // // check that works
+        // // int seek_pos = head_loops.struct_size + i * (sizeof(double) *  (head_loops.T/2+1));
+        // // error(ftell(infile_loop) != seek_pos, 1, "main", "ftell %ld  differ from seek_pos %d", ftell(infile_loop), seek_pos);
+        // fseek(infile_loop, seek_pos, SEEK_SET);
+
+        // for (int t = 0; t < head_loops.T / 2 + 1;t++) {
+        //     fread(&tmp_d, sizeof(double), 1, infile_loop);
+        //     data_loop[i][0][t][0] = tmp_d;
+        // }
+
+        int seek_pos = head_loops.struct_size + idx_b[i] * (sizeof(double) * (head_loops.T ));
         // check that works
         // int seek_pos = head_loops.struct_size + i * (sizeof(double) *  (head_loops.T/2+1));
         // error(ftell(infile_loop) != seek_pos, 1, "main", "ftell %ld  differ from seek_pos %d", ftell(infile_loop), seek_pos);
         fseek(infile_loop, seek_pos, SEEK_SET);
 
-        for (int t = 0; t < head_loops.T / 2 + 1;t++) {
+        for (int t = 0; t < head_loops.T ;t++) {
             fread(&tmp_d, sizeof(double), 1, infile_loop);
             data_loop[i][0][t][0] = tmp_d;
         }
@@ -343,6 +354,7 @@ int main(int argc, char** argv) {
             // if (i == 27 && j == head.Njack - 1)
             //     printf("bubble dmu = %g  %g       <W(0)*bubble>= %g %g\n", bubble.real(), bubble.imag(), data[j][head.ncorr + i][0][0], data[j][head.ncorr + i][0][1]);
         }
+        printf("ncorr +i = %d\n", head.ncorr + i);
     }
     free_corr(head_loops.Njack, head_loops.ncorr, head_loops.T, data_loop);
     //////////////////////////////////////////////////////////////
@@ -632,6 +644,7 @@ int main(int argc, char** argv) {
 
         int Ng = head_loops.gammas.size();
         fit_info.corr_id = { 6, head.ncorr };
+        printf("   id  correction  %d    %d\n",6, head.ncorr );
         fit_info.myen = { 0 }; // reim of corr_id[1] (the correction)
 
 
