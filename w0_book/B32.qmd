@@ -196,6 +196,44 @@ gg<- gg+ geom_line(aes(x=dfc$conf_id , y=dfc$r, color= "c"))
 fig<-myplotly(gg,"","id","r", to_print = TRUE)
 ```
 
+## check sources
+
+```{r, echo=FALSE,results='asis'}
+dir <- "/home/garofalo/analysis/flow/data/out/"
+file <- "onlinemeas_B24.dat_reweight_charm_OS_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-NULL
+dff<-NULL
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df)
+dff<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,dff )
+##############
+file <- "onlinemeas_B24.dat_reweight_charm_OS_more_sources_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,nudge=0.1, rename = "more surces dM/dm")
+dff<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,dff,nudge=0.1 , rename = "more surces df/dm")
+####
+file <- "data_mesons/B24/P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin_reweight_charm_OS_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,nudge=0.2, rename = "antonio dM/dm")
+dff<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,dff,nudge=0.2 , rename = "antonio df/dm")
+####
+file <- "data_mesons/B24/P5P5_tm_mu2.5000e-03_mu2.5000e-03.bin_reweight_charm_OS_more_sources_B24.dat_output"
+mt <- read_df(paste0(dir, file))
+all_obs <- Rose::get_all_corr(mt)
+df<-add_corr_to_df("plateau_dM/drewcOS",all_obs ,mt, df,nudge=0.3, rename = "antonio more sources dM/dm")
+dff<-add_corr_to_df("plateau_df/drewcOS",all_obs ,mt,dff,nudge=0.3 , rename = "antonio more surces df/dm")
+####
+
+
+gg<-plot_df_corr_ggplot(df)
+fig<-myplotly(gg,"","t/a","",to_print = TRUE)
+gg1<-plot_df_corr_ggplot(dff)
+fig1<-myplotly(gg1,"","t/a","",to_print = TRUE)
+
+```
 
 <!-- ```{r, echo=FALSE, results='asis'} -->
 <!-- df <- data.frame( -->

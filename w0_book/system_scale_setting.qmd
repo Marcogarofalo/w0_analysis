@@ -27,6 +27,7 @@ masses <- c(
 ```
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
+cat("## FLAG\n")
 df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_fpi.txt", header = TRUE)
 start_indices <- seq(2, ncol(df), by = 2)
 new_df <- data.frame(df[,c(1,start_indices)])
@@ -40,6 +41,7 @@ for( i in seq_along(start_indices)){
 kable(new_df)
 
 # kable(df)
+cat("## wp25\n")
 df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_w0.txt", header = TRUE)
 start_indices <- seq(2, ncol(df), by = 2)
 new_df <- data.frame(df[,c(1,start_indices)])
@@ -52,20 +54,41 @@ for( i in seq_along(start_indices)){
 }
 kable(new_df)
 
+cat("## wp25_hybrid\n")
+df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_w0_hybrid.txt", header = TRUE)
+start_indices <- seq(2, ncol(df), by = 2)
+new_df <- data.frame(df[,c(1,start_indices)])
+colnames(new_df) <- colnames(df)[c(1,start_indices)]
+new_df[,1]<- df[,1]
+for( i in seq_along(start_indices)){
+  for (row in seq_along(df[,1])){
+    new_df[row,i+1] <-mean_print(df[row,start_indices[i]], df[row,start_indices[i]+1])
+  }
+}
+kable(new_df)
 ```
+
 
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta_no_charm_sea_w0/fit_w0_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta_nocorw0/fit_w0_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta_sim/fit_w0_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta_no_m0//fit_w0_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_ens_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_hybrid_cont_a2"
+  # "/home/garofalo/analysis/flow/data/fit_all_beta_nocharmw0//fit_w0_cont_a2",
+  # "/home/garofalo/analysis/flow/data/fit_all_beta_nocharmw0_decorr///fit_w0_cont_a2"
 )
 labels <- c(
   "P[0]+ P[1]*a2 ",
-  "-no-charm-sea-w0",
-  "sim-point"
+  "sim-point",
+  "no m0 corr",
+  "sea-deriv-ens",
+  "hybrid"
+  # "no-charm-corr-w0",
+  # "no-charm-corr-w0-decorr"
 )
 
 
@@ -98,10 +121,12 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 [\\mbox{fm}]$",
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_hybrid_cont_a2"
 )
 labels <- c(
-  "P[0]+ P[1]*a2 "
+  "P[0]+ P[1]*a2 ",
+  "w0 hybrid"
 )
 
 
@@ -111,7 +136,7 @@ for (j in seq_along(basenames)) {
   make_table_fit_result(fit)
   gg <- plot_fit(basenames[j], "a2",
     # noline = TRUE,
-    data_type = c("data"),
+    data_type =labels[j],
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j],
@@ -136,11 +161,13 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
 gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_ms_over_ml_from_fpi_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_ms_over_ml_from_w0_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_ms_over_ml_from_w0_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_ms_over_ml_from_w0_hybrid_cont_a2"
 )
 labels <- c(
   "FLAG",
-  "wp25"
+  "wp25",
+  "wp25_hybrid"
 )
 
 
@@ -191,12 +218,12 @@ gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_mc_over_ms_from_fpi_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_mc_over_ms_from_w0_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta_no_charm_sea_w0//fit_mc_over_ms_from_w0_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta//fit_mc_over_ms_from_w0_hybrid_cont_a2"
 )
 labels <- c(
   "FLAG",
   "wp25",
-  "wp25-no-charm-sea-w0"
+  "wp25_hybrid"
 )
 
 
@@ -244,12 +271,13 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$m_c/m_s$",
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_afpi_over_aw0_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_a_ratio_FLAG_wp25_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_a_ratio_FLAG_wp25hybrid_cont_a2"
 )
 labels <- c(
-  "P[0]+P[1]a2"
+  "FLAG-wp25",
+  "FLAG-wp25_hybr"
 )
-
 
 for (j in seq_along(basenames)) {
   print(basenames[j])
@@ -276,12 +304,12 @@ fig <- myplotly(gg, "", "$a^2_{FLAG} [\\mbox{fm}^2]$", "$a_{FLAG}/a_{wp25}$",
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_afpi_minus_aw0_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta_no_charm_sea_w0//fit_afpi_minus_aw0_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_a_diff_FLAG_wp25_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_a_diff_FLAG_wp25hybrid_cont_a2"
 )
 labels <- c(
-  "P[0]+P[1]a2",
-  "wp25-no-charm-sea-w0"
+  "FLAG-wp25",
+  "FLAG-wp25_hybr"
 )
 
 
