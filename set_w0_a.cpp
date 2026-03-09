@@ -879,13 +879,13 @@ int main(int argc, char** argv) {
         data_m_a[2][j] = miso[2][j];
         data_m_a[3][j] = a_fm[j];
     }
-    double **cov_m_a = myres->comp_cov(4, data_m_a);
+    double** cov_m_a = myres->comp_cov(4, data_m_a);
     printf("covariance matrix for (in order) m^iso l,s,c and a, ens: %s\n", ensemble.c_str());
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
             // double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
             // if (std::fabs(corr) > 0.4)
-            printf("%-22.12g", cov_m_a[i][j] );
+            printf("%-22.12g", cov_m_a[i][j]);
         }
         printf("\n");
     }
@@ -1121,7 +1121,24 @@ int main(int argc, char** argv) {
         a_from_w0_hybrid[j] = w0_fm / w0_hybrid;
     }
 
+    double* a_from_Mpi_wp25_hybrid = myres->create_copy(data[iw0]);
+    for (int j = 0; j < Njack;j++) {
+        int iMpi = 0;
+        double aMpi = data[id_deriv(iMpi, 0, 0, 0)][j];
+        if(j==Njack-1) printf("a from Mpi wp25 hybrid: starting value from Mpi %g\n", aMpi);
+        for (int im = 0; im < 3; im++) {
+            for (int val_sea = 0; val_sea < 2; val_sea++) {
+                double dM = data[id_deriv(iMpi, 1, im, val_sea)][j];
+                double dm = (miso_w0_h[im][j] - amusim[im][j]);
+                aMpi += dm * dM;
+            }
+        }
+        a_from_Mpi_wp25_hybrid[j] = aMpi / (Mpi_MeV / hbarc);
+    }
+
+
     double* fpi_from_w0_h = myres->create_copy(data[4]);
+    double* fpi_from_Mpi_wp25_hybrid = myres->create_copy(data[4]);
     for (int j = 0; j < Njack;j++) {
         int ifpi = 3;
         double af = data[id_deriv(ifpi, 0, 0, 0)][j];
@@ -1130,14 +1147,15 @@ int main(int argc, char** argv) {
         for (int im = 0; im < 3; im++) {
             for (int val_sea = 0; val_sea < 2; val_sea++) {
                 double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
-                double dm = (miso_w0[im][j] - amusim[im][j]);
+                double dm = (miso_w0_h[im][j] - amusim[im][j]);
                 af += dm * df;
                 double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
                 // if (val_sea != 2 && im != 2)
                 w_a += dm * dw;
-            }
+            }   
         }
         fpi_from_w0_h[j] = af / (a_from_w0_hybrid[j] / hbarc);
+        fpi_from_Mpi_wp25_hybrid[j] = af / (a_from_Mpi_wp25_hybrid[j] / hbarc);
     }
     printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_from_w0_hybrid), myres->comp_error(a_from_w0_hybrid));
     printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0_h), myres->comp_error(fpi_from_w0_h));
@@ -1156,6 +1174,18 @@ int main(int argc, char** argv) {
     write_jack(dm_w0_h[0], Njack, jack_file);     check_correlatro_counter(53);
     write_jack(dm_w0_h[1], Njack, jack_file);     check_correlatro_counter(54);
     write_jack(dm_w0_h[2], Njack, jack_file);     check_correlatro_counter(55);
+
+    mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_l_wp25_hybrid.jack", files[36].c_str());
+    myres->write_jack_in_file(dm_w0_h[0], name_out);
+    mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_s_wp25_hybrid.jack", files[36].c_str());
+    myres->write_jack_in_file(dm_w0_h[1], name_out);
+    mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_c_wp25_hybrid.jack", files[36].c_str());
+    myres->write_jack_in_file(dm_w0_h[2], name_out);
+    
+
+    printf("lattice spacing  wpMpi (fm): %g +/- %g\n", myres->mean(a_from_Mpi_wp25_hybrid), myres->comp_error(a_from_Mpi_wp25_hybrid));
+    write_jack(a_from_Mpi_wp25_hybrid, Njack, jack_file);     check_correlatro_counter(56);
+    write_jack(fpi_from_Mpi_wp25_hybrid, Njack, jack_file);     check_correlatro_counter(57);
 
 
     return 0;
