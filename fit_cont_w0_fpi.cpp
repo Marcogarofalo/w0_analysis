@@ -176,28 +176,11 @@ double rhs_1overamu_1overamu2_1overamu3(int n, int Nvar, double* x, int Npar, do
     return r;
 }
 
-int get_count_x(int n, int e, struct fit_type fit_info) {
-    int count = 0;
-
-    for (int in = 0;in < n;in++) {
-        for (int ie : fit_info.Nxen[in]) {
-            count++;
-        }
-    }
-    for (int ee : fit_info.Nxen[n]) {
-        if (ee == e) {
-            break;
-        }
-        count++;
-    }
-    return count;
-}
-
 double lhs_fun_masses(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double m = gjack.en[e].jack[fit_info.corr_id[0 + n * 2]][j];
     double Z = gjack.en[e].jack[fit_info.corr_id[1 + n * 2]][j];
 
-    int ix = get_count_x(n, e, fit_info);
+    int ix = get_count_x_in_lhs(n, e, fit_info);
     // if (j == 0)printf("n=%d  e=%d ix=%d\n", n, e, ix);
     double a = std::sqrt(fit_info.x[0][ix][j]) / hbarc;
     return m / (Z * a);
@@ -221,13 +204,12 @@ double rhs_masses(int n, int Nvar, double* x, int Npar, double* P) {
         r += cf * (a2 * std::log(a2 * lam2) * clogZ);
     return r;
 }
-double rhs_mass_light(int n, int Nvar, double* x, int Npar, double* P) {
+double  rhs_mass_light(int n, int Nvar, double* x, int Npar, double* P) {
     double a2 = x[0];
     int Nz = 2;
     int Nferm = 1;
     int iz = n % 2;
     int ferm = n / 2;
-    // P[0,1,2] = c(f)
     // c0(f)* (1 + a ^ 2 * c1(Z, f) + a ^ 2log(a ^ 2 * Lam ^ 2) * clog(Z))
     double cf = P[ferm];
     double c1 = P[Nferm + iz * Nferm + ferm];
@@ -451,9 +433,9 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////
-    std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid" };
-    std::vector<int> id_obs = { 34, 39, 46 ,47, 52 };
-    std::vector<int> id_a = { 33, 38 , 33, 33 ,51 };
+    std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid" };
+    std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57 };
+    std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56 };
 
 
 
@@ -589,10 +571,11 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // lattice spacings
     //////////////////////////////////////////////////////////////
-    std::vector<std::string> diff_a = { "FLAG_wp25", "FLAG_wp25hybrid" };
+    std::vector<std::string> diff_a = { "FLAG_wp25", "FLAG_wp25hybrid", "FLAG_wp25Mpihybrid" };
     std::vector<std::vector<int>> id_diff_a = {
         { 33, 38 }, // w0
-        { 33, 51 }  // w0_hybrid
+        { 33, 51 },  // w0_hybrid
+        { 33, 56 }  // w0_Mpi_hybrid
     };
     for (int idiff_a = 0; idiff_a < diff_a.size(); idiff_a++) {
 
