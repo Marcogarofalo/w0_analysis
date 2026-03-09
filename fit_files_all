@@ -35,8 +35,9 @@ onlinemeas_mu1_B32.dat reweight_charm_OS_B32.dat
 onlinemeas_mu1_B32.dat reweight_strange_OS_B32.dat
 onlinemeas_mu1_B32.dat reweight_light_OS_B32.dat
 new_beta
-onlinemeas_E112_LMA.dat reweight_strange_OS_E112_LMA.dat
-onlinemeas_E112_LMA.dat reweight_light_OS_E112_LMA.dat
+onlinemeas_E112_LMA.dat reweight_charm_OS_E112_507.dat
+onlinemeas_E112_LMA.dat reweight_strange_OS_E112_507.dat
+onlinemeas_E112_LMA.dat reweight_light_OS_E112_507.dat
 new_beta
 onlinemeas_A32.dat reweight_charm_OS_A32.dat
 onlinemeas_A32.dat reweight_strange_OS_A32.dat
