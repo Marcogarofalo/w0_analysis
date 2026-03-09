@@ -49,3 +49,12 @@ deriv/der_w0_m0_flow_E112_LMA.dat_P5_mu1.4150e-01.bin
 # strange and charm sea derivatives
 deriv/der_rewsOS_flow_E112_LMA.dat
 deriv/der_rewcOS_flow_E112_LMA.dat
+####
+deriv/P0_fit_mul_over_w0_dw_dmuc_a2_5pt_jack.txt
+deriv/P1_fit_mul_over_w0_dw_dmuc_a2_5pt_jack.txt
+####
+../../data_l/mpcac_and_dm0/E112/mpcac_fullstat.dat
+####
+skip
+skip
+skip

@@ -1,0 +1,66 @@
+# test removing la
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+masses <- c(
+  0.0006669,
+  0.018267,
+  0.23134
+)
+```
+
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/w0_analysis/build/test_fit/fit_test_ori_data",
+  "/home/garofalo/analysis/flow/w0_analysis/build/test_fit/fit_test_m05_data",
+  "/home/garofalo/analysis/flow/w0_analysis/build/test_fit/fit_test_m05_mx2_data"
+)
+labels <- c(
+  "original data ",
+  "-0.5*x ",
+  "-0.5*x+x^2 "
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "x",
+    # noline = TRUE,
+    data_type = labels[j],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    noribbon = TRUE,
+    nudge = j * 0.00001
+  )
+}
+
+fig <- myplotly(gg, "", "x", "y",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```

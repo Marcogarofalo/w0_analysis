@@ -128,3 +128,4 @@ add_target_with_libs(fit_small_volume_Mpi_fpi fit_small_volume_Mpi_fpi.cpp)
 add_target_with_libs(meson_smallAC meson_smallAC.cpp)
 
 add_target_with_libs(fit_cont_w0_fpi fit_cont_w0_fpi.cpp)
+add_target_with_libs(test_add_la_in_fit test_add_la_in_fit.cpp)

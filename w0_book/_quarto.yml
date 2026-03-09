@@ -25,6 +25,7 @@ book:
     - w0_small_volumes.qmd
     - system_scale_setting.qmd
     - quark_masses.qmd
+    - test_removing_la.qmd
     - params.qmd
     - summary.qmd
     - references.qmd

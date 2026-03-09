@@ -49,3 +49,13 @@ deriv/der_w0_m0_flow_B64_LMA.dat_P5_mu7.2000e-04.bin
 ##
 deriv/der_rewsOS_0.2_flow_C80_LMA.dat
 deriv/der_rewcOS_0.1_flow_C80_LMA.dat
+####
+deriv/P0_fit_mul_over_w0_dw_dmuc_a2_5pt_jack.txt
+deriv/P1_fit_mul_over_w0_dw_dmuc_a2_5pt_jack.txt
+####
+../../data_l/mpcac_and_dm0/C80/mpcac_fullstat.dat
+####
+../../data_l/C112/MPi_sim.dat
+../../data_l/C112/fpi_sim.dat
+112
+

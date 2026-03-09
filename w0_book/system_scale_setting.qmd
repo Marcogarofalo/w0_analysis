@@ -123,12 +123,18 @@ gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_hybrid_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_Mpi_wp25_hybrid_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_Mpi_wp25_hybrid_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_laRDs_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_laRDs_exact_cont_a2"
 )
 labels <- c(
   "P[0]+ P[1]*a2 ",
   "w0 hybrid",
-  "wp25Mpi_hybrid"
+  "wp25Mpi_hybrid",
+  "wp25_lin_dmc",
+  "wp25_lin_dmc_laRDs",
+  "wp25_lin_dmc_laRDs_exact"
 )
 
 

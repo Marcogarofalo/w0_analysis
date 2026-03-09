@@ -433,9 +433,9 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////
-    std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid" };
-    std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57 };
-    std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56 };
+    std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid", "fpi_wp25_lin", "fpi_wp25_lin_laRDs",  "fpi_wp25_lin_laRDs_exact"  };
+    std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57, 62, 70, 78};
+    std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56, 61, 69, 77 };
 
 
 
