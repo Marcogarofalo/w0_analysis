@@ -80,8 +80,51 @@ fig <- myplotly(gg, "", "$(\\mu/\\mu_\\ell)$", "$(\\mu_\\ell/ w_0)  dw_0/d\\mu$"
 )
 ```
 
+## only charm fit
 
 
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_charm_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/der_charm_a2_5pt"
+)
+labels <- c(
+  "P[0] + P[1]*a2 ",
+  "5pt =P[0] + P[1]*a2 "
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    #data_type = c("sea-charm-deriv"),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    id_color = 2,
+    id_shape = 2
+  )
+ 
+}
+
+# gg <- gg + geom_vline(xintercept = masses[2] / masses[1], linetype = "dashed",
+#                       alpha=0.3)
+# gg <- gg + geom_vline(xintercept = masses[3] / masses[1], linetype = "dashed",
+#                       alpha=0.3)
+fig <- myplotly(gg, "", "$a^2$", "$(\\mu_\\ell/ w_0)  dw_0/d\\mu$",
+  to_print = TRUE,
+  #yrange = c(-1, 4),
+  legend_position = c(0.1, 0.1)
+)
+```
+
+## linear fit all masses
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL

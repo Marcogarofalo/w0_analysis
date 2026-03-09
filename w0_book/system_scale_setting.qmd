@@ -122,11 +122,13 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 [\\mbox{fm}]$",
 gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_hybrid_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_hybrid_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_Mpi_wp25_hybrid_cont_a2"
 )
 labels <- c(
   "P[0]+ P[1]*a2 ",
-  "w0 hybrid"
+  "w0 hybrid",
+  "wp25Mpi_hybrid"
 )
 
 
@@ -140,7 +142,8 @@ for (j in seq_along(basenames)) {
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j],
-    width = 0.0001
+    width = 0.0001,
+    nudge= j*0.00001
   )
 }
 fpi_FLAG <- 130.5
@@ -305,11 +308,13 @@ fig <- myplotly(gg, "", "$a^2_{FLAG} [\\mbox{fm}^2]$", "$a_{FLAG}/a_{wp25}$",
 gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_a_diff_FLAG_wp25_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_a_diff_FLAG_wp25hybrid_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_a_diff_FLAG_wp25hybrid_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_a_diff_FLAG_wp25Mpihybrid_cont_a2"
 )
 labels <- c(
   "FLAG-wp25",
-  "FLAG-wp25_hybr"
+  "FLAG-wp25_hybr",
+  "FLAG-wp25Mpi_hybr"
 )
 
 

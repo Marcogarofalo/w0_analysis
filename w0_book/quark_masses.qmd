@@ -29,7 +29,9 @@ from_21_to_9 <- 0.91708855448905
 ```
 
 
-
+$$
+m(f) = c_0(f) \left[1+c_1(f,Z) a^2 + c_l(Z)a^2\log (a^2\Lambda^2)\right]
+$$
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
@@ -70,7 +72,7 @@ for (j in seq_along(basenames)) {
   )
 }
 
-fig <- myplotly(gg, "", "$m [\\mbox{fm}^2]$", "$w_0 [\\mbox{fm}]$",
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$m(f,21 \\mbox{GeV}) [\\mbox{MeV}]$",
   to_print = TRUE,
   # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
