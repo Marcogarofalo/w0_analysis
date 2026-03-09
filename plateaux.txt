@@ -959,3 +959,5 @@ E112_l1_c1.bin  M_{PS}  25 49 1
 E112_s_c1.bin  M_{PS}  25 49 1
 E112_s_c2.bin  M_{PS}  25 49 1
 E112_s_c3.bin  M_{PS}  25 49 1
+
+D96_P5P5_l1_l1_LMA.bin  M_{PS}    28 84 1
