@@ -30,6 +30,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <ranges>
 
 constexpr double Mpi_MeV = 135;
 constexpr double Mpi_MeV_err = 0.2;
@@ -75,6 +76,13 @@ double read_single_Nobs(FILE* stream, int header_size, int Njack) {
     fseek(stream, header_size, SEEK_SET);
 
     return Nobs;
+}
+
+double rhs_a2_a4(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    r = P[0] + a2 * P[1] + a2 * a2 * P[2];
+    return r;
 }
 
 data_single read_single_dataj(FILE* stream) {
@@ -429,13 +437,107 @@ int main(int argc, char** argv) {
         fprintf(summary_out, "\n");
     }
 
+    mysprintf(namefile, NAMESIZE, "%s/data_from_wp25_deriv_mc_a2.txt", argv[3]);
+    summary_out = open_file(namefile, "w+");
+    fprintf(summary_out, "ens   a[fm] da[fm]  afpi dafpi  amul damul amus damus  amuc  damuc    delta_amul  ddelta_amul  delta_amus  ddelta_amus  delta_amuc   ddelta_amuc\n");
+    for (int i = 0;i < myen[0].size();i++) {
+        size_t lastUnderscore = files[i].find_last_of('_');
+
+        error(lastUnderscore == std::string::npos, 1, "error in file name", "cannot read ens from name %s", files[i].c_str());
+        // 2. Estrae tutto ciò che segue l'ultimo underscore
+        std::string result = files[i].substr(lastUnderscore + 1);
+        fprintf(summary_out, "%s  ", result.c_str());
+        double* tmp = jackall.en[i].jack[61];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[62];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[58];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[59];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[60];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+        tmp = jackall.en[i].jack[63];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[64];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[65];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+        fprintf(summary_out, "\n");
+    }
+
+    mysprintf(namefile, NAMESIZE, "%s/data_from_wp25_deriv_mc_a2_la_RDs.txt", argv[3]);
+    summary_out = open_file(namefile, "w+");
+    fprintf(summary_out, "ens   a[fm] da[fm]  afpi dafpi  amul damul amus damus  amuc  damuc    delta_amul  ddelta_amul  delta_amus  ddelta_amus  delta_amuc   ddelta_amuc\n");
+    for (int i = 0;i < myen[0].size();i++) {
+        size_t lastUnderscore = files[i].find_last_of('_');
+
+        error(lastUnderscore == std::string::npos, 1, "error in file name", "cannot read ens from name %s", files[i].c_str());
+        // 2. Estrae tutto ciò che segue l'ultimo underscore
+        std::string result = files[i].substr(lastUnderscore + 1);
+        fprintf(summary_out, "%s  ", result.c_str());
+        double* tmp = jackall.en[i].jack[69];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[70];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[66];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[67];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[68];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+        tmp = jackall.en[i].jack[71];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[72];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[73];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+        fprintf(summary_out, "\n");
+    }
+
+    mysprintf(namefile, NAMESIZE, "%s/data_from_wp25_deriv_mc_a2_la_mc.txt", argv[3]);
+    summary_out = open_file(namefile, "w+");
+    fprintf(summary_out, "ens   a[fm] da[fm]  afpi dafpi  amul damul amus damus  amuc  damuc    delta_amul  ddelta_amul  delta_amus  ddelta_amus  delta_amuc   ddelta_amuc\n");
+    for (int i = 0;i < myen[0].size();i++) {
+        size_t lastUnderscore = files[i].find_last_of('_');
+
+        error(lastUnderscore == std::string::npos, 1, "error in file name", "cannot read ens from name %s", files[i].c_str());
+        // 2. Estrae tutto ciò che segue l'ultimo underscore
+        std::string result = files[i].substr(lastUnderscore + 1);
+        fprintf(summary_out, "%s  ", result.c_str());
+        double* tmp = jackall.en[i].jack[86];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[87];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[83];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[84];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[85];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+        tmp = jackall.en[i].jack[88];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[89];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+        tmp = jackall.en[i].jack[90];
+        fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+        fprintf(summary_out, "\n");
+    }
+
 
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////
-    std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid", "fpi_wp25_lin", "fpi_wp25_lin_laRDs",  "fpi_wp25_lin_laRDs_exact"  };
-    std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57, 62, 70, 78};
-    std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56, 61, 69, 77 };
+    std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid", "fpi_wp25_lin", "fpi_wp25_lin_laRDs",  "fpi_wp25_lin_laRDs_exact",
+         "MDs_wp25_lin_laRDs_exact", "fpi_wp25_lin_la_mc_exact", "MDs_wp25_lin_la_mc_exact" };
+    std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57, 62, 70, 78 , 82, 87, 91};
+    std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56, 61, 69, 77 , 77, 86, 86};
 
 
 
@@ -718,4 +820,72 @@ int main(int argc, char** argv) {
 
     }
 
+
+    //////////////////////////////////////////////////////////////
+    // AIC fpi
+    //////////////////////////////////////////////////////////////
+
+    obs = { "fpi_wp25_lin" };
+    id_obs = { 62 };
+    id_a = { 61 };
+    std::vector<std::string> fits = { "a2", "a2_3pt", "a2_a4" , "a2_3pt_noC" };
+    double (*funcArray[])(int, int, double*, int, double*) = { rhs_a2, rhs_a2, rhs_a2_a4 ,rhs_a2 };
+    std::vector<int> Npars = { 2, 2, 3, 2 };
+    std::vector<std::vector<int>> ens_to_fit = { {0,1,2,3}, {1,2,3}, {0,1,2,3}, {0,2,3} };
+
+    for (auto [ifit, fit] : std::views::enumerate(fits)) {
+        for (int i = 0; i < obs.size(); i++) {
+            fit_type fit_info;
+
+            fit_info.corr_id = { id_obs[i] };
+
+            //////////////////////////////////////////////////////////////
+            // charm small volume fit - constant
+            //////////////////////////////////////////////////////////////
+
+            fit_info.N = 1;
+            fit_info.Nxen = std::vector<std::vector<int>>(fit_info.N);
+            for (int n = 0; n < fit_info.N; n++) {
+                // fit_info.Nxen[n].resize(ens_to_fit[ifit].size());
+                // for (int b = 0; b < ens_to_fit[ifit].size(); b++) {
+                //     fit_info.Nxen[n][b] = ens_to_fit[ifit][b];  // the charm is in myen[beta][0]
+                // }
+                fit_info.Nxen[n] = ens_to_fit[ifit];
+            }
+            fit_info.init_N_etot_form_Nxen();
+
+            fit_info.function = funcArray[ifit];
+            fit_info.linear_fit = true;
+            fit_info.Npar = Npars[ifit];
+            fit_info.Nvar = 1; // a2
+            fit_info.Njack = jackall.en[0].Njack;
+            fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+            int count = 0;
+            for (int n = 0; n < fit_info.N; n++) {
+                for (int e : fit_info.Nxen[n]) {
+                    for (int j = 0; j < Njack; j++) {
+                        fit_info.x[0][count][j] = pow(jackall.en[e].jack[id_a[i]][j], 2); // a^2 fm^2
+                    }
+                    count++;
+                }
+            }
+            // fit_info.linear_fit = false;
+            fit_info.verbosity = 0;
+            // fit_info.covariancey = true;
+            // fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+            // fit_info.make_covariance_block_diagonal_in_n();
+            // fit_info.compute_cov1_fit();
+
+            std::string namefit = "fit_" + obs[i] + "_" + fit;
+
+            fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+            fit_info.band_range = { 0, 0.008145209846823482 };
+            print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
+            der_fpi_const_full.clear();
+
+            fit_info.restore_default();
+
+        }
+    }
 }
