@@ -1822,8 +1822,8 @@ int main(int argc, char** argv) {
         double** miso_w0 = malloc_2<double>(3, Njack);
         double** dm_w0 = malloc_2<double>(3, Njack);
         // double coeff = +0.75;
-        double coeff = -1.70;
-        
+        double coeff = -40.70;
+
         for (int j = 0; j < Njack;j++) {
 
             y[0] = Mpi_MeV * w0_MeV;
@@ -1864,24 +1864,24 @@ int main(int argc, char** argv) {
                     // if (im!=2) 
                     Mat[iM][im] += dM * w0 + M * dw;
                     //a2 coeff in RDs
-                    if (iM == 2)
-                        Mat[iM][im] += coeff * a2_sim * 2.0 * dw / w0;
+                    // if (iM == 2)
+                    //     Mat[iM][im] += coeff * a2_sim * 2.0 * dw / w0;
                 }
                 y[iM] -= M * w0;
 
             }
             // add the lattice artefact RDs
             // y[2] += coeff * a2_sim;
-            la[2] += coeff * a2_sim;
-            for (int ii = 0;ii < 3;ii++) {
-                for (int ij = 0;ij < 3;ij++) {
-                    rhs[ii] += Mat[ii][ij] * la[ij];
-                }
-                rhs[ii] += y[ii];
-            }
+            // la[2] += coeff * a2_sim;
+            // for (int ii = 0;ii < 3;ii++) {
+            //     for (int ij = 0;ij < 3;ij++) {
+            //         rhs[ii] += Mat[ii][ij] * la[ij];
+            //     }
+            //     rhs[ii] += y[ii];
+            // }
 
 
-            double* P = LU_decomposition_solver(3, Mat, rhs);
+            double* P = LU_decomposition_solver(3, Mat, y);
             miso_w0[0][j] = (amusim[0][j] + P[0]);
             miso_w0[1][j] = (amusim[1][j] + P[1]);
             miso_w0[2][j] = (amusim[2][j] + P[2]);
@@ -1929,9 +1929,7 @@ int main(int argc, char** argv) {
             double w_a = data[id_deriv(iw0, 0, 0, 0)][j];
             for (int im = 0; im < 3; im++) {
                 for (int val_sea = 0; val_sea < 2; val_sea++) {
-                    double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
                     double dm = (miso_w0[im][j] - amusim[im][j]);
-                    af += dm * df;
                     double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
                     // add special case for charm sea
                     if (im == 2 && val_sea == 1) {
@@ -1947,13 +1945,26 @@ int main(int argc, char** argv) {
                     }
                     w_a += dm * dw;
 
+                }
+            }
+            a_from_w0[j] = w0_fm / w_a;
+            // add lattice artefact to mc
+            miso_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
+            dm_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
+
+            for (int im = 0; im < 3; im++) {
+                for (int val_sea = 0; val_sea < 2; val_sea++) {
+                    double dm = (miso_w0[im][j] - amusim[im][j]);
+                    double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
+                    af += dm * df;
+
                     // MDs
                     double dM = data[id_deriv(iMDs, 1, im, val_sea)][j];
                     MDs[j] += dm * dM;
 
                 }
             }
-            a_from_w0[j] = w0_fm / w_a;
+
             fpi_from_w0[j] = af / (a_from_w0[j] / hbarc);
             MDs[j] /= (a_from_w0[j] / hbarc);
         }
