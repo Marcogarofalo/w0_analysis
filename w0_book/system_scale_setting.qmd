@@ -30,12 +30,12 @@ masses <- c(
 cat("## FLAG\n")
 df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_fpi.txt", header = TRUE)
 start_indices <- seq(2, ncol(df), by = 2)
-new_df <- data.frame(df[,c(1,start_indices)])
-colnames(new_df) <- colnames(df)[c(1,start_indices)]
-new_df[,1]<- df[,1]
-for( i in seq_along(start_indices)){
-  for (row in seq_along(df[,1])){
-    new_df[row,i+1] <-mean_print(df[row,start_indices[i]], df[row,start_indices[i]+1])
+new_df <- data.frame(df[, c(1, start_indices)])
+colnames(new_df) <- colnames(df)[c(1, start_indices)]
+new_df[, 1] <- df[, 1]
+for (i in seq_along(start_indices)) {
+  for (row in seq_along(df[, 1])) {
+    new_df[row, i + 1] <- mean_print(df[row, start_indices[i]], df[row, start_indices[i] + 1])
   }
 }
 kable(new_df)
@@ -44,12 +44,12 @@ kable(new_df)
 cat("## wp25\n")
 df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_w0.txt", header = TRUE)
 start_indices <- seq(2, ncol(df), by = 2)
-new_df <- data.frame(df[,c(1,start_indices)])
-colnames(new_df) <- colnames(df)[c(1,start_indices)]
-new_df[,1]<- df[,1]
-for( i in seq_along(start_indices)){
-  for (row in seq_along(df[,1])){
-    new_df[row,i+1] <-mean_print(df[row,start_indices[i]], df[row,start_indices[i]+1])
+new_df <- data.frame(df[, c(1, start_indices)])
+colnames(new_df) <- colnames(df)[c(1, start_indices)]
+new_df[, 1] <- df[, 1]
+for (i in seq_along(start_indices)) {
+  for (row in seq_along(df[, 1])) {
+    new_df[row, i + 1] <- mean_print(df[row, start_indices[i]], df[row, start_indices[i] + 1])
   }
 }
 kable(new_df)
@@ -57,17 +57,159 @@ kable(new_df)
 cat("## wp25_hybrid\n")
 df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_w0_hybrid.txt", header = TRUE)
 start_indices <- seq(2, ncol(df), by = 2)
-new_df <- data.frame(df[,c(1,start_indices)])
-colnames(new_df) <- colnames(df)[c(1,start_indices)]
-new_df[,1]<- df[,1]
-for( i in seq_along(start_indices)){
-  for (row in seq_along(df[,1])){
-    new_df[row,i+1] <-mean_print(df[row,start_indices[i]], df[row,start_indices[i]+1])
+new_df <- data.frame(df[, c(1, start_indices)])
+colnames(new_df) <- colnames(df)[c(1, start_indices)]
+new_df[, 1] <- df[, 1]
+for (i in seq_along(start_indices)) {
+  for (row in seq_along(df[, 1])) {
+    new_df[row, i + 1] <- mean_print(df[row, start_indices[i]], df[row, start_indices[i] + 1])
   }
 }
 kable(new_df)
+
+cat("## wp25_deriv_mc_a2\n")
+df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_wp25_deriv_mc_a2.txt", header = TRUE)
+df1 <- df
+start_indices <- seq(2, ncol(df), by = 2)
+new_df <- data.frame(df[, c(1, start_indices)])
+colnames(new_df) <- colnames(df)[c(1, start_indices)]
+new_df[, 1] <- df[, 1]
+for (i in seq_along(start_indices)) {
+  for (row in seq_along(df[, 1])) {
+    new_df[row, i + 1] <- mean_print(df[row, start_indices[i]], df[row, start_indices[i] + 1])
+  }
+}
+kable(new_df)
+
+
+cat("## wp25_deriv_mc_a2_la_RDs\n")
+df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_wp25_deriv_mc_a2_la_RDs.txt", header = TRUE)
+df_MD<-df
+start_indices <- seq(2, ncol(df), by = 2)
+new_df <- data.frame(df[, c(1, start_indices)])
+colnames(new_df) <- colnames(df)[c(1, start_indices)]
+new_df[, 1] <- df[, 1]
+for (i in seq_along(start_indices)) {
+  for (row in seq_along(df[, 1])) {
+    new_df[row, i + 1] <- mean_print(df[row, start_indices[i]], df[row, start_indices[i] + 1])
+  }
+}
+kable(new_df)
+
+cat("## wp25_deriv_mc_a2_la_mc\n")
+df <- read.table("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_wp25_deriv_mc_a2_la_mc.txt", header = TRUE)
+df_mc<-df
+start_indices <- seq(2, ncol(df), by = 2)
+new_df <- data.frame(df[, c(1, start_indices)])
+colnames(new_df) <- colnames(df)[c(1, start_indices)]
+new_df[, 1] <- df[, 1]
+for (i in seq_along(start_indices)) {
+  for (row in seq_along(df[, 1])) {
+    new_df[row, i + 1] <- mean_print(df[row, start_indices[i]], df[row, start_indices[i] + 1])
+  }
+}
+kable(new_df)
+
 ```
 
+## difference in  mc 
+
+We need to solve the system $T\vec{\delta\mu}=R^{sub}$ where $T_{ij}=\frac{\partial R_i}{\partial \mu_j}$ with
+$R_i= M_i/f_\pi$ or $R_i=M_iw_0$ and $R^{sub}=R^{iso}-R^{sim}$.
+
+Here we compare $\delta\mu_c$ when we add a term $C a^2$ to the physical value 
+of $M_{D_s}$ adding to the system
+$$
+  T\vec{\delta\mu} = \vec{R^{sub}}+ a^2C \hat{e_{\mu_c}}
+$$
+
+The solution, writing the factor $a$ explicitelly is
+
+$$
+  a\vec{\delta\mu} = a T^{-1}(\vec{R^{sub}}+ a^2C \hat{e_{\mu_c}})
+$$
+
+With this modification $f_\pi$ becomes
+$$
+f_\pi= f_\pi^{sim}+ (a\vec{\delta \mu_c} +a^3C T^{-1}\hat{e_{\mu_c}})\frac{d f_\pi}{da\vec{\mu_c}}
+$$
+
+Alternatively to add the lattice artefact only on $\mu_c$ we can do
+$$
+  \frac{T}{a} a\vec{\delta\mu} = \vec{R^{sub}}+ a^3 C \frac{T}{a}\hat{e_{\mu_c}}
+$$
+
+$$
+a\vec{\delta\mu} = a T^{-1}(\vec{R^{sub}}+ a^3C \frac{1}{a}T\hat{e_{\mu_c}})= 
+aT^{-1}\vec{R^{sub}}+ a^3C\hat{e_{\mu_c}}
+$$
+(this can be done after adding the term $C$ to $\delta \mu$ after solving the sistem)
+With this modification $f_\pi$ becomes
+$$
+f_\pi= f_\pi^{sim}+ (a\vec{\delta \mu_c} +a^3C\hat{e_{\mu_c}})\frac{d f_\pi}{da\vec{\mu_c}}
+$$
+
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- myggplot(fill = FALSE)
+gg<- ggplot()+theme_bw()
+diff<-(df1$delta_amuc - df_MD$delta_amuc)/df1$afpi
+gg <- gg + geom_point(aes(
+  x = df1$a.fm. * df1$a.fm.,
+  y = diff,
+  color="diff a2 MDs"
+))
+gg <- gg + geom_errorbar(aes(
+  x = df1$a.fm. * df1$a.fm.,
+  y = diff,
+  ymin = diff- (df1$ddelta_amuc)/df1$afpi,
+  ymax = diff +(df1$ddelta_amuc)/df1$afpi,
+  color="diff a2 MDs"
+), width=0.00005) 
+####
+diff_mc<-(df1$delta_amuc - df_mc$delta_amuc)/df1$afpi
+gg <- gg + geom_point(aes(
+  x = df1$a.fm. * df1$a.fm.,
+  y = diff_mc,
+  color="diff a2 mc"
+))
+gg <- gg + geom_errorbar(aes(
+  x = df1$a.fm. * df1$a.fm.,
+  y = diff_mc,
+  ymin = diff_mc- (df1$ddelta_amuc)/df1$afpi,
+  ymax = diff_mc +(df1$ddelta_amuc)/df1$afpi,
+  color="diff a2 mc"
+), width=0.00005) 
+
+######
+gg <- gg + geom_point(aes(
+  x = df1$a.fm. * df1$a.fm.,
+  y = df1$delta_amuc/df1$afpi ,
+  color="MDs"
+))
+gg <- gg + geom_point(aes(
+  x = df1$a.fm. * df1$a.fm.,
+  y = df_MD$delta_amuc/df1$afpi ,
+  color="MDs+a2*C"
+))
+gg <- gg + geom_point(aes(
+  x = df1$a.fm. * df1$a.fm.,
+  y = df_mc$delta_amuc/df1$afpi ,
+  color="muc+a2*C"
+))
+
+
+fig<-myplotly(gg,"","$a^2$","$[\\delta\\mu_c-\\delta\\mu_c(a^2C)]/f_\\pi$", 
+         xrange = c(0,0.008),
+         yrange = c(-0.005,0.018),
+         to_print = TRUE
+      )
+```
+
+
+
+## w0
 
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
@@ -116,7 +258,7 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 [\\mbox{fm}]$",
 )
 ```
 
-
+## fpi
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
@@ -126,7 +268,8 @@ basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_Mpi_wp25_hybrid_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_laRDs_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_laRDs_exact_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_laRDs_exact_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_la_mc_exact_cont_a2"
 )
 labels <- c(
   "P[0]+ P[1]*a2 ",
@@ -134,22 +277,23 @@ labels <- c(
   "wp25Mpi_hybrid",
   "wp25_lin_dmc",
   "wp25_lin_dmc_laRDs",
-  "wp25_lin_dmc_laRDs_exact"
+  "wp25_lin_dmc_laRDs_exact",
+  "wp25_lin_dmc_la_mc_exact"
 )
 
 
 for (j in seq_along(basenames)) {
   print(basenames[j])
   fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
-  make_table_fit_result(fit)
+  print(make_table_fit_result(fit))
   gg <- plot_fit(basenames[j], "a2",
     # noline = TRUE,
-    data_type =labels[j],
+    data_type = labels[j],
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j],
     width = 0.0001,
-    nudge= j*0.00001
+    nudge = j * 0.00001
   )
 }
 fpi_FLAG <- 130.5
@@ -163,6 +307,125 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
 )
 ```
 
+## AIC fpi
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+dir <- "/home/garofalo/analysis/flow/data/fit_all_beta/"
+basenames <- c(
+  "fit_fpi_wp25_lin_a2",
+  "fit_fpi_wp25_lin_a2_3pt",
+  "fit_fpi_wp25_lin_a2_a4",
+  "fit_fpi_wp25_lin_a2_3pt_noC"
+)
+# labels <- c(  "a2",  "a2_3pt",  "a2_a4")
+count <- length(basenames)
+df <- data.frame(
+  "fit" = rep("", count),
+  "res" = rep(0, count),
+  "err" = rep(0, count),
+  "chi2dof" = rep(0, count),
+  "dof" = rep(0, count),
+  "Npar" = rep(0, count),
+  "Ndat" = rep(0, count),
+  "mult" = rep(0, count),
+  "k" = rep(0, count)
+)
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(dir, basenames[j], "_fit_P.dat"))
+  df[j, 1] <- basenames[j]
+  M <- data.matrix(fit$C)
+  for (i in c(1:dim(M)[1])) {
+    for (l in c(1:dim(M)[1])) {
+      M[i, l] <- as.numeric(fit$C[i, l])
+    }
+  }
+  e <- eigen(M)
+
+  lmin <- min(abs(e$values))
+  lmax <- max(abs(e$values))
+  k <- lmax / lmin
+  df[j, -1] <- c(fit$P[1, 2], fit$P[1, 3], fit$chi2dof, fit$dof, fit$npar, fit$ndata, 1, k)
+
+
+  # print(make_table_fit_result(fit))
+  gg <- plot_fit(paste0(dir, basenames[j]), "a2",
+    # noline = TRUE,
+    data_type = basenames[j],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = basenames[j],
+    width = 0.0001,
+    nudge = j * 0.00001
+  )
+}
+fpi_FLAG <- 130.5
+gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+
+#### AIC
+ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$"))
+cat("BAIC average $f_\\pi=", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>")
+#### remove a4
+dff <- df[!grepl("a4", df$fit), ]
+ave_BAICf <- BAIC(v = dff$res, err = dff$err, chi2dof = dff$chi2dof, dof = dff$dof, npar = dff$Npar, multiplicity = dff$mult)
+cat("BAIC average no a4 $f_\\pi=", mean_print(ave_BAICf$m, ave_BAICf$dm), "\\,[\\text{MeV}]$<br>")
+
+
+
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+## MDs
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_MDs_wp25_lin_laRDs_exact_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_MDs_wp25_lin_la_mc_exact_cont_a2"
+)
+labels <- c(
+  "wp25_lin_dmc_laRDs_exact",
+  "wp25_lin_dmc_la_mc_exact"
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = labels[j],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    nudge = j * 0.0000001
+  )
+}
+MDs_FLAG <- 1967
+gg <- gg + geom_hline(yintercept = MDs_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+gg <- gg + geom_point(aes(x = 0, y = MDs_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$M_{D_s} [\\mbox{MeV}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+## ms/ml
 
 
 
