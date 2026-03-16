@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include "match_confs.hpp"
 
 std::pair<std::vector<size_t>, std::vector<size_t>>
 matching_indices(const std::vector<std::string>& a,
@@ -66,3 +67,37 @@ matching_indices(const std::vector<std::string>& a,
 //     return 0;
 
 // }
+
+std::vector<Match> findAllIndices(const std::vector<std::string>& v1, 
+                                  const std::vector<std::string>& v2, 
+                                  const std::vector<std::string>& v3) {
+    // Map strings to their indices in v2 and v3
+    std::unordered_map<std::string, size_t> map2, map3;
+    for (size_t i = 0; i < v2.size(); ++i) map2[v2[i]] = i;
+    for (size_t i = 0; i < v3.size(); ++i) map3[v3[i]] = i;
+
+    std::vector<Match> matches;
+
+    // Check v1 against the maps
+    for (size_t i = 0; i < v1.size(); ++i) {
+        auto it2 = map2.find(v1[i]);
+        auto it3 = map3.find(v1[i]);
+
+        if (it2 != map2.end() && it3 != map3.end()) {
+            matches.push_back({v1[i], i, it2->second, it3->second});
+        }
+    }
+    return matches;
+}
+
+
+bool hasDuplicates(const std::vector<std::string>& vec) {
+    std::unordered_set<std::string> seen;
+    for (const auto& str : vec) {
+        // insert().second is false if the element already exists
+        if (!seen.insert(str).second) {
+            return true; 
+        }
+    }
+    return false;
+}

@@ -129,3 +129,8 @@ add_target_with_libs(meson_smallAC meson_smallAC.cpp)
 
 add_target_with_libs(fit_cont_w0_fpi fit_cont_w0_fpi.cpp)
 add_target_with_libs(test_add_la_in_fit test_add_la_in_fit.cpp)
+
+add_target_with_libs(other_fpi other_fpi.cpp)
+add_target_with_libs(deriv_other_fpi deriv_other_fpi.cpp)
+
+add_target_with_libs(fit_smallV_phys_point_fpi_A0P5 fit_smallV_phys_point_fpi_A0P5.cpp)
