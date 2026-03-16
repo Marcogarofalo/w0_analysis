@@ -32,8 +32,6 @@
 #include <vector>
 #include <ranges>
 
-constexpr double Mpi_MeV = 135;
-constexpr double Mpi_MeV_err = 0.2;
 // #include "do_analysis_charm.hpp"
 
 generic_header read_header(FILE* stream) {

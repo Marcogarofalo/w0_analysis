@@ -3,6 +3,23 @@
 #include "non_linear_fit.hpp"
 
 constexpr double hbarc = 197.326963; // MeV*fm
+constexpr double fpi_MeV = 130.5;
+constexpr double fpi_MeV_err = 0.04;
+
+constexpr double Mpi_MeV = 135;
+constexpr double Mpi_MeV_err = 0.2;
+
+constexpr double w0_fm = 0.17236;
+constexpr double w0_fm_err = 0.0000002; // 0.00070
+
+constexpr double w0_MeV = w0_fm / hbarc;
+constexpr double w0_MeV_err = w0_fm_err / hbarc; // 0.00070
+
+constexpr double MK_MeV = 494.6;
+constexpr double MK_MeV_err = 0.3;
+
+constexpr double MDs_MeV = 1967.0;
+constexpr double MDs_MeV_err = 0.4;
 
 double ****bin_intoN_exp(double ****data, int ivar, int T, int Nconf_in, int Nb);
 double ****bin_intoN_exp1(double ****data, double ****data_noexp, int ivar, int ivar_noexp, int T, int Nconf_in, int Nb);
@@ -27,4 +44,7 @@ double lhs_plateau_dM_dmu(int j, double ****in, int t, struct fit_type fit_info)
 double lhs_plateau_df_dmu(int j, double ****in, int t, struct fit_type fit_info);
 
 double lhs_plateau_ratio_dM_dmu(int j, double ****in, int t, struct fit_type fit_info);
+
+double lhs_me(int j, double**** in, int t, struct fit_type fit_info);
+double lhs_fpi_P5A0(int j, double**** in, int t, struct fit_type fit_info);
 #endif

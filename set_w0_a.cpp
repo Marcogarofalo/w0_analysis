@@ -44,23 +44,6 @@ enum enum_ensembles {
     E112,
     C112
 };
-constexpr double fpi_MeV = 130.5;
-constexpr double fpi_MeV_err = 0.04;
-
-constexpr double Mpi_MeV = 135;
-constexpr double Mpi_MeV_err = 0.2;
-
-constexpr double w0_fm = 0.17236;
-constexpr double w0_fm_err = 0.0000002; // 0.00070
-
-constexpr double w0_MeV = w0_fm / hbarc;
-constexpr double w0_MeV_err = w0_fm_err / hbarc; // 0.00070
-
-constexpr double MK_MeV = 494.6;
-constexpr double MK_MeV_err = 0.3;
-
-constexpr double MDs_MeV = 1967.0;
-constexpr double MDs_MeV_err = 0.4;
 
 // #include "do_analysis_charm.hpp"
 
@@ -1822,7 +1805,7 @@ int main(int argc, char** argv) {
         double** miso_w0 = malloc_2<double>(3, Njack);
         double** dm_w0 = malloc_2<double>(3, Njack);
         // double coeff = +0.75;
-        double coeff = -40.70;
+        double coeff = -260.70;
 
         for (int j = 0; j < Njack;j++) {
 
@@ -1835,7 +1818,7 @@ int main(int argc, char** argv) {
             static constexpr int iw0 = 4;
             double w0 = data[id_deriv(iw0, 0, 0, 0)][j];
             // double a2_sim = previous_a[j] * previous_a[j];
-            double a2_sim = std::pow(w0_fm / w0, 2);
+            double a2_sim = std::pow(w0_fm / w0, 3);
 
             for (int iM = 0; iM < 3; iM++) {
 
@@ -1864,21 +1847,20 @@ int main(int argc, char** argv) {
                     // if (im!=2) 
                     Mat[iM][im] += dM * w0 + M * dw;
                     //a2 coeff in RDs
-                    // if (iM == 2)
-                    //     Mat[iM][im] += coeff * a2_sim * 2.0 * dw / w0;
+                    if (iM == 2)
+                        Mat[iM][im] += coeff * a2_sim * 3.0 * dw / w0;
                 }
                 y[iM] -= M * w0;
 
             }
             // add the lattice artefact RDs
-            // y[2] += coeff * a2_sim;
-            // la[2] += coeff * a2_sim;
-            // for (int ii = 0;ii < 3;ii++) {
-            //     for (int ij = 0;ij < 3;ij++) {
-            //         rhs[ii] += Mat[ii][ij] * la[ij];
-            //     }
-            //     rhs[ii] += y[ii];
-            // }
+            la[2] += coeff * a2_sim;
+            for (int ii = 0;ii < 3;ii++) {
+                for (int ij = 0;ij < 3;ij++) {
+                    rhs[ii] += Mat[ii][ij] * la[ij];
+                }
+                rhs[ii] += y[ii];
+            }
 
 
             double* P = LU_decomposition_solver(3, Mat, y);
@@ -1948,9 +1930,9 @@ int main(int argc, char** argv) {
                 }
             }
             a_from_w0[j] = w0_fm / w_a;
-            // add lattice artefact to mc
-            miso_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
-            dm_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
+            // // add lattice artefact to mc
+            // miso_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
+            // dm_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
 
             for (int im = 0; im < 3; im++) {
                 for (int val_sea = 0; val_sea < 2; val_sea++) {

@@ -284,6 +284,30 @@ double lhs_mpcac(int j, double**** in, int t, struct fit_type fit_info) {
     double r = -(in[j][id_V][t + 1][0] - in[j][id_V][(t - 1) % fit_info.T][0]) / (4. * mu * in[j][id_P][t][0]);
     return r;
 }
+double lhs_me(int j, double**** in, int t, struct fit_type fit_info) {
+    int id = fit_info.corr_id[0];
+    double corr = in[j][id][t][0];
+    double M = fit_info.ext_P[0][j];
+    double me = sqrt(corr * 2 * M / (exp(-t * M) + exp(-(fit_info.T - t) * M)));
+    return me;
+}
+double lhs_fpi_P5A0(int j, double**** in, int t, struct fit_type fit_info) {
+    int id_A = fit_info.corr_id[0];
+    double corr_A = in[j][id_A][t][0];
+    double corr_A_m = in[j][id_A][(t - 1) % fit_info.T][0];
+    double dA = corr_A - corr_A_m;
+    int id_P = fit_info.corr_id[1];
+    double corr_P = in[j][id_P][t][0];
+
+    double M = fit_info.ext_P[0][j];
+    double oPp = fit_info.ext_P[1][j];
+
+    // double oAp = (dA / corr_P) * oPp;
+    // double fpi = oAp / (M * sinh(M));
+    double oAp = ((corr_A / oPp) * 2 * M / (exp(-t * M) - exp(-(fit_info.T - t) * M)));
+    double fpi = -oAp / (M); // we need a minus because we are using P5A0 wich is  <P5(0) A0^\dagger(t)> so we are computing <0| A0^\dagger|P> = -<0| A0|P> 
+    return fpi;
+}
 
 double lhs_dM_sea(int j, double**** in, int t, struct fit_type fit_info) {
     // fit_info.myen = { 1, 1 }; // sign , reim   for mass correction of the pion
