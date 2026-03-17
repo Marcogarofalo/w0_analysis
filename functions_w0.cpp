@@ -308,6 +308,30 @@ double lhs_fpi_P5A0(int j, double**** in, int t, struct fit_type fit_info) {
     double fpi = -oAp / (M); // we need a minus because we are using P5A0 wich is  <P5(0) A0^\dagger(t)> so we are computing <0| A0^\dagger|P> = -<0| A0|P> 
     return fpi;
 }
+double lhs_plateau_fpi_P5A0(int j, double**** in, int t, struct fit_type fit_info) {
+    int id_A = fit_info.corr_id[0];
+    double corr_A = in[j][id_A][t][0];
+
+    double M = fit_info.ext_P[0][j];
+    double oPp = fit_info.ext_P[1][j];
+
+    double oAp = ((corr_A / oPp) * 2 * M / (exp(-t * M) - exp(-(fit_info.T - t) * M)));
+    double fpi = -oAp / (M); // we need a minus because we are using P5A0 wich is  <P5(0) A0^\dagger(t)> so we are computing <0| A0^\dagger|P> = -<0| A0|P> 
+
+    int id_A1 = fit_info.corr_id[1];
+    double corr_A1 = in[j][id_A1][t][0];
+
+    double M1 = fit_info.ext_P[2][j];
+    double oPp1 = fit_info.ext_P[3][j];
+
+    double oAp1 = ((corr_A1 / oPp1) * 2 * M1 / (exp(-t * M1) - exp(-(fit_info.T - t) * M1)));
+    double fpi1 = -oAp1 / (M1); // we need a minus because we are using P5A0 wich is  <P5(0) A0^\dagger(t)> so we are computing <0| A0^\dagger|P> = -<0| A0|P> 
+
+    double dmu = fit_info.ave_P[0];
+    // if (j == fit_info.Njack - 1)
+    //     printf("t=%d  fpi=%g   fpi1=%g   dmu=%g\n", t, fpi, fpi1, dmu);
+    return (fpi - fpi1) / dmu;
+}
 
 double lhs_dM_sea(int j, double**** in, int t, struct fit_type fit_info) {
     // fit_info.myen = { 1, 1 }; // sign , reim   for mass correction of the pion

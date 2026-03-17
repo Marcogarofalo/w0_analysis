@@ -47,4 +47,5 @@ double lhs_plateau_ratio_dM_dmu(int j, double ****in, int t, struct fit_type fit
 
 double lhs_me(int j, double**** in, int t, struct fit_type fit_info);
 double lhs_fpi_P5A0(int j, double**** in, int t, struct fit_type fit_info);
+double lhs_plateau_fpi_P5A0(int j, double**** in, int t, struct fit_type fit_info);
 #endif

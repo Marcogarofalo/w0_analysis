@@ -134,3 +134,4 @@ add_target_with_libs(other_fpi other_fpi.cpp)
 add_target_with_libs(deriv_other_fpi deriv_other_fpi.cpp)
 
 add_target_with_libs(fit_smallV_phys_point_fpi_A0P5 fit_smallV_phys_point_fpi_A0P5.cpp)
+add_target_with_libs(average_smallV_phys_point_fpi_A0P5 average_smallV_phys_point_fpi_A0P5.cpp)

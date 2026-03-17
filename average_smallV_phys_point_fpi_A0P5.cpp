@@ -356,29 +356,19 @@ int main(int argc, char** argv) {
 
             std::vector<std::string> word = split(line, ' ');
 
-            if (word.size() == 2) {
+            if (word.size() == 1) {
                 basename = word[0];
-                mysprintf(namefile, NAMESIZE, "%s/%s_%s_%s", argv[2], argv[1], word[0].c_str(), word[1].c_str());
+                mysprintf(namefile, NAMESIZE, "%s/%s", argv[2],  word[0].c_str());
                 printf("adding file %s\n", namefile);
                 files.emplace_back(namefile);
                 myen[beta_count].emplace_back(file_count);
                 file_count++;
             }
-            else if (word.size() == 1) {
-                if (strcmp(word[0].c_str(), "new_beta") == 0) {
-                    myen.emplace_back(std::vector<int>());
-                    beta_count++;
-                }
-                else {
-                    printf("impossible to give a meaning to the line: %s\n", word[0].c_str());
-                    exit(1);
-                }
-            }
-            else if (word.size() == 0) {
-            }
             else {
-                error(1, 1, "main", "Invalid line in input file: %s", line.c_str());
+                printf("impossible to give a meaning to the line: %s\n", word[0].c_str());
+                exit(1);
             }
+
         }
     }
 
@@ -472,35 +462,25 @@ int main(int argc, char** argv) {
     // fitting
     //////////////////////////////////////////////////////////////
     std::vector<std::string> der_name = { "deriv_fpi_A0P5" , "deriv_fpi_WTI" };
-    std::vector<int> id_der = { id_mu_over_f_dfpi_A0P5, id_mu_over_f_dfpi_WTI };
+    std::vector<std::vector<int>> id_der = { {17, 19}, {18,20} };
     // std::vector<int> id_der = { id_dfpi_dmu, id_dfpi_WTI_dmu };
-    std::vector<double> x_phys_point = { jackall.en[0].jack[id_muliso][Njack-1] }; // Mpi/fpi
+    std::vector<double> x_phys_point = { jackall.en[0].jack[id_muliso][Njack - 1] }; // Mpi/fpi
 
     double* zeros = (double*)malloc(sizeof(double) * Njack);
     for (int j = 0; j < Njack; j++) {
         zeros[j] = 0;
     }
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 17; i++) {
         write_jack(zeros, Njack, jack_file); check_correlatro_counter(i);
     }
-    write_jack(jackall.en[0].jack[10], Njack, jack_file); check_correlatro_counter(10); //amuiso
-    write_jack(jackall.en[0].jack[11], Njack, jack_file); check_correlatro_counter(11);
-    write_jack(jackall.en[0].jack[12], Njack, jack_file); check_correlatro_counter(12);
 
-    write_jack(jackall.en[0].jack[13], Njack, jack_file); check_correlatro_counter(13); //amusim
-    write_jack(jackall.en[0].jack[14], Njack, jack_file); check_correlatro_counter(14);
-    write_jack(jackall.en[0].jack[15], Njack, jack_file); check_correlatro_counter(15);
-
-    write_jack(jackall.en[0].jack[16], Njack, jack_file); check_correlatro_counter(16); //  a_fm
-    
     fit_type fit_info;
-
-    // linear fit of the smallest masses
-    fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
-    for (int n = 0; n < myen.size(); n++) {
-        fit_info.Nxen[n].resize(myen[n].size()-1);
-        for (int e = 0; e < myen[n].size()-1; e++) {
-            fit_info.Nxen[n][e] = myen[n][e];
+    int Nfits = 2;
+    fit_info.Nxen = std::vector<std::vector<int>>(Nfits, std::vector<int>());
+    for (int n = 0; n < Nfits; n++) {
+        fit_info.Nxen[n].resize(myen[0].size());
+        for (int e = 0; e < myen[0].size(); e++) {
+            fit_info.Nxen[n][e] = myen[0][e];
         }
     }
     fit_info.init_N_etot_form_Nxen();
@@ -513,92 +493,41 @@ int main(int argc, char** argv) {
         for (int e : fit_info.Nxen[n]) {
             for (int j = 0; j < Njack; j++) {
                 // fit_info.x[0][count][j] = jackall.en[e].jack[id_aMpi][j] / jackall.en[e].jack[id_afpi_WTI][j]; // Mpi/fpi
-                fit_info.x[0][count][j] = jackall.en[e].jack[id_mu][j] ;
+                fit_info.x[0][count][j] = jackall.en[e].header.L;
             }
             count++;
         }
     }
-    
-    
     fit_info.verbosity = 0;
     double* fpi_phys_point = myres->create_fake(0, 0.001, 1);
     double* tif = (double*)malloc(sizeof(double) * 3);
     // fit_info.band_range = { x_phys_point[0], 4 };
-    fit_info.band_range = {  x_phys_point[0], 0.006 };
+    fit_info.band_range = { x_phys_point[0], 0.006 };
     double dx = 0.0001;
 
     for (int i = 0; i < der_name.size(); i++) {
 
         // fit_info.corr_id = {id_dw0_dmu, id_m0iso, id_a_fm};
-        fit_info.corr_id = { id_der[i], id_muliso };
+        fit_info.corr_id = id_der[i];
 
-        fit_info.function = rhs_xi;
+        fit_info.function = rhs_const;
         fit_info.linear_fit = true;
-        fit_info.Npar = 2;
+        fit_info.Npar = 1;
 
 
-        std::string namefit = base_name + "_" + der_name[i] + "_xi";
+        std::string namefit = base_name + "_" + der_name[i] + "_const";
 
         fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, dx, {});
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "L", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, dx, {});
 
 
-        // a function that compute rhs_xi at the physical point and write it in a jackknife file
-        for (int j = 0; j < Njack; j++) {
-            for (int p = 0; p < fit_info.Npar; p++)                tif[p] = der_fpi_const_full.P[p][j];
-            fpi_phys_point[j] = fit_info.function(0, fit_info.Nvar, x_phys_point.data(), fit_info.Npar, tif);
-        }
-        write_jack(fpi_phys_point, Njack, jack_file); check_correlatro_counter(17 + i);
+
+        write_jack(der_fpi_const_full.P[0], Njack, jack_file); check_correlatro_counter(17 + i);
+        std::string name_j = "deriv/" + base_name + "_" + der_name[i];
+        myres->write_jack_in_file(der_fpi_const_full.P[0], name_j.c_str());
     }
 
-    free_3(fit_info.Nvar, fit_info.entot, fit_info.x);
 
-    fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
-    for (int n = 0; n < myen.size(); n++) {
-        fit_info.Nxen[n].resize(myen[n].size());
-        for (int e = 0; e < myen[n].size(); e++) {
-            fit_info.Nxen[n][e] = myen[n][e];
-        }
-    }
-    fit_info.init_N_etot_form_Nxen();
-    fit_info.Nvar = 1;
-    fit_info.Njack = jackall.en[0].Njack;
-
-    fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
-    count = 0;
-    for (int n = 0; n < fit_info.N; n++) {
-        for (int e : fit_info.Nxen[n]) {
-            for (int j = 0; j < Njack; j++) {
-                // fit_info.x[0][count][j] = jackall.en[e].jack[id_aMpi][j] / jackall.en[e].jack[id_afpi_WTI][j]; // Mpi/fpi
-                fit_info.x[0][count][j] = jackall.en[e].jack[id_mu][j] ;
-            }
-            count++;
-        }
-    }
-
-    for (int i = 0; i < der_name.size(); i++) {
-        //////////////////////////////////////////////////////////////
-        // a+b*mu*mu2
-        //////////////////////////////////////////////////////////////
-        fit_info.corr_id = { id_der[i] ,id_muliso };
-        fit_info.linear_fit = true;
-        fit_info.function = rhs_xi_xi2;
-        fit_info.Npar = 3;
-
-
-
-        std::string namefit = base_name + "_" + der_name[i] + "_xi_xi2";
-
-        fit_result der_fpi_const_full_poly = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full_poly, der_fpi_const_full_poly, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, dx, {});
-
-        for (int j = 0; j < Njack; j++) {
-            for (int p = 0; p < fit_info.Npar; p++)                tif[p] = der_fpi_const_full_poly.P[p][j];
-            fpi_phys_point[j] = fit_info.function(0, fit_info.Nvar, x_phys_point.data(), fit_info.Npar, tif);
-        }
-        write_jack(fpi_phys_point, Njack, jack_file); check_correlatro_counter(17 + der_name.size() + i);
-
-    }
     free(fpi_phys_point);
     fit_info.restore_default();
     free(tif);

@@ -164,6 +164,9 @@ int main(int argc, char** argv) {
     error(hasDuplicates(head_rew.smearing), 1, "main", "duplicates in confs of rew");
 
     auto results = findAllIndices(head_A0.smearing, head_P5.smearing, head_rew.smearing);
+    printf("confs A0P5 %ld\n", head_A0.smearing.size());
+    printf("confs P5P5 %ld\n", head_P5.smearing.size());
+    printf("confs rew  %ld\n", head_rew.smearing.size());
     printf("conf matching: %ld\n", results.size());
     // for (const auto& m : results) {
     //     std::cout << "Value: " << m.value 
@@ -401,10 +404,37 @@ int main(int argc, char** argv) {
     line_read_param(option_p, "a", mean, err, seed, namefile_plateaux);
     double* a_fm = myres->create_fake(mean, err, seed);
 
+    std::string name_OStm = argv[3];
+    std::string name_OStm1 = argv[7];
+
+    size_t first = name_OStm.find('_');
+    size_t second = name_OStm.find('_', first + 1);
+    std::string label = name_OStm.substr(first + 1, second - first - 1);
+
+    size_t first1 = name_OStm1.find('_');
+    size_t second1 = name_OStm1.find('_', first1 + 1);
+    std::string label1 = name_OStm1.substr(first1 + 1, second1 - first1 - 1);
+
+    std::string Z_RIMON;
+    if (label.compare("tm") == 0 && label1.compare("tm") == 0)
+        Z_RIMON = "ZA_RIMOM";
+    else if (label.compare("OS") == 0 && label1.compare("OS") == 0)
+        Z_RIMON = "ZV_RIMOM";
+    else
+        error(1 == 1, 1, "main", "label of input files should be  both tm or OS");
+
+    printf("Z_RIMON: %s\n", Z_RIMON.c_str());
+    line_read_param(option_p, Z_RIMON.c_str(), mean, err, seed, namefile_plateaux);
+    double* Z = myres->create_fake(mean, err, seed);
+
     ////////////////////////////////////////////////////////////
     // start fitting
     //////////////////////////////
     corr_counter = -1;
+    struct fit_type fit_info;
+    fit_info.codeplateaux = true;
+
+    line_read_param(option, "M_{PS}", fit_info.tmin, fit_info.tmax, seed, namefile_plateaux);
 
     double* M_PS = plateau_correlator_function(
         option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
@@ -412,10 +442,6 @@ int main(int argc, char** argv) {
     // free(M_PS);
     check_correlatro_counter(0);
 
-    struct fit_type fit_info;
-    fit_info.codeplateaux = true;
-
-    line_read_param(option, "M_{PS}", fit_info.tmin, fit_info.tmax, seed, namefile_plateaux);
 
     double* M_PS_mu = plateau_correlator_function(
         option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
@@ -477,20 +503,21 @@ int main(int argc, char** argv) {
     ///////// deriv
 
     double* deriv = myres->create_copy(M_PS);
-    double dmu = head_rew.oranges[0] - head_rew.mus[0];
+    double dmu = head_rew.mus[0] - head_rew.oranges[0];
+    printf("dmu: %.12g mu1 =  %g   mu2 = %g\n", dmu, head_rew.mus[0], head_rew.oranges[0]);
     for (int j = 0; j < Njack;j++) {
-        deriv[j] = (fpi.P[0][j] - fpi_mu.P[0][j]) / dmu;
+        deriv[j] = Z[j] * (fpi.P[0][j] - fpi_mu.P[0][j]) / dmu;
     }
-    printf("deriv: %.12g   %.12g\n", deriv[Njack-1] , myres->comp_error(deriv));
+    printf("deriv: %.12g   %.12g\n", deriv[Njack - 1], myres->comp_error(deriv));
     write_jack(deriv, Njack, jack_file);
     check_correlatro_counter(6);
 
     std::string name(option[6]);
     // 1. Find the first underscore
-    size_t first = name.find('_');
+    first = name.find('_');
 
     // 2. Find the second underscore starting search from the position after the first
-    size_t second = name.find('_', first + 1);
+    second = name.find('_', first + 1);
     if (second != std::string::npos) {
         // 3. Extract from the start (0) up to the second underscore
         std::string result = name.substr(0, second);
@@ -504,7 +531,7 @@ int main(int argc, char** argv) {
     std::cout << name_rew << "\n";
     first = name_rew.find('_');
     second = name_rew.find('_', first + 1);
-    std::string label = name_rew.substr(first + 1, second - first - 1);
+    label = name_rew.substr(first + 1, second - first - 1);
     std::cout << label << "\n";
     if (label.compare("charm") == 0)
         label = "rewcOS";
@@ -513,6 +540,13 @@ int main(int argc, char** argv) {
     if (label.compare("strange") == 0)
         label = "rewsOS";
 
+    std::string name_jack_fpi = "deriv/deriv_fpi_P5A0_" + std::string(argv[3]) + "_" + std::string(argv[8]) +  ".jack_txt";
+    myres->write_jack_in_file(deriv,  name_jack_fpi.c_str());
+
+    name_jack_fpi = "deriv/fpi_P5A0_" + std::string(argv[3]) +   ".jack_txt";
+    double *Zf = myres->create_copy(fpi.P[0]);
+    myres->mult(Zf, Z, fpi.P[0]); 
+    myres->write_jack_in_file(Zf,  name_jack_fpi.c_str());
 
 
 
@@ -553,13 +587,12 @@ int main(int argc, char** argv) {
     check_correlatro_counter(8);
 
     // free_fit_result(fit_info, fit_out);
-    fit_info.restore_default();
 
     double* deriv_WTI = myres->create_copy(M_PS);
     for (int j = 0; j < Njack;j++) {
         deriv_WTI[j] = (f_PS.P[0][j] - f_PS_rew.P[0][j]) / dmu;
     }
-    printf("deriv_WTI: %.12g   %.12g\n", deriv_WTI[Njack-1] , myres->comp_error(deriv_WTI));
+    printf("deriv_WTI: %.12g   %.12g\n", deriv_WTI[Njack - 1], myres->comp_error(deriv_WTI));
     write_jack(deriv_WTI, Njack, jack_file);
     check_correlatro_counter(9);
 
@@ -573,16 +606,51 @@ int main(int argc, char** argv) {
 
     write_jack(a_fm, Njack, jack_file); check_correlatro_counter(16);
 
-    double *mul_over_fpi_deriv = myres->create_copy(deriv);
+    double* mul_over_fpi_deriv = myres->create_copy(deriv);
     for (int j = 0; j < Njack;j++) {
-        mul_over_fpi_deriv[j] = (amuiso[0][j] / fpi.P[0][j]) * deriv[j];
+        mul_over_fpi_deriv[j] =  (amuiso[0][j] / fpi.P[0][j]) * deriv[j];
     }
-    printf("mul_over_fpi_deriv: %.12g   %.12g\n", mul_over_fpi_deriv[Njack-1] , myres->comp_error(mul_over_fpi_deriv));
-    double *mul_over_fpi_deriv_WTI= myres->create_copy(deriv_WTI);
+    printf("mul_over_fpi_deriv: %.12g   %.12g\n", mul_over_fpi_deriv[Njack - 1], myres->comp_error(mul_over_fpi_deriv));
+    double* mul_over_fpi_deriv_WTI = myres->create_copy(deriv_WTI);
     for (int j = 0; j < Njack;j++) {
         mul_over_fpi_deriv_WTI[j] = (amuiso[0][j] / fpi.P[0][j]) * deriv_WTI[j];
     }
-    printf("mul_over_fpi_deriv_WTI: %.12g   %.12g\n", mul_over_fpi_deriv_WTI[Njack-1] , myres->comp_error(mul_over_fpi_deriv_WTI));
+    printf("mul_over_fpi_deriv_WTI: %.12g   %.12g\n", mul_over_fpi_deriv_WTI[Njack - 1], myres->comp_error(mul_over_fpi_deriv_WTI));
     write_jack(mul_over_fpi_deriv, Njack, jack_file); check_correlatro_counter(17);
     write_jack(mul_over_fpi_deriv_WTI, Njack, jack_file); check_correlatro_counter(18);
+
+    fit_info.Nvar = 1;
+    fit_info.Npar = 1;
+    fit_info.N = 1;
+    fit_info.Njack = Njack;
+    fit_info.n_ext_P = 0;
+    fit_info.function = constant_fit;
+    fit_info.linear_fit = true;
+    fit_info.T = head_A0.T;
+    fit_info.n_ext_P = 4;
+    // fit_info.malloc_ext_P();
+    fit_info.ext_P = (double**)malloc(sizeof(double*) * fit_info.n_ext_P);
+    fit_info.ext_P[0] = M_PS;
+    fit_info.ext_P[1] = me.P[0];
+    fit_info.ext_P[2] = M_PS_mu;
+    fit_info.ext_P[3] = me_mu.P[0];
+    fit_info.ave_P = { dmu };
+
+
+    fit_info.corr_id = { 0 ,2 }
+    ;
+    struct fit_result plateau_fpi = fit_fun_to_fun_of_corr(
+        option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
+        outfile, lhs_plateau_fpi_P5A0, "pateau_deriv_fpi_P5A0", fit_info,
+        jack_file);
+    check_correlatro_counter(19);
+
+
+    double* mul = myres->create_fake(head_P5.mus[0], 1e-20, -1);
+    write_jack(mul, Njack, jack_file); check_correlatro_counter(20);
+
+    write_jack(Z, Njack, jack_file); check_correlatro_counter(21);
+
+    fit_info.restore_default();
+
 }
