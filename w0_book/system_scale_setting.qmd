@@ -154,33 +154,33 @@ $$
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- myggplot(fill = FALSE)
 gg<- ggplot()+theme_bw()
-diff<-(df1$delta_amuc - df_MD$delta_amuc)/df1$afpi
-gg <- gg + geom_point(aes(
-  x = df1$a.fm. * df1$a.fm.,
-  y = diff,
-  color="diff a2 MDs"
-))
-gg <- gg + geom_errorbar(aes(
-  x = df1$a.fm. * df1$a.fm.,
-  y = diff,
-  ymin = diff- (df1$ddelta_amuc)/df1$afpi,
-  ymax = diff +(df1$ddelta_amuc)/df1$afpi,
-  color="diff a2 MDs"
-), width=0.00005) 
+# diff<-(df1$delta_amuc - df_MD$delta_amuc)/df1$afpi
+# gg <- gg + geom_point(aes(
+#   x = df1$a.fm. * df1$a.fm.,
+#   y = diff,
+#   color="diff a2 MDs"
+# ))
+# gg <- gg + geom_errorbar(aes(
+#   x = df1$a.fm. * df1$a.fm.,
+#   y = diff,
+#   ymin = diff- (df1$ddelta_amuc)/df1$afpi,
+#   ymax = diff +(df1$ddelta_amuc)/df1$afpi,
+#   color="diff a2 MDs"
+# ), width=0.00005) 
 ####
-diff_mc<-(df1$delta_amuc - df_mc$delta_amuc)/df1$afpi
-gg <- gg + geom_point(aes(
-  x = df1$a.fm. * df1$a.fm.,
-  y = diff_mc,
-  color="diff a2 mc"
-))
-gg <- gg + geom_errorbar(aes(
-  x = df1$a.fm. * df1$a.fm.,
-  y = diff_mc,
-  ymin = diff_mc- (df1$ddelta_amuc)/df1$afpi,
-  ymax = diff_mc +(df1$ddelta_amuc)/df1$afpi,
-  color="diff a2 mc"
-), width=0.00005) 
+# diff_mc<-(df1$delta_amuc - df_mc$delta_amuc)/df1$afpi
+# gg <- gg + geom_point(aes(
+#   x = df1$a.fm. * df1$a.fm.,
+#   y = diff_mc,
+#   color="diff a2 mc"
+# ))
+# gg <- gg + geom_errorbar(aes(
+#   x = df1$a.fm. * df1$a.fm.,
+#   y = diff_mc,
+#   ymin = diff_mc- (df1$ddelta_amuc)/df1$afpi,
+#   ymax = diff_mc +(df1$ddelta_amuc)/df1$afpi,
+#   color="diff a2 mc"
+# ), width=0.00005) 
 
 ######
 gg <- gg + geom_point(aes(
@@ -199,10 +199,19 @@ gg <- gg + geom_point(aes(
   color="muc+a2*C"
 ))
 
+for (ic in c(-1,-2,-5,-10)) {
+  df_m <- read.table(paste0("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_wp25_deriv_mc_a2_laC",ic,".txt"), header = TRUE)
+  gg <- gg + geom_point(aes(
+    x = !!(df_m$a.fm. * df_m$a.fm.),
+    y = !!(df_m$delta_amuc/df_m$afpi) ,
+    color=!!paste0("MDs+a2*C=",ic)
+  ))
+}
 
-fig<-myplotly(gg,"","$a^2$","$[\\delta\\mu_c-\\delta\\mu_c(a^2C)]/f_\\pi$", 
+
+fig<-myplotly(gg,"","$a^2$","$\\delta\\mu_c/f_\\pi$", 
          xrange = c(0,0.008),
-         yrange = c(-0.005,0.018),
+         yrange = c(-0.0002,0.0006),
          to_print = TRUE
       )
 ```
@@ -385,6 +394,93 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
 )
 ```
 
+
+## fpi + C a^2 MDs
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+library(stringr)
+basenames <- c(
+    "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-1.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-2.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-5.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-10.000000_cont_a2"
+)
+# extract the C value from the string 
+c_value <- as.numeric(sub(".*_C([^_]+)_.*", "\\1", basenames))
+c_value[is.na(c_value)] <- 0
+labels <- paste0("C=",c_value)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = labels[j],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    nudge = j * 0.00001
+  )
+}
+fpi_FLAG <- 130.5
+gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+## fpi + C a^2 mc
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+library(stringr)
+basenames <- c(
+    "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-100.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-200.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-400.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-800.000000_cont_a2"
+)
+# extract the C value from the string 
+c_value <- as.numeric(sub(".*mc_C([^_]+)_.*", "\\1", basenames))
+c_value[is.na(c_value)] <- 0
+labels <- paste0("C=",c_value)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = labels[j],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    nudge = j * 0.00001
+  )
+}
+fpi_FLAG <- 130.5
+gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
 
 ## MDs
 
