@@ -563,6 +563,40 @@ int main(int argc, char** argv) {
         }
     }
 
+        for (std::size_t ic = 0; ic < coeffs_mc.size(); ++ic) {
+
+        mysprintf(namefile, NAMESIZE, "%s/data_from_wp25_deriv_mc_a2_lamcC%g.txt", argv[3], coeffs_mc[ic]);
+        summary_out = open_file(namefile, "w+");
+        fprintf(summary_out, "ens   a[fm] da[fm]  afpi dafpi  amul damul amus damus  amuc  damuc    delta_amul  ddelta_amul  delta_amus  ddelta_amus  delta_amuc   ddelta_amuc\n");
+        for (int i = 0;i < myen[0].size();i++) {
+            size_t lastUnderscore = files[i].find_last_of('_');
+
+            error(lastUnderscore == std::string::npos, 1, "error in file name", "cannot read ens from name %s", files[i].c_str());
+            // 2. Estrae tutto ciò che segue l'ultimo underscore
+            std::string result = files[i].substr(lastUnderscore + 1);
+            fprintf(summary_out, "%s  ", result.c_str());
+            double* tmp = jackall.en[i].jack[95 +coeffs.size()*8+ic*9];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[96 +coeffs.size()*8+ic*9];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[92 +coeffs.size()*8+ic*9];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[93 +coeffs.size()*8+ic*9];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[94 +coeffs.size()*8+ic*9];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+            tmp = jackall.en[i].jack[97 +coeffs.size()*8+ic*9];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[98 +coeffs.size()*8+ic*9];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[99 +coeffs.size()*8+ic*9];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+            fprintf(summary_out, "\n");
+        }
+    }
+
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////

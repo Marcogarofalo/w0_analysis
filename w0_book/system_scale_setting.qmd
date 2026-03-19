@@ -146,7 +146,7 @@ $$
 (this can be done after adding the term $C$ to $\delta \mu$ after solving the sistem)
 With this modification $f_\pi$ becomes
 $$
-f_\pi= f_\pi^{sim}+ (a\vec{\delta \mu_c} +a^3C\hat{e_{\mu_c}})\frac{d f_\pi}{da\vec{\mu_c}}
+f_\pi= f_\pi^{sim}+ (a\vec{\delta \mu} +a^3C\hat{e_{\mu_c}})\cdot\frac{d f_\pi}{da\vec{\mu}}
 $$
 
 
@@ -205,6 +205,15 @@ for (ic in c(-1,-2,-5,-10)) {
     x = !!(df_m$a.fm. * df_m$a.fm.),
     y = !!(df_m$delta_amuc/df_m$afpi) ,
     color=!!paste0("MDs+a2*C=",ic)
+  ))
+}
+
+for (ic in c(-100,-200,-400,-800,-1600, -3200)) {
+  df_m <- read.table(paste0("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_wp25_deriv_mc_a2_lamcC",ic,".txt"), header = TRUE)
+  gg <- gg + geom_point(aes(
+    x = !!(df_m$a.fm. * df_m$a.fm.),
+    y = !!(df_m$delta_amuc/df_m$afpi) ,
+    color=!!paste0("mc+a2*C=",ic)
   ))
 }
 
@@ -424,7 +433,8 @@ for (j in seq_along(basenames)) {
     id_x = 1,
     single_name_for_fit = labels[j],
     width = 0.0001,
-    nudge = j * 0.00001
+    nudge = j * 0.00001,
+    noribbon = TRUE
   )
 }
 fpi_FLAG <- 130.5
@@ -449,7 +459,10 @@ basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-100.000000_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-200.000000_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-400.000000_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-800.000000_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-800.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-1600.000000_cont_a2",
+    "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_mc_C-3200.000000_cont_a2"
+
 )
 # extract the C value from the string 
 c_value <- as.numeric(sub(".*mc_C([^_]+)_.*", "\\1", basenames))

@@ -223,6 +223,11 @@ int id_deriv(int Meson, int deriv, int quark, int val_sea) {
     return Meson + deriv * (5 + 5 * (quark + 3 * val_sea));
 }
 
+
+int id_derv_fpi(int reg, int deriv, int quark, int val_sea) {
+    return 46 + reg * 7 + deriv * (1 + (quark + 3 * val_sea));
+}
+
 int main(int argc, char** argv) {
     error(argc != 5, 1, "main ",
         "usage:./fit_all_phi4  jack/boot   path_to_jack   output_dir    file_inputs");
@@ -375,7 +380,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // read the jacks
     //////////////////////////////////////////////////////////////
-    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3;
+    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2;
     printf("%d\n", file_to_read);
     error(files.size() - 2 != file_to_read, 1, "main", "No input files found in  file %s we need %d lines but we have %d", argv[4], file_to_read, files.size() - 2);
     double** data = malloc_2<double>(file_to_read, Njack);
@@ -606,11 +611,47 @@ int main(int argc, char** argv) {
     if (strcmp(files[46].c_str(), "skip") != 0 &&
         strcmp(files[47].c_str(), "skip") != 0 &&
         strcmp(files[48].c_str(), "skip") != 0) {
-        id_to_correct = { {0,3}, {44,45} };
+        // id_to_correct = { {0,3}, {44,45} };
+        id_to_correct.push_back({ 44, 45 }); // 
         read_file_debug(data[44], files[46].c_str());// mpi 
         read_file_debug(data[45], files[47].c_str());// fpi
         Ls.push_back(std::stoi(files[48]));
     }
+
+    read_file_debug(data[46], files[49].c_str());// fpi A0 tm
+    read_file_debug(data[47], files[50].c_str());// deriv val ml fpi A0 
+    read_file_debug(data[48], files[51].c_str());// deriv val ms fpi A0 
+    read_file_debug(data[49], files[52].c_str());// deriv val mc fpi A0 
+    read_file_debug(data[50], files[53].c_str());// deriv sea ml fpi A0 
+    read_file_debug(data[51], files[54].c_str());// deriv sea ms fpi A0 
+    read_file_debug(data[52], files[55].c_str());// deriv sea mc fpi A0
+
+    read_file_debug(data[53], files[50].c_str());// fpi A0 OS
+    read_file_debug(data[54], files[51].c_str());// deriv val ml fpi A0 
+    read_file_debug(data[55], files[52].c_str());// deriv val ms fpi A0 
+    read_file_debug(data[56], files[53].c_str());// deriv val mc fpi A0 
+    read_file_debug(data[57], files[54].c_str());// deriv sea ml fpi A0 
+    read_file_debug(data[58], files[55].c_str());// deriv sea ms fpi A0 
+    read_file_debug(data[59], files[56].c_str());// deriv sea mc fpi A0
+
+
+    for (int j = 0; j < Njack;j++) {
+        for (int r = 0; r < 2; r++) {
+            for (int sc = 1;sc < 3;sc++) {
+                int iddf = id_derv_fpi(r, 1, sc, 1);
+                double* dR = &data[iddf][j];
+                int idf = id_derv_fpi(r, 0, 0, 0);
+                double f = data[idf][j];
+                *dR = (*dR) * (f) / amuiso[0][j];
+            }
+        }
+    }
+
+    id_to_correct.push_back({ id_derv_fpi(0, 0, 0, 0) });
+    // OS does not need max twist correction
+    std::vector<std::vector<int>> id_correct_max_twist = id_to_correct;
+
+    id_to_correct.push_back({ id_derv_fpi(1, 0, 0, 0) });
 
 
     //////////////////////////////////////////////////////////////
@@ -618,9 +659,17 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     printf("////////////// applying max twist correction\n");
 
-    for (int i = 0; i < id_to_correct.size(); i++) {
-        int idM = id_to_correct[i][0];
-        int idf = id_to_correct[i][1];
+    for (int i = 0; i < id_correct_max_twist.size(); i++) {
+        int idM;
+        int idf;
+        if (id_correct_max_twist[i].size() == 2) {
+            idM = id_correct_max_twist[i][0];
+            idf = id_correct_max_twist[i][1];
+        }
+        else if (id_correct_max_twist[i].size() == 1) {
+            idM = 0;
+            idf = id_correct_max_twist[i][0];
+        }
         printf("Mpi before max twist correction: %.12g  %.12g\n", data[idM][Njack - 1], myres->comp_error(data[idM]));
         printf("fpi before max twist correction: %.12g  %.12g\n", data[idf][Njack - 1], myres->comp_error(data[idf]));
         for (int j = 0; j < Njack;j++) {
@@ -628,7 +677,7 @@ int main(int argc, char** argv) {
             double cl = sqrt(1 + mr * mr);
             double* Mpi = &data[idM][j];
             double* fpi = &data[idf][j];
-            *Mpi = *Mpi / sqrt(cl);
+            if (id_correct_max_twist[i].size() == 2) *Mpi = *Mpi / sqrt(cl);
             *fpi = *fpi * cl;
         }
         printf("Mpi after max twist correction: %.12g  %.12g\n", data[idM][Njack - 1], myres->comp_error(data[idM]));
@@ -647,8 +696,16 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     printf("////////////// applying FVE correction\n");
     for (int i = 0; i < id_to_correct.size(); i++) {
-        int idM = id_to_correct[i][0];
-        int idf = id_to_correct[i][1];
+        int idM;
+        int idf;
+        if (id_correct_max_twist[i].size() == 2) {
+            idM = id_correct_max_twist[i][0];
+            idf = id_correct_max_twist[i][1];
+        }
+        else if (id_correct_max_twist[i].size() == 1) {
+            idM = 0;
+            idf = id_correct_max_twist[i][0];
+        }
         for (int j = 0; j < Njack;j++) {
             double* Mpi = &data[idM][j];
             double* fpi = &data[idf][j];
@@ -659,7 +716,7 @@ int main(int argc, char** argv) {
             delta_fve_NNLO_CDH  d = Delta_pi_NNLO_CDH(Ls[i], xi, (*fpi));
             if (j == Njack - 1) printf("delta FVE M (L=%d) = %g   %g\n", Ls[i], -0.25 * delta_FVE, d.dM);
             if (j == Njack - 1) printf("delta FVE f (L=%d) = %g   %g\n", Ls[i], delta_FVE, d.df);
-            *Mpi /= (1 + d.dM);
+            if (id_correct_max_twist[i].size() == 2)*Mpi /= (1 + d.dM);
             *fpi /= (1 + d.df);
 
         }
@@ -1976,6 +2033,8 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // loop over the different coeff in the lattice artefact and see how the results change
     //////////////////////////////////////////////////////////////
+    std::vector<double*> fpi_tm(coeffs.size());
+    std::vector<double*> fpi_OS(coeffs.size());
 
     for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
         const double coeff = coeffs[ic];
@@ -2034,7 +2093,7 @@ int main(int argc, char** argv) {
             for (int im = 0; im < 3; im++) {
                 dm_w0[im][j] = P[im];
             }
-            
+
             free(P);
         }
         printf("Results for m^iso (MeV):\n");
@@ -2043,10 +2102,12 @@ int main(int argc, char** argv) {
             double err = myres->comp_error(miso_w0[i]);
             printf("m^iso_%d = %-12g +/- %-12g   starting from %-12g +/- %-12g\n", i, mean, err, myres->mean(amuiso[i]), myres->comp_error(amuiso[i]));
         }
-        
+
 
         double* a_from_w0 = myres->create_copy(data[4]);
         double* fpi_from_w0 = myres->create_copy(data[4]);
+        fpi_tm[ic] = myres->create_copy(data[id_derv_fpi(0,0,0,0)]);
+        fpi_OS[ic] = myres->create_copy(data[id_derv_fpi(1,0,0,0)]);
         for (int j = 0; j < Njack;j++) {
             int ifpi = 3;
             double af = data[id_deriv(ifpi, 0, 0, 0)][j];
@@ -2071,26 +2132,34 @@ int main(int argc, char** argv) {
                         dw = P0 + P1 * a * a;
                     }
                     w_a += dm * dw;
+
+                    fpi_tm[ic][j] += dm * data[id_derv_fpi(0, 1, im, val_sea)][j];
+                    fpi_OS[ic][j] += dm * data[id_derv_fpi(1, 1, im, val_sea)][j];
                 }
             }
             a_from_w0[j] = w0_fm / w_a;
             fpi_from_w0[j] = af / (a_from_w0[j] / hbarc);
+            fpi_tm[ic][j] /= (a_from_w0[j] / hbarc);
+            fpi_OS[ic][j] /= (a_from_w0[j] / hbarc);
         }
         printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_from_w0), myres->comp_error(a_from_w0));
         printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
 
-        write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(92+ic*8);
-        write_jack(miso_w0[1], Njack, jack_file);     check_correlatro_counter(93+ic*8);
-        write_jack(miso_w0[2], Njack, jack_file);     check_correlatro_counter(94+ic*8);
+        write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(92 + ic * 8);
+        write_jack(miso_w0[1], Njack, jack_file);     check_correlatro_counter(93 + ic * 8);
+        write_jack(miso_w0[2], Njack, jack_file);     check_correlatro_counter(94 + ic * 8);
 
-        write_jack(a_from_w0, Njack, jack_file);     check_correlatro_counter(95+ic*8);
-        write_jack(fpi_from_w0, Njack, jack_file);     check_correlatro_counter(96+ic*8);
+        write_jack(a_from_w0, Njack, jack_file);     check_correlatro_counter(95 + ic * 8);
+        write_jack(fpi_from_w0, Njack, jack_file);     check_correlatro_counter(96 + ic * 8);
 
-        write_jack(dm_w0[0], Njack, jack_file);     check_correlatro_counter(97+ic*8);
-        write_jack(dm_w0[1], Njack, jack_file);     check_correlatro_counter(98+ic*8);
-        write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(99+ic*8);
+        write_jack(dm_w0[0], Njack, jack_file);     check_correlatro_counter(97 + ic * 8);
+        write_jack(dm_w0[1], Njack, jack_file);     check_correlatro_counter(98 + ic * 8);
+        write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(99 + ic * 8);
 
     }
+    
+    std::vector<double*> fpi_mc_tm(coeffs_mc.size());
+    std::vector<double*> fpi_mc_OS(coeffs_mc.size());
 
     //////////////////////////////////////////////////////////////
     // w0 system linear plus lattice artefact mc
@@ -2168,23 +2237,6 @@ int main(int argc, char** argv) {
             for (int im = 0; im < 3; im++) {
                 dm_w0[im][j] = P[im];
             }
-            if (j == Njack - 1) {
-                printf("Matrix for m^iso solution (jackknife %d):\n", j);
-                for (int ii = 0; ii < 3; ii++) {
-                    for (int jj = 0; jj < 3; jj++) {
-                        printf("%g ", Mat[ii][jj]);
-                    }
-                    printf("\n");
-                }
-                printf("RHS:\n");
-                for (int ii = 0; ii < 3; ii++) {
-                    printf("%g\n", y[ii]);
-                }
-                printf("solution:\n");
-                for (int ii = 0; ii < 3; ii++) {
-                    printf("%g\n", P[ii]);
-                }
-            }
             free(P);
         }
         printf("Results for m^iso (MeV):\n");
@@ -2193,15 +2245,14 @@ int main(int argc, char** argv) {
             double err = myres->comp_error(miso_w0[i]);
             printf("m^iso_%d = %-12g +/- %-12g   starting from %-12g +/- %-12g\n", i, mean, err, myres->mean(amuiso[i]), myres->comp_error(amuiso[i]));
         }
-        printf("sim values:\n");
-        for (int i = 0; i < 3; i++) {
-            printf("m^sim_%d = %g \n", i, myres->mean(amusim[i]));
-        }
+        
 
         double* a_from_w0 = myres->create_copy(data[4]);
         double* fpi_from_w0 = myres->create_copy(data[4]);
         int iMDs = 2;
         double* MDs = myres->create_copy(data[iMDs]);
+        fpi_mc_tm[ic] = myres->create_copy(data[id_derv_fpi(0,0,0,0)]);
+        fpi_mc_OS[ic] = myres->create_copy(data[id_derv_fpi(1,0,0,0)]);
         for (int j = 0; j < Njack;j++) {
             int ifpi = 3;
             double af = data[id_deriv(ifpi, 0, 0, 0)][j];
@@ -2224,10 +2275,15 @@ int main(int argc, char** argv) {
                         dw = P0 + P1 * a * a;
                     }
                     w_a += dm * dw;
+                    fpi_mc_tm[ic][j] += dm * data[id_derv_fpi(0, 1, im, val_sea)][j];
+                    fpi_mc_OS[ic][j] += dm * data[id_derv_fpi(1, 1, im, val_sea)][j];
 
                 }
             }
             a_from_w0[j] = w0_fm / w_a;
+            fpi_mc_tm[ic][j] /= (a_from_w0[j] / hbarc);
+            fpi_mc_OS[ic][j] /= (a_from_w0[j] / hbarc);
+
             // // add lattice artefact to mc
             // miso_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
             // dm_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
@@ -2252,19 +2308,27 @@ int main(int argc, char** argv) {
         printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
 
 
-        write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(92+coeffs.size()*8+ic*9);
-        write_jack(miso_w0[1], Njack, jack_file);     check_correlatro_counter(93+coeffs.size()*8+ic*9);
-        write_jack(miso_w0[2], Njack, jack_file);     check_correlatro_counter(94+coeffs.size()*8+ic*9);
-        write_jack(a_from_w0, Njack, jack_file);     check_correlatro_counter(95+coeffs.size()*8+ic*9);
-        write_jack(fpi_from_w0, Njack, jack_file);     check_correlatro_counter(96+coeffs.size()*8+ic*9);
+        write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(92 + coeffs.size() * 8 + ic * 9);
+        write_jack(miso_w0[1], Njack, jack_file);     check_correlatro_counter(93 + coeffs.size() * 8 + ic * 9);
+        write_jack(miso_w0[2], Njack, jack_file);     check_correlatro_counter(94 + coeffs.size() * 8 + ic * 9);
+        write_jack(a_from_w0, Njack, jack_file);     check_correlatro_counter(95 + coeffs.size() * 8 + ic * 9);
+        write_jack(fpi_from_w0, Njack, jack_file);     check_correlatro_counter(96 + coeffs.size() * 8 + ic * 9);
 
 
-        write_jack(dm_w0[0], Njack, jack_file);     check_correlatro_counter(97+coeffs.size()*8+ic*9);
-        write_jack(dm_w0[1], Njack, jack_file);     check_correlatro_counter(98+coeffs.size()*8+ic*9);
-        write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(99+coeffs.size()*8+ic*9);
+        write_jack(dm_w0[0], Njack, jack_file);     check_correlatro_counter(97 + coeffs.size() * 8 + ic * 9);
+        write_jack(dm_w0[1], Njack, jack_file);     check_correlatro_counter(98 + coeffs.size() * 8 + ic * 9);
+        write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(99 + coeffs.size() * 8 + ic * 9);
 
-        write_jack(MDs, Njack, jack_file);     check_correlatro_counter(100+coeffs.size()*8+ic*9);
+        write_jack(MDs, Njack, jack_file);     check_correlatro_counter(100 + coeffs.size() * 8 + ic * 9);
 
+    }
+    for (int ic = 0; ic < coeffs.size(); ic++) {
+        write_jack(fpi_tm[ic], Njack, jack_file);     check_correlatro_counter(sid_fpi_A0 + ic * 2);
+        write_jack(fpi_OS[ic], Njack, jack_file);     check_correlatro_counter(sid_fpi_A0 + ic * 2 + 1);
+    }
+    for (int ic = 0; ic < coeffs_mc.size(); ic++) {
+        write_jack(fpi_mc_tm[ic], Njack, jack_file);     check_correlatro_counter(sid_fpi_A0 + coeffs.size() * 2 + ic * 2);
+        write_jack(fpi_mc_OS[ic], Njack, jack_file);     check_correlatro_counter(sid_fpi_A0 + coeffs.size() * 2 + ic * 2 + 1);
     }
 
     return 0;

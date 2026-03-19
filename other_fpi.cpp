@@ -113,14 +113,14 @@ double poly3(int n, int Nvar, double* x, int Npar, double* P) {
 }
 
 int main(int argc, char** argv) {
-    error(!(argc == 10), 1, "main ",
-        "usage:././w0_rew -p path file -bin $bin  jack/boot   fileP5P5  fileA0P5_mu1  fileP5P5_mu2\n separate "
+    error(!(argc == 11), 1, "main ",
+        "usage:././w0_rew -p path file -bin $bin  jack/boot   fileP5P5  fileA0P5_mu1  fileP5P5_mu2   basename_plateau\n separate "
         "path and file please   argc =%d", argc);
 
     char resampling[NAMESIZE];
     mysprintf(resampling, NAMESIZE, argv[6]);
     printf("resampling: %s\n", resampling);
-
+    
     char** option = argv_to_options(argv);
 
 
@@ -142,20 +142,22 @@ int main(int argc, char** argv) {
     FILE* infile_P5 = open_file(namefile, "r");
     generic_header head_P5;
     head_P5.read_header_debug(infile_P5);
-    init_global_head(head_P5);
+    // init_global_head(head_P5);
 
     mysprintf(namefile, NAMESIZE, "%s/%s", option[3], argv[8]);
     FILE* infile_A0_mu = open_file(namefile, "r");
     generic_header head_A0_mu;
     head_A0_mu.read_header_debug(infile_A0_mu);
-    init_global_head(head_A0_mu);
+    // init_global_head(head_A0_mu);
 
     mysprintf(namefile, NAMESIZE, "%s/%s", option[3], argv[9]);
     FILE* infile_P5_mu = open_file(namefile, "r");
     generic_header head_P5_mu;
     head_P5_mu.read_header_debug(infile_P5_mu);
-    init_global_head(head_P5);
-
+    // init_global_head(head_P5);
+    
+    error(head_A0_mu.mus.size() !=2,1,"main","derivative file %s should have 2 mus, instead %d\n", argv[8], head_A0_mu.mus.size());
+    error(head_P5_mu.mus.size() !=2,1,"main","derivative file %s should have 2 mus, instead %d\n", argv[9], head_P5_mu.mus.size());
 
     //////////////////////////////////////////////////////////////
     // reading flow
@@ -254,8 +256,8 @@ int main(int argc, char** argv) {
     error(head_A0.mus[0] != head_P5.mus[0] != 0, 1, "error mu do not mathch ", "file  A0   mu =%g \nfile  P5   mu =%g ", head_A0.mus[0], head_P5.mus[0]);
     // head_A0.mus[0] = sim
     // head_A0_mu.mus[0] = extra
-    double dmu = head_A0.mus[0] - head_A0_mu.mus[0];
-    
+    double dmu = head_A0.mus[0] - head_A0_mu.mus[1];
+
     for (int j = 0; j < head_A0.Njack; j++) {
         for (int tf = 0; tf < head_A0.T; tf++) {
             conf_jack[j][2][tf][0] = conf_jack[j][0][tf][0] - conf_jack_mu[j][0][tf][0] * dmu;
@@ -330,35 +332,55 @@ int main(int argc, char** argv) {
     sprintf(option[1], "%s", save_option); // restore option
     corr_counter = -1;
 
-    ////////////////////////////////////////////////////////////
-    // symmetrize
-    ////////////////////////////////////////////////////////////
-    // symmetrise_jackboot(Njack, 0, head_A0T, conf_jack);
-    // symmetrise_jackboot(Njack, 1, head_A0T, conf_jack, -1);
-
     //////////////////////////////////////////////////////////////
     //  read m^iso
     //////////////////////////////////////////////////////////////
-    // std::vector<double*> amuiso(3);
-    // double mean, err;
-    // int seed;
-    // line_read_param(option, "muliso", mean, err, seed, namefile_plateaux);
-    // amuiso[0] = myres->create_fake(mean, err, seed);
-    // line_read_param(option, "musiso", mean, err, seed, namefile_plateaux);
-    // amuiso[1] = myres->create_fake(mean, err, seed);
-    // line_read_param(option, "muciso", mean, err, seed, namefile_plateaux);
-    // amuiso[2] = myres->create_fake(mean, err, seed);
+    std::vector<double*> amuiso(3);
+    double mean, err;
+    int seed;
+    char** option_p = argv_to_options(argv);
+    mysprintf(option_p[6], NAMESIZE, "%s", argv[10]);         // basename plateau
+    line_read_param(option_p, "muliso", mean, err, seed, namefile_plateaux);
+    amuiso[0] = myres->create_fake(mean, err, seed);
+    line_read_param(option_p, "musiso", mean, err, seed, namefile_plateaux);
+    amuiso[1] = myres->create_fake(mean, err, seed);
+    line_read_param(option_p, "muciso", mean, err, seed, namefile_plateaux);
+    amuiso[2] = myres->create_fake(mean, err, seed);
 
-    // std::vector<double*> amusim(3);
-    // line_read_param(option, "mulsim", mean, err, seed, namefile_plateaux);
-    // amusim[0] = myres->create_fake(mean, err, seed);
-    // line_read_param(option, "mussim", mean, err, seed, namefile_plateaux);
-    // amusim[1] = myres->create_fake(mean, err, seed);
-    // line_read_param(option, "mucsim", mean, err, seed, namefile_plateaux);
-    // amusim[2] = myres->create_fake(mean, err, seed);
+    std::vector<double*> amusim(3);
+    line_read_param(option_p, "mulsim", mean, err, seed, namefile_plateaux);
+    amusim[0] = myres->create_fake(mean, err, seed);
+    line_read_param(option_p, "mussim", mean, err, seed, namefile_plateaux);
+    amusim[1] = myres->create_fake(mean, err, seed);
+    line_read_param(option_p, "mucsim", mean, err, seed, namefile_plateaux);
+    amusim[2] = myres->create_fake(mean, err, seed);
 
-    // line_read_param(option, "a", mean, err, seed, namefile_plateaux);
-    // double* a_fm = myres->create_fake(mean, err, seed);
+    line_read_param(option_p, "a", mean, err, seed, namefile_plateaux);
+    double* a_fm = myres->create_fake(mean, err, seed);
+
+    std::string name_OStm = argv[3];
+    std::string name_OStm1 = argv[7];
+
+    size_t first = name_OStm.find('_');
+    size_t second = name_OStm.find('_', first + 1);
+    std::string label = name_OStm.substr(first + 1, second - first - 1);
+
+    size_t first1 = name_OStm1.find('_');
+    size_t second1 = name_OStm1.find('_', first1 + 1);
+    std::string label1 = name_OStm1.substr(first1 + 1, second1 - first1 - 1);
+
+    std::string Z_RIMON;
+    if (label.compare("tm") == 0 && label1.compare("tm") == 0)
+        Z_RIMON = "ZV_RIMOM";
+    else if (label.compare("OS") == 0 && label1.compare("OS") == 0)
+        Z_RIMON = "ZA_RIMOM";
+    else
+        error(1 == 1, 1, "main", "label of input files should be  both tm or OS");
+
+    printf("Z_RIMON: %s\n", Z_RIMON.c_str());
+    line_read_param(option_p, Z_RIMON.c_str(), mean, err, seed, namefile_plateaux);
+    double* Z = myres->create_fake(mean, err, -1);
+
 
     ////////////////////////////////////////////////////////////
     // start fitting
@@ -373,7 +395,6 @@ int main(int argc, char** argv) {
 
     struct fit_type fit_info;
     fit_info.codeplateaux = true;
-    int seed;
     line_read_param(option, "M_{PS}", fit_info.tmin, fit_info.tmax, seed, namefile_plateaux);
 
     double* M_PS_mu = plateau_correlator_function(
@@ -437,22 +458,66 @@ int main(int argc, char** argv) {
 
     double* deriv = myres->create_copy(M_PS);
     for (int j = 0; j < Njack;j++) {
-        deriv[j] = (fpi.P[0][j] - fpi_mu.P[0][j]) / dmu;
+        deriv[j] = Z[j] * (fpi.P[0][j] - fpi_mu.P[0][j]) / dmu;
     }
+    printf("deriv: %.12g   %.12g\n", deriv[Njack - 1], myres->comp_error(deriv));
+    std::string name_jack_fpi = "deriv/deriv_val_fpi_P5A0_" + std::string(argv[3]) + ".jack_txt";
+    myres->write_jack_in_file(deriv, name_jack_fpi.c_str());
+
+
     write_jack(deriv, Njack, jack_file);
     check_correlatro_counter(6);
 
-    std::string name(option[6]);
-    // 1. Find the first underscore
-    size_t first = name.find('_');
 
-    // 2. Find the second underscore starting search from the position after the first
-    size_t second = name.find('_', first + 1);
-    if (second != std::string::npos) {
-        // 3. Extract from the start (0) up to the second underscore
-        std::string result = name.substr(0, second);
-        std::cout << result << std::endl; // Output: B64_TM
+    /// fpi
+    // fit_info.restore_default();
+    fit_info.Nvar = 1;
+    fit_info.Npar = 1;
+    fit_info.N = 1;
+    fit_info.Njack = Njack;
+    fit_info.n_ext_P = 3;
+    fit_info.ext_P = malloc_2<double>(fit_info.n_ext_P, fit_info.Njack);
+    for (int j = 0; j < fit_info.Njack; j++) {
+        fit_info.ext_P[0][j] = M_PS[j];
+        fit_info.ext_P[1][j] = head_P5.mus[0];
+        fit_info.ext_P[2][j] = head_P5.mus[0];
     }
+    fit_info.function = constant_fit;
+    fit_info.linear_fit = true;
+    fit_info.T = head_P5.T;
+    fit_info.corr_id = { 1 };
+
+    struct fit_result f_PS = fit_fun_to_fun_of_corr(
+        option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
+        outfile, lhs_function_f_PS, "f_{PS}", fit_info, jack_file);
+    check_correlatro_counter(7);
+    // with reweighting
+    fit_info.corr_id = { 3 };
+    for (int j = 0; j < fit_info.Njack; j++) {
+        fit_info.ext_P[0][j] = M_PS_mu[j];
+        fit_info.ext_P[1][j] = head_P5_mu.mus[1];
+        fit_info.ext_P[2][j] = head_P5_mu.mus[1];
+    }
+    mysprintf(namefile, NAMESIZE, "f_{PS}_%s", label.c_str());
+    struct fit_result f_PS_rew = fit_fun_to_fun_of_corr(
+        option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
+        outfile, lhs_function_f_PS, namefile, fit_info, jack_file);
+    check_correlatro_counter(8);
+
+    // free_fit_result(fit_info, fit_out);
+
+    double* deriv_WTI = myres->create_copy(M_PS);
+    for (int j = 0; j < Njack;j++) {
+        deriv_WTI[j] = (f_PS.P[0][j] - f_PS_rew.P[0][j]) / dmu;
+    }
+    printf("deriv_WTI: %.12g   %.12g\n", deriv_WTI[Njack - 1], myres->comp_error(deriv_WTI));
+    write_jack(deriv_WTI, Njack, jack_file);
+    check_correlatro_counter(9);
+
+    name_jack_fpi = "deriv/deriv_val_fpi_WTI_" + std::string(argv[3]) + ".jack_txt";
+    myres->write_jack_in_file(deriv_WTI, name_jack_fpi.c_str());
+
+
 
     // free_fit_result(fit_info, fit_out);
     fit_info.restore_default();
