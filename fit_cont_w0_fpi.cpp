@@ -529,15 +529,66 @@ int main(int argc, char** argv) {
     }
 
 
+    for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
+
+        mysprintf(namefile, NAMESIZE, "%s/data_from_wp25_deriv_mc_a2_laC%g.txt", argv[3], coeffs[ic]);
+        summary_out = open_file(namefile, "w+");
+        fprintf(summary_out, "ens   a[fm] da[fm]  afpi dafpi  amul damul amus damus  amuc  damuc    delta_amul  ddelta_amul  delta_amus  ddelta_amus  delta_amuc   ddelta_amuc\n");
+        for (int i = 0;i < myen[0].size();i++) {
+            size_t lastUnderscore = files[i].find_last_of('_');
+
+            error(lastUnderscore == std::string::npos, 1, "error in file name", "cannot read ens from name %s", files[i].c_str());
+            // 2. Estrae tutto ciò che segue l'ultimo underscore
+            std::string result = files[i].substr(lastUnderscore + 1);
+            fprintf(summary_out, "%s  ", result.c_str());
+            double* tmp = jackall.en[i].jack[95 + ic * 8];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[96 + ic * 8];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[92 + ic * 8];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[93 + ic * 8];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[94 + ic * 8];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+            tmp = jackall.en[i].jack[97 + ic * 8];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[98 + ic * 8];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+            tmp = jackall.en[i].jack[99 + ic * 8];
+            fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
+
+            fprintf(summary_out, "\n");
+        }
+    }
+
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////
     std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid", "fpi_wp25_lin", "fpi_wp25_lin_laRDs",  "fpi_wp25_lin_laRDs_exact",
          "MDs_wp25_lin_laRDs_exact", "fpi_wp25_lin_la_mc_exact", "MDs_wp25_lin_la_mc_exact" };
-    std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57, 62, 70, 78 , 82, 87, 91};
-    std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56, 61, 69, 77 , 77, 86, 86};
 
+    std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57, 62, 70, 78 ,
+        82, 87, 91
+    };
+    std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56, 61, 69, 77 ,
+         77, 86, 86
+    };
 
+    for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
+        const double coeff = coeffs[ic];
+        obs.push_back("fpi_wp25_C" + std::to_string(coeff));
+        id_obs.push_back(96 + ic * 8);
+        id_a.push_back(95 + ic * 8);
+    }
+
+    for (std::size_t ic = 0; ic < coeffs_mc.size(); ++ic) {
+        const double coeff = coeffs_mc[ic];
+        obs.push_back("fpi_wp25_mc_C" + std::to_string(coeff));
+        id_obs.push_back(96 + coeffs.size()*8 + ic * 9);
+        id_a.push_back(95 + coeffs.size()*8 + ic * 9);
+    }
 
     int id_amuliso = 13;
     int id_a_fm = 16;

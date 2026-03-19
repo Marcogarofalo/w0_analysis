@@ -439,6 +439,10 @@ int main(int argc, char** argv) {
     read_file_debug(data[3 + 5 * 4], files[3 + 5 * 4].c_str());// dpi / dmul(sea)
     read_file_debug(data[4 + 5 * 4], files[4 + 5 * 4].c_str());// dw0 / dmul(sea)
     for (int j = 0; j < Njack;j++) { // we need a factor 2 in w0 because of the two quarks u and d
+        data[0 + 5 * 4][j] *= 2;
+        data[1 + 5 * 4][j] *= 2;
+        data[2 + 5 * 4][j] *= 2; // this should be zero but we put the factor 2 for consistency with the other two
+        data[3 + 5 * 4][j] *= 2;
         data[4 + 5 * 4][j] *= 2;
     }
     // sea deriv ms
@@ -1818,7 +1822,7 @@ int main(int argc, char** argv) {
             static constexpr int iw0 = 4;
             double w0 = data[id_deriv(iw0, 0, 0, 0)][j];
             // double a2_sim = previous_a[j] * previous_a[j];
-            double a2_sim = std::pow(w0_fm / w0, 3);
+            double a3_sim = std::pow(w0_fm / w0, 3);
 
             for (int iM = 0; iM < 3; iM++) {
 
@@ -1848,13 +1852,13 @@ int main(int argc, char** argv) {
                     Mat[iM][im] += dM * w0 + M * dw;
                     //a2 coeff in RDs
                     if (iM == 2)
-                        Mat[iM][im] += coeff * a2_sim * 3.0 * dw / w0;
+                        Mat[iM][im] += coeff * a3_sim * 3.0 * dw / w0;
                 }
                 y[iM] -= M * w0;
 
             }
             // add the lattice artefact RDs
-            la[2] += coeff * a2_sim;
+            la[2] += coeff * a3_sim;
             for (int ii = 0;ii < 3;ii++) {
                 for (int ij = 0;ij < 3;ij++) {
                     rhs[ii] += Mat[ii][ij] * la[ij];
@@ -1966,6 +1970,300 @@ int main(int argc, char** argv) {
         write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(90);
 
         write_jack(MDs, Njack, jack_file);     check_correlatro_counter(91);
+
+    }
+
+    //////////////////////////////////////////////////////////////
+    // loop over the different coeff in the lattice artefact and see how the results change
+    //////////////////////////////////////////////////////////////
+
+    for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
+        const double coeff = coeffs[ic];
+        printf("//////////////////////////////////////////////////////////////\n");
+        printf("// w0 systemone linear deriv mc la RDs  coef=%g\n", coeff);
+        printf("//////////////////////////////////////////////////////////////\n");
+
+        double** miso_w0 = malloc_2<double>(3, Njack);
+        double** dm_w0 = malloc_2<double>(3, Njack);
+
+        for (int j = 0; j < Njack;j++) {
+
+            y[0] = Mpi_MeV * w0_MeV;
+            y[1] = MK_MeV * w0_MeV;
+            y[2] = MDs_MeV * w0_MeV;
+            static constexpr int iw0 = 4;
+            double w0 = data[id_deriv(iw0, 0, 0, 0)][j];
+
+            for (int iM = 0; iM < 3; iM++) {
+
+                double M = data[id_deriv(iM, 0, 0, 0)][j];
+
+                for (int im = 0; im < 3; im++) {
+                    Mat[iM][im] = 0.0;
+                    // valence
+                    double dM = data[id_deriv(iM, 1, im, 0)][j];
+                    double dw = data[id_deriv(iw0, 1, im, 0)][j];
+                    Mat[iM][im] += dM * w0 + M * dw;
+                    // sea
+                    dM = data[id_deriv(iM, 1, im, 1)][j];
+                    dw = data[id_deriv(iw0, 1, im, 1)][j];
+                    if (im == 2) {
+                        double P0 = data[41][j];
+                        double P1 = data[42][j];
+                        // remove the prefactor in dw0/dmc(sea)
+                        double mul = amuiso[0][j];
+                        double w0 = data[iw0][j];
+                        double a = previous_a[j];
+                        P0 *= w0 / mul;
+                        P1 *= w0 / mul;
+                        dw = P0 + P1 * a * a;
+                    }
+                    // if (im!=2) 
+                    Mat[iM][im] += dM * w0 + M * dw;
+                }
+                y[iM] -= M * w0;
+
+            }
+            // add the lattice artefact RDs
+            y[2] += coeff * previous_a[j] * previous_a[j];
+
+            double* P = LU_decomposition_solver(3, Mat, y);
+            miso_w0[0][j] = (amusim[0][j] + P[0]);
+            miso_w0[1][j] = (amusim[1][j] + P[1]);
+            miso_w0[2][j] = (amusim[2][j] + P[2]);
+            for (int im = 0; im < 3; im++) {
+                dm_w0[im][j] = P[im];
+            }
+            
+            free(P);
+        }
+        printf("Results for m^iso (MeV):\n");
+        for (int i = 0; i < 3; i++) {
+            double mean = myres->mean(miso_w0[i]);
+            double err = myres->comp_error(miso_w0[i]);
+            printf("m^iso_%d = %-12g +/- %-12g   starting from %-12g +/- %-12g\n", i, mean, err, myres->mean(amuiso[i]), myres->comp_error(amuiso[i]));
+        }
+        
+
+        double* a_from_w0 = myres->create_copy(data[4]);
+        double* fpi_from_w0 = myres->create_copy(data[4]);
+        for (int j = 0; j < Njack;j++) {
+            int ifpi = 3;
+            double af = data[id_deriv(ifpi, 0, 0, 0)][j];
+            int iw0 = 4;
+            double w_a = data[id_deriv(iw0, 0, 0, 0)][j];
+            for (int im = 0; im < 3; im++) {
+                for (int val_sea = 0; val_sea < 2; val_sea++) {
+                    double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
+                    double dm = (miso_w0[im][j] - amusim[im][j]);
+                    af += dm * df;
+                    double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                    // add special case for charm sea
+                    if (im == 2 && val_sea == 1) {
+                        double P0 = data[41][j];
+                        double P1 = data[42][j];
+                        // remove the prefactor in dw0/dmc(sea)
+                        double mul = amuiso[0][j];
+                        double w0 = data[iw0][j];
+                        double a = previous_a[j];
+                        P0 *= w0 / mul;
+                        P1 *= w0 / mul;
+                        dw = P0 + P1 * a * a;
+                    }
+                    w_a += dm * dw;
+                }
+            }
+            a_from_w0[j] = w0_fm / w_a;
+            fpi_from_w0[j] = af / (a_from_w0[j] / hbarc);
+        }
+        printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_from_w0), myres->comp_error(a_from_w0));
+        printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
+
+        write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(92+ic*8);
+        write_jack(miso_w0[1], Njack, jack_file);     check_correlatro_counter(93+ic*8);
+        write_jack(miso_w0[2], Njack, jack_file);     check_correlatro_counter(94+ic*8);
+
+        write_jack(a_from_w0, Njack, jack_file);     check_correlatro_counter(95+ic*8);
+        write_jack(fpi_from_w0, Njack, jack_file);     check_correlatro_counter(96+ic*8);
+
+        write_jack(dm_w0[0], Njack, jack_file);     check_correlatro_counter(97+ic*8);
+        write_jack(dm_w0[1], Njack, jack_file);     check_correlatro_counter(98+ic*8);
+        write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(99+ic*8);
+
+    }
+
+    //////////////////////////////////////////////////////////////
+    // w0 system linear plus lattice artefact mc
+    //////////////////////////////////////////////////////////////
+    for (std::size_t ic = 0; ic < coeffs_mc.size(); ++ic) {
+        const double coeff = coeffs_mc[ic];
+        printf("//////////////////////////////////////////////////////////////\n");
+        printf("// w0 systemone linear deriv mc la mc  coef=%g\n", coeff);
+        printf("//////////////////////////////////////////////////////////////\n");
+
+        double** miso_w0 = malloc_2<double>(3, Njack);
+        double** dm_w0 = malloc_2<double>(3, Njack);
+        // double coeff = +0.75;
+
+        for (int j = 0; j < Njack;j++) {
+
+            y[0] = Mpi_MeV * w0_MeV;
+            y[1] = MK_MeV * w0_MeV;
+            y[2] = MDs_MeV * w0_MeV;
+            double la[3] = { 0,0,0 };
+            double rhs[3] = { 0,0,0 };
+
+            static constexpr int iw0 = 4;
+            double w0 = data[id_deriv(iw0, 0, 0, 0)][j];
+            // double a2_sim = previous_a[j] * previous_a[j];
+            double a3_sim = std::pow(w0_fm / w0, 3);
+
+            for (int iM = 0; iM < 3; iM++) {
+
+                double M = data[id_deriv(iM, 0, 0, 0)][j];
+
+                for (int im = 0; im < 3; im++) {
+                    Mat[iM][im] = 0.0;
+                    // valence
+                    double dM = data[id_deriv(iM, 1, im, 0)][j];
+                    double dw = data[id_deriv(iw0, 1, im, 0)][j];
+                    Mat[iM][im] += dM * w0 + M * dw;
+                    // sea
+                    dM = data[id_deriv(iM, 1, im, 1)][j];
+                    dw = data[id_deriv(iw0, 1, im, 1)][j];
+                    if (im == 2) {
+                        double P0 = data[41][j];
+                        double P1 = data[42][j];
+                        // remove the prefactor in dw0/dmc(sea)
+                        double mul = amuiso[0][j];
+                        double w0 = data[iw0][j];
+                        double a = previous_a[j];
+                        P0 *= w0 / mul;
+                        P1 *= w0 / mul;
+                        dw = P0 + P1 * a * a;
+                    }
+                    // if (im!=2) 
+                    Mat[iM][im] += dM * w0 + M * dw;
+                    //a2 coeff in RDs
+                    if (iM == 2)
+                        Mat[iM][im] += coeff * a3_sim * 3.0 * dw / w0;
+                }
+                y[iM] -= M * w0;
+
+            }
+            // add the lattice artefact RDs
+            la[2] += coeff * a3_sim;
+            for (int ii = 0;ii < 3;ii++) {
+                for (int ij = 0;ij < 3;ij++) {
+                    rhs[ii] += Mat[ii][ij] * la[ij];
+                }
+                rhs[ii] += y[ii];
+            }
+
+
+            double* P = LU_decomposition_solver(3, Mat, y);
+            miso_w0[0][j] = (amusim[0][j] + P[0]);
+            miso_w0[1][j] = (amusim[1][j] + P[1]);
+            miso_w0[2][j] = (amusim[2][j] + P[2]);
+            for (int im = 0; im < 3; im++) {
+                dm_w0[im][j] = P[im];
+            }
+            if (j == Njack - 1) {
+                printf("Matrix for m^iso solution (jackknife %d):\n", j);
+                for (int ii = 0; ii < 3; ii++) {
+                    for (int jj = 0; jj < 3; jj++) {
+                        printf("%g ", Mat[ii][jj]);
+                    }
+                    printf("\n");
+                }
+                printf("RHS:\n");
+                for (int ii = 0; ii < 3; ii++) {
+                    printf("%g\n", y[ii]);
+                }
+                printf("solution:\n");
+                for (int ii = 0; ii < 3; ii++) {
+                    printf("%g\n", P[ii]);
+                }
+            }
+            free(P);
+        }
+        printf("Results for m^iso (MeV):\n");
+        for (int i = 0; i < 3; i++) {
+            double mean = myres->mean(miso_w0[i]);
+            double err = myres->comp_error(miso_w0[i]);
+            printf("m^iso_%d = %-12g +/- %-12g   starting from %-12g +/- %-12g\n", i, mean, err, myres->mean(amuiso[i]), myres->comp_error(amuiso[i]));
+        }
+        printf("sim values:\n");
+        for (int i = 0; i < 3; i++) {
+            printf("m^sim_%d = %g \n", i, myres->mean(amusim[i]));
+        }
+
+        double* a_from_w0 = myres->create_copy(data[4]);
+        double* fpi_from_w0 = myres->create_copy(data[4]);
+        int iMDs = 2;
+        double* MDs = myres->create_copy(data[iMDs]);
+        for (int j = 0; j < Njack;j++) {
+            int ifpi = 3;
+            double af = data[id_deriv(ifpi, 0, 0, 0)][j];
+            int iw0 = 4;
+            double w_a = data[id_deriv(iw0, 0, 0, 0)][j];
+            for (int im = 0; im < 3; im++) {
+                for (int val_sea = 0; val_sea < 2; val_sea++) {
+                    double dm = (miso_w0[im][j] - amusim[im][j]);
+                    double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                    // add special case for charm sea
+                    if (im == 2 && val_sea == 1) {
+                        double P0 = data[41][j];
+                        double P1 = data[42][j];
+                        // remove the prefactor in dw0/dmc(sea)
+                        double mul = amuiso[0][j];
+                        double w0 = data[iw0][j];
+                        double a = previous_a[j];
+                        P0 *= w0 / mul;
+                        P1 *= w0 / mul;
+                        dw = P0 + P1 * a * a;
+                    }
+                    w_a += dm * dw;
+
+                }
+            }
+            a_from_w0[j] = w0_fm / w_a;
+            // // add lattice artefact to mc
+            // miso_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
+            // dm_w0[2][j] += coeff * a_from_w0[j] * a_from_w0[j] * a_from_w0[j];
+
+            for (int im = 0; im < 3; im++) {
+                for (int val_sea = 0; val_sea < 2; val_sea++) {
+                    double dm = (miso_w0[im][j] - amusim[im][j]);
+                    double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
+                    af += dm * df;
+
+                    // MDs
+                    double dM = data[id_deriv(iMDs, 1, im, val_sea)][j];
+                    MDs[j] += dm * dM;
+
+                }
+            }
+
+            fpi_from_w0[j] = af / (a_from_w0[j] / hbarc);
+            MDs[j] /= (a_from_w0[j] / hbarc);
+        }
+        printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_from_w0), myres->comp_error(a_from_w0));
+        printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
+
+
+        write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(92+coeffs.size()*8+ic*9);
+        write_jack(miso_w0[1], Njack, jack_file);     check_correlatro_counter(93+coeffs.size()*8+ic*9);
+        write_jack(miso_w0[2], Njack, jack_file);     check_correlatro_counter(94+coeffs.size()*8+ic*9);
+        write_jack(a_from_w0, Njack, jack_file);     check_correlatro_counter(95+coeffs.size()*8+ic*9);
+        write_jack(fpi_from_w0, Njack, jack_file);     check_correlatro_counter(96+coeffs.size()*8+ic*9);
+
+
+        write_jack(dm_w0[0], Njack, jack_file);     check_correlatro_counter(97+coeffs.size()*8+ic*9);
+        write_jack(dm_w0[1], Njack, jack_file);     check_correlatro_counter(98+coeffs.size()*8+ic*9);
+        write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(99+coeffs.size()*8+ic*9);
+
+        write_jack(MDs, Njack, jack_file);     check_correlatro_counter(100+coeffs.size()*8+ic*9);
 
     }
 

@@ -1,0 +1,3 @@
+B24_OS_l0_l0_A0P5.dat   reweight_strange_OS_B24.dat
+B24_OS_l1_l1_A0P5.dat   reweight_strange_OS_B24.dat
+B24_OS_l2_l2_A0P5.dat   reweight_strange_OS_B24.dat

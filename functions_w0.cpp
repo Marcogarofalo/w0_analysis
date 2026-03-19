@@ -328,9 +328,10 @@ double lhs_plateau_fpi_P5A0(int j, double**** in, int t, struct fit_type fit_inf
     double fpi1 = -oAp1 / (M1); // we need a minus because we are using P5A0 wich is  <P5(0) A0^\dagger(t)> so we are computing <0| A0^\dagger|P> = -<0| A0|P> 
 
     double dmu = fit_info.ave_P[0];
+    double Z = fit_info.ext_P[4][j];
     // if (j == fit_info.Njack - 1)
     //     printf("t=%d  fpi=%g   fpi1=%g   dmu=%g\n", t, fpi, fpi1, dmu);
-    return (fpi - fpi1) / dmu;
+    return Z * (fpi - fpi1) / dmu;
 }
 
 double lhs_dM_sea(int j, double**** in, int t, struct fit_type fit_info) {

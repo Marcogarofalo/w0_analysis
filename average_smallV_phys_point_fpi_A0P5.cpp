@@ -138,7 +138,7 @@ double lhs_fun(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[1]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[1]][j]);
     //     printf("lhs_fun: gjack.en[e].jack[fit_info.corr_id[2]][j]=%g\n", gjack.en[e].jack[fit_info.corr_id[2]][j]);
     // }
-    double r = gjack.en[e].jack[fit_info.corr_id[0]][j]; // d(afpi)/d(amuc)
+    double r = gjack.en[e].jack[fit_info.corr_id[n]][j]; // d(afpi)/d(amuc)
     // r *= gjack.en[e].jack[fit_info.corr_id[1]][j];       // muliso
     // r /= gjack.en[e].jack[fit_info.corr_id[1]][j];       // afpi
     return r;
@@ -502,8 +502,8 @@ int main(int argc, char** argv) {
     double* fpi_phys_point = myres->create_fake(0, 0.001, 1);
     double* tif = (double*)malloc(sizeof(double) * 3);
     // fit_info.band_range = { x_phys_point[0], 4 };
-    fit_info.band_range = { x_phys_point[0], 0.006 };
-    double dx = 0.0001;
+    fit_info.band_range = { 23, 33 };
+    double dx = 1;
 
     for (int i = 0; i < der_name.size(); i++) {
 

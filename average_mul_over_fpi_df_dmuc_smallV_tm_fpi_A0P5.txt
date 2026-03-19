@@ -1,0 +1,2 @@
+fit_smallV_B24_fpi_A0P5
+fit_smallV_B32_fpi_A0P5

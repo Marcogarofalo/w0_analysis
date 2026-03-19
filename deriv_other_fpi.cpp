@@ -152,6 +152,7 @@ int main(int argc, char** argv) {
     head_rew.read_header(infile_rew);
     // init_global_head(head_rew); // don't!! it will set the file_head.l0=1
 
+    printf("mu = %g\n", head_A0.mus[0]);
 
     auto [idx_A0, idx_P5] = matching_indices(head_A0.smearing, head_P5.smearing);
 
@@ -417,15 +418,15 @@ int main(int argc, char** argv) {
 
     std::string Z_RIMON;
     if (label.compare("tm") == 0 && label1.compare("tm") == 0)
-        Z_RIMON = "ZA_RIMOM";
-    else if (label.compare("OS") == 0 && label1.compare("OS") == 0)
         Z_RIMON = "ZV_RIMOM";
+    else if (label.compare("OS") == 0 && label1.compare("OS") == 0)
+        Z_RIMON = "ZA_RIMOM";
     else
         error(1 == 1, 1, "main", "label of input files should be  both tm or OS");
 
     printf("Z_RIMON: %s\n", Z_RIMON.c_str());
     line_read_param(option_p, Z_RIMON.c_str(), mean, err, seed, namefile_plateaux);
-    double* Z = myres->create_fake(mean, err, seed);
+    double* Z = myres->create_fake(mean, err, -1);
 
     ////////////////////////////////////////////////////////////
     // start fitting
@@ -481,6 +482,10 @@ int main(int argc, char** argv) {
         outfile, lhs_fpi_P5A0, "fpi_P5A0", fit_info,
         jack_file);
     check_correlatro_counter(3);
+
+    double *Zfpi = myres->create_copy(fpi.P[0]);
+    myres->mult(Zfpi, Z, fpi.P[0]);
+    printf("Zfpi: %.12g   %.12g\n", Zfpi[Njack - 1], myres->comp_error(Zfpi));
 
 
     fit_info.ext_P[0] = M_PS_mu;
@@ -627,13 +632,14 @@ int main(int argc, char** argv) {
     fit_info.function = constant_fit;
     fit_info.linear_fit = true;
     fit_info.T = head_A0.T;
-    fit_info.n_ext_P = 4;
+    fit_info.n_ext_P = 5;
     // fit_info.malloc_ext_P();
     fit_info.ext_P = (double**)malloc(sizeof(double*) * fit_info.n_ext_P);
     fit_info.ext_P[0] = M_PS;
     fit_info.ext_P[1] = me.P[0];
     fit_info.ext_P[2] = M_PS_mu;
     fit_info.ext_P[3] = me_mu.P[0];
+    fit_info.ext_P[4] = Z;
     fit_info.ave_P = { dmu };
 
 
