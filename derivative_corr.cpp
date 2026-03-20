@@ -168,7 +168,7 @@ int main(int argc, char** argv) {
 
     }
 
-    double**** data_mu = calloc_corr(head_A0_mu.Njack, 2, head_A0_mu.T);
+    double**** data_mu = calloc_corr(head_A0_mu.Njack, head_A0_mu.ncorr, head_A0_mu.T);
     for (int iconf = 0; iconf < head_A0_mu.Njack; iconf++) {
         read_twopt(infile_A0_mu, data_mu[iconf], head_A0_mu);
 
@@ -177,7 +177,8 @@ int main(int argc, char** argv) {
     for (int iconf = 0; iconf < head_A0.Njack; iconf++) {
         for (int iv = 0; iv < head_A0.ncorr; iv++) {
             for (int t = 0; t < head_A0.T; t++) {
-                data[iconf][iv][t][0] = (data[iconf][iv][t][0] - data_mu[iconf][0][t][0]) / dmu;
+                data[iconf][iv][t][0] = (data[iconf][iv][t][0] - data_mu[iconf][iv][t][0]) / dmu;
+                data[iconf][iv][t][1] = (data[iconf][iv][t][1] - data_mu[iconf][iv][t][1]) / dmu;
             }
         }
 

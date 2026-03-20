@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
     char resampling[NAMESIZE];
     mysprintf(resampling, NAMESIZE, argv[6]);
     printf("resampling: %s\n", resampling);
-    
+
     char** option = argv_to_options(argv);
 
 
@@ -155,10 +155,13 @@ int main(int argc, char** argv) {
     generic_header head_P5_mu;
     head_P5_mu.read_header_debug(infile_P5_mu);
     // init_global_head(head_P5);
-    
-    error(head_A0_mu.mus.size() !=2,1,"main","derivative file %s should have 2 mus, instead %d\n", argv[8], head_A0_mu.mus.size());
-    error(head_P5_mu.mus.size() !=2,1,"main","derivative file %s should have 2 mus, instead %d\n", argv[9], head_P5_mu.mus.size());
 
+    error(head_A0_mu.mus.size() != 2, 1, "main", "derivative file %s should have 2 mus, instead %d\n", argv[8], head_A0_mu.mus.size());
+    error(head_P5_mu.mus.size() != 2, 1, "main", "derivative file %s should have 2 mus, instead %d\n", argv[9], head_P5_mu.mus.size());
+
+    error(head_A0.T != head_P5.T, 1, "main", "A0 and P5 files should have the same T, instead %d and %d\n", head_A0.T, head_P5.T);
+    error(head_A0_mu.T != head_P5_mu.T, 1, "main", "A0_mu and P5_mu files should have the same T, instead %d and %d\n", head_A0_mu.T, head_P5_mu.T);
+    error(head_A0.T != head_P5_mu.T, 1, "main", "A0 and P5_mu files should have the same T, instead %d and %d\n", head_A0.T, head_P5_mu.T);
     //////////////////////////////////////////////////////////////
     // reading flow
     //////////////////////////////////////////////////////////////
@@ -244,8 +247,8 @@ int main(int argc, char** argv) {
     free_corr(Neff, Max_corr, head_A0.T, data_bin);
     free_corr(confs, Max_corr, head_A0.T, data);
 
-    int confs_mu = head_A0.Njack;
-    head_A0.Njack = Njack;
+    int confs_mu = head_A0_mu.Njack;
+    head_A0_mu.Njack = Njack;
     double**** data_bin_mu = bin_intoN(data_mu, 2, head_A0_mu.T, confs_mu, bin); // binning into N=bin with not integer
     double**** conf_jack_mu = myres->create(Neff, 2, head_A0_mu.T, data_bin_mu);
     free_corr(Neff, 2, head_A0_mu.T, data_bin_mu);
@@ -257,14 +260,16 @@ int main(int argc, char** argv) {
     // head_A0.mus[0] = sim
     // head_A0_mu.mus[0] = extra
     double dmu = head_A0.mus[0] - head_A0_mu.mus[1];
-
+    printf("mu 0 = %g\n", head_A0.mus[0]);
+    printf("mu 1 = %g\n", head_A0_mu.mus[1]);
+    printf("dmu = %g\n", dmu);
     for (int j = 0; j < head_A0.Njack; j++) {
         for (int tf = 0; tf < head_A0.T; tf++) {
-            conf_jack[j][2][tf][0] = conf_jack[j][0][tf][0] - conf_jack_mu[j][0][tf][0] * dmu;
-            conf_jack[j][2][tf][1] = conf_jack[j][0][tf][1] - conf_jack_mu[j][0][tf][1] * dmu;
+            conf_jack[j][2][tf][0] = conf_jack_mu[j][0][tf][0];//conf_jack[j][0][tf][0] - conf_jack_mu[j][0][tf][0] * dmu;
+            conf_jack[j][2][tf][1] = conf_jack_mu[j][0][tf][1];//conf_jack[j][0][tf][1] - conf_jack_mu[j][0][tf][1] * dmu;
 
-            conf_jack[j][3][tf][0] = conf_jack[j][1][tf][0] - conf_jack_mu[j][1][tf][0] * dmu;
-            conf_jack[j][3][tf][1] = conf_jack[j][1][tf][1] - conf_jack_mu[j][1][tf][1] * dmu;
+            conf_jack[j][3][tf][0] = conf_jack_mu[j][1][tf][0];//conf_jack[j][1][tf][0] - conf_jack_mu[j][1][tf][0] * dmu;
+            conf_jack[j][3][tf][1] = conf_jack_mu[j][1][tf][1];//conf_jack[j][1][tf][1] - conf_jack_mu[j][1][tf][1] * dmu;
         }
     }
 
@@ -403,6 +408,15 @@ int main(int argc, char** argv) {
     // free(M_PS);
     check_correlatro_counter(1);
 
+    {
+        double* deriv = myres->create_copy(M_PS);
+        for (int j = 0; j < Njack;j++) {
+            deriv[j] = (M_PS[j] - M_PS_mu[j]) / dmu;
+        }
+        printf("deriv: %.12g   %.12g\n", deriv[Njack - 1], myres->comp_error(deriv));
+        free(deriv);
+    }
+
     //////////////// me  and fpi
 
     struct fit_result fit_out;
@@ -498,7 +512,7 @@ int main(int argc, char** argv) {
         fit_info.ext_P[1][j] = head_P5_mu.mus[1];
         fit_info.ext_P[2][j] = head_P5_mu.mus[1];
     }
-    mysprintf(namefile, NAMESIZE, "f_{PS}_%s", label.c_str());
+    mysprintf(namefile, NAMESIZE, "f_{PS}_mu");
     struct fit_result f_PS_rew = fit_fun_to_fun_of_corr(
         option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
         outfile, lhs_function_f_PS, namefile, fit_info, jack_file);
@@ -520,7 +534,13 @@ int main(int argc, char** argv) {
 
 
     // free_fit_result(fit_info, fit_out);
+
+
+    double* M_PS_A0 = plateau_correlator_function(
+        option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
+        namefile_plateaux, outfile, 0, "M_{PS}_A0", M_eff_sinh_T, jack_file, fit_info);
+    // free(M_PS);
+    check_correlatro_counter(10);
+
     fit_info.restore_default();
-
-
 }
