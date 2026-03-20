@@ -22,8 +22,40 @@ ggp # Let knit handle the plot
 myplotly(ggplot())
 ```
 
+## B64
 
 
+```{r, results='asis', echo=FALSE}
+df <- NULL
+li<-c("l0")
+for (l in li){
+for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu", "f_{PS}", "f_{PS}_mu", "M_{PS}_A0")){
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B64_tm_",l,"_",l,"_A0P5.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename=paste0(obs,"_",l))
+}}
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+
+fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
+
+```
+
+
+
+```{r, results='asis', echo=FALSE}
+df <- NULL
+li<-c("l0")
+for (l in li){
+for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu",  "M_{PS}_A0")){
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B64_OS_",l,"_",l,"_A0P5.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename=paste0(obs,"_",l))
+}}
+gg <- plot_df_corr_ggplot(df, width = 0.05)
+
+fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
+
+```
 
 ## B24
 
