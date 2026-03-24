@@ -782,18 +782,6 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // sistemone fpi
     //////////////////////////////////////////////////////////////
-    enum class Meson_enum {
-        Pi = 0,
-        K = 1,
-        Ds = 2,
-        fPi = 3,
-        w0 = 4
-    };
-    enum class quark_enum {
-        ml = 0,
-        ms = 1,
-        mc = 2
-    };
 
     for (int iM = 0; iM < 5; iM++) {
 

@@ -495,6 +495,44 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
 )
 ```
 
+## fpi 3 reg
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+library(stringr)
+basenames <- c(
+    "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_N3_a2"
+)
+# extract the C value from the string 
+labels <- list(c("WTI","tm","OS"))
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type =labels[[j]],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = "fit",
+    # labelfit = "fit",
+    width = 0.0001,
+    nudge = j * 0.00001
+  )
+}
+fpi_FLAG <- 130.5
+gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
 ## MDs
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}

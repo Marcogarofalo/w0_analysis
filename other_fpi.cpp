@@ -281,6 +281,7 @@ int main(int argc, char** argv) {
     FILE* outfile_meff_corr = open_file(namefile, "w+");
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_raw_correlators", option[3], option[6], argv[7]);
     FILE* outfile_raw_corr = open_file(namefile, "w+");
+    printf("writing in:\n %s \n", namefile);
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_shifted_correlators", option[3], option[6], argv[7]);
     FILE* outfile_shifted_corr = open_file(namefile, "w+");
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_log_meff_shifted", option[3], option[6], argv[7]);
@@ -300,7 +301,7 @@ int main(int argc, char** argv) {
     fit_info_silent.chi2_gap_jackboot = 1e+6;
     fit_info_silent.guess_per_jack = 0;
 
-    for (int icorr = 0; icorr < head_A0.ncorr; icorr++) {
+    for (int icorr = 0; icorr < Max_corr; icorr++) {
         // log effective mass
         double* tmp_meff_corr = plateau_correlator_function(
             option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
@@ -474,6 +475,14 @@ int main(int argc, char** argv) {
     for (int j = 0; j < Njack;j++) {
         deriv[j] = Z[j] * (fpi.P[0][j] - fpi_mu.P[0][j]) / dmu;
     }
+    double *Z_fpi = myres->create_zero();
+    double *Z_fpi_mu = myres->create_zero();
+    for (int j = 0; j < Njack;j++) {
+        Z_fpi[j] = fpi.P[0][j]*Z[j];
+        Z_fpi_mu[j] = fpi_mu.P[0][j]*Z[j];
+    }
+    printf("Z_fpi: %.12g   %.12g\n", Z_fpi[Njack - 1], myres->comp_error(Z_fpi));
+    printf("Z_fpi_mu: %.12g   %.12g\n", Z_fpi_mu[Njack - 1], myres->comp_error(Z_fpi_mu));
     printf("deriv: %.12g   %.12g\n", deriv[Njack - 1], myres->comp_error(deriv));
     std::string name_jack_fpi = "deriv/deriv_val_fpi_P5A0_" + std::string(argv[3]) + ".jack_txt";
     myres->write_jack_in_file(deriv, name_jack_fpi.c_str());

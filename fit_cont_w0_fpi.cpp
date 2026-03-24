@@ -130,6 +130,7 @@ double lhs_fun(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double r = gjack.en[e].jack[fit_info.corr_id[0]][j]; // d(w0/a)/d(a*mu)
     return r;
 }
+
 double lhs_fun_ratio(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
     double r = gjack.en[e].jack[fit_info.corr_id[0]][j];
     r /= gjack.en[e].jack[fit_info.corr_id[1]][j];
@@ -228,6 +229,20 @@ double  rhs_mass_light(int n, int Nvar, double* x, int Npar, double* P) {
         r += cf * (a2 * std::log(a2 * lam2) * clogZ);
     return r;
 }
+
+
+double lhs_fun_N3(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double r = gjack.en[e].jack[fit_info.corr_id[n]][j]; // d(w0/a)/d(a*mu)
+    return r;
+}
+
+double rhs_a2_N3(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    r = P[0] + a2 * P[1 + n];
+    return r;
+}
+
 
 
 int main(int argc, char** argv) {
@@ -563,7 +578,7 @@ int main(int argc, char** argv) {
         }
     }
 
-        for (std::size_t ic = 0; ic < coeffs_mc.size(); ++ic) {
+    for (std::size_t ic = 0; ic < coeffs_mc.size(); ++ic) {
 
         mysprintf(namefile, NAMESIZE, "%s/data_from_wp25_deriv_mc_a2_lamcC%g.txt", argv[3], coeffs_mc[ic]);
         summary_out = open_file(namefile, "w+");
@@ -575,22 +590,22 @@ int main(int argc, char** argv) {
             // 2. Estrae tutto ciò che segue l'ultimo underscore
             std::string result = files[i].substr(lastUnderscore + 1);
             fprintf(summary_out, "%s  ", result.c_str());
-            double* tmp = jackall.en[i].jack[95 +coeffs.size()*8+ic*9];
+            double* tmp = jackall.en[i].jack[95 + coeffs.size() * 8 + ic * 9];
             fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
-            tmp = jackall.en[i].jack[96 +coeffs.size()*8+ic*9];
+            tmp = jackall.en[i].jack[96 + coeffs.size() * 8 + ic * 9];
             fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
-            tmp = jackall.en[i].jack[92 +coeffs.size()*8+ic*9];
+            tmp = jackall.en[i].jack[92 + coeffs.size() * 8 + ic * 9];
             fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
-            tmp = jackall.en[i].jack[93 +coeffs.size()*8+ic*9];
+            tmp = jackall.en[i].jack[93 + coeffs.size() * 8 + ic * 9];
             fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
-            tmp = jackall.en[i].jack[94 +coeffs.size()*8+ic*9];
+            tmp = jackall.en[i].jack[94 + coeffs.size() * 8 + ic * 9];
             fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
 
-            tmp = jackall.en[i].jack[97 +coeffs.size()*8+ic*9];
+            tmp = jackall.en[i].jack[97 + coeffs.size() * 8 + ic * 9];
             fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
-            tmp = jackall.en[i].jack[98 +coeffs.size()*8+ic*9];
+            tmp = jackall.en[i].jack[98 + coeffs.size() * 8 + ic * 9];
             fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
-            tmp = jackall.en[i].jack[99 +coeffs.size()*8+ic*9];
+            tmp = jackall.en[i].jack[99 + coeffs.size() * 8 + ic * 9];
             fprintf(summary_out, "%.12g    %.12g     ", myres->mean(tmp), myres->comp_error(tmp));
 
             fprintf(summary_out, "\n");
@@ -620,10 +635,15 @@ int main(int argc, char** argv) {
     for (std::size_t ic = 0; ic < coeffs_mc.size(); ++ic) {
         const double coeff = coeffs_mc[ic];
         obs.push_back("fpi_wp25_mc_C" + std::to_string(coeff));
-        id_obs.push_back(96 + coeffs.size()*8 + ic * 9);
-        id_a.push_back(95 + coeffs.size()*8 + ic * 9);
+        id_obs.push_back(96 + coeffs.size() * 8 + ic * 9);
+        id_a.push_back(95 + coeffs.size() * 8 + ic * 9);
     }
-
+    for (std::size_t ic = 0; ic < coeffs_mc.size(); ++ic) {
+        const double coeff = coeffs_mc[ic];
+        obs.push_back("MDs_wp25_mc_C" + std::to_string(coeff));
+        id_obs.push_back(100 + coeffs.size() * 8 + ic * 9);
+        id_a.push_back(95 + coeffs.size() * 8 + ic * 9);
+    }
     int id_amuliso = 13;
     int id_a_fm = 16;
     int id_w0 = 1;
@@ -971,4 +991,55 @@ int main(int argc, char** argv) {
 
         }
     }
+
+    //////////////////////////////////////////////////////////////
+    // multifit fpi
+    //////////////////////////////////////////////////////////////
+    {
+        fit_type fit_info;
+        fit_info.corr_id = { 62, sid_fpi_A0 + 0 * 2, sid_fpi_A0 + 0 * 2 + 1 };
+        fit_info.N = 3;
+            fit_info.Nxen = std::vector<std::vector<int>>(fit_info.N);
+            for (int n = 0; n < fit_info.N; n++) {
+                // fit_info.Nxen[n].resize(ens_to_fit[ifit].size());
+                // for (int b = 0; b < ens_to_fit[ifit].size(); b++) {
+                //     fit_info.Nxen[n][b] = ens_to_fit[ifit][b];  // the charm is in myen[beta][0]
+                // }
+                fit_info.Nxen[n] = {0,1,2,3};
+            }
+            fit_info.init_N_etot_form_Nxen();
+            fit_info.function = rhs_a2_N3;
+            fit_info.linear_fit = true;
+            fit_info.Npar = 4;
+            fit_info.Nvar = 1; // a2
+            fit_info.Njack = jackall.en[0].Njack;
+            fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+            int count = 0;
+            for (int n = 0; n < fit_info.N; n++) {
+                for (int e : fit_info.Nxen[n]) {
+                    for (int j = 0; j < Njack; j++) {
+                        fit_info.x[0][count][j] = pow(jackall.en[e].jack[id_a[0]][j], 2); // a^2 fm^2
+                    }
+                    count++;
+                }
+            }
+            // fit_info.linear_fit = false;
+            fit_info.verbosity = 0;
+            // fit_info.covariancey = true;
+            // fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+            // fit_info.make_covariance_block_diagonal_in_n();
+            // fit_info.compute_cov1_fit();
+
+            std::string namefit = "fit_fpi_N3_a2";
+
+            fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun_N3, fit_info, namefit.c_str());
+            fit_info.band_range = { 0, 0.008145209846823482 };
+            print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
+            der_fpi_const_full.clear();
+
+            fit_info.restore_default();
+
+    }
+
 }
