@@ -265,11 +265,13 @@ int main(int argc, char** argv) {
     printf("dmu = %g\n", dmu);
     for (int j = 0; j < head_A0.Njack; j++) {
         for (int tf = 0; tf < head_A0.T; tf++) {
-            conf_jack[j][2][tf][0] = conf_jack_mu[j][0][tf][0];//conf_jack[j][0][tf][0] - conf_jack_mu[j][0][tf][0] * dmu;
-            conf_jack[j][2][tf][1] = conf_jack_mu[j][0][tf][1];//conf_jack[j][0][tf][1] - conf_jack_mu[j][0][tf][1] * dmu;
+            // conf_jack[j][2][tf][0] = conf_jack_mu[j][0][tf][0];
+            // conf_jack[j][2][tf][1] = conf_jack_mu[j][0][tf][1];
+            conf_jack[j][2][tf][0] = conf_jack[j][0][tf][0] - conf_jack_mu[j][0][tf][0] * dmu;
+            conf_jack[j][2][tf][1] = conf_jack[j][0][tf][1] - conf_jack_mu[j][0][tf][1] * dmu;
 
-            conf_jack[j][3][tf][0] = conf_jack_mu[j][1][tf][0];//conf_jack[j][1][tf][0] - conf_jack_mu[j][1][tf][0] * dmu;
-            conf_jack[j][3][tf][1] = conf_jack_mu[j][1][tf][1];//conf_jack[j][1][tf][1] - conf_jack_mu[j][1][tf][1] * dmu;
+            conf_jack[j][3][tf][0] = conf_jack[j][1][tf][0] - conf_jack_mu[j][1][tf][0] * dmu;
+            conf_jack[j][3][tf][1] = conf_jack[j][1][tf][1] - conf_jack_mu[j][1][tf][1] * dmu;
         }
     }
 
