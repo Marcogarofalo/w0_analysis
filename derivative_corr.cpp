@@ -117,6 +117,12 @@ int main(int argc, char** argv) {
         "usage:././w0_rew -p path file -bin $bin  jack/boot   file_mu  out\n separate "
         "path and file please   argc =%d", argc);
 
+    for (size_t i = 0; i < argc; i++)
+    {
+        printf("%s  ",argv[i]);
+        /* code */
+    }
+    printf("\n");
     char resampling[NAMESIZE];
     mysprintf(resampling, NAMESIZE, argv[6]);
     printf("resampling: %s\n", resampling);
@@ -133,12 +139,14 @@ int main(int argc, char** argv) {
     //////////////////////////////////// read and setup header
     char namefile[NAMESIZE];
     mysprintf(namefile, NAMESIZE, "%s/%s", option[3], option[6]);
+    printf("reading from :\n %s \n", namefile);
     FILE* infile_A0 = open_file(namefile, "r");
     generic_header head_A0;
     head_A0.read_header_debug(infile_A0);
     init_global_head(head_A0);
 
     mysprintf(namefile, NAMESIZE, "%s/%s", option[3], argv[7]);
+    printf("reading from :\n %s \n", namefile);
     FILE* infile_A0_mu = open_file(namefile, "r");
     generic_header head_A0_mu;
     head_A0_mu.read_header_debug(infile_A0_mu);
@@ -150,6 +158,7 @@ int main(int argc, char** argv) {
     double mu1 = head_A0_mu.mus[0];
     head_A0.mus = { mu0, mu1 };
     mysprintf(namefile, NAMESIZE, "%s/%s", option[3], argv[8]);
+    printf("writing to :\n %s \n", namefile);
     FILE* outfile = open_file(namefile, "w+");
     head_A0.write_header(outfile);
 
