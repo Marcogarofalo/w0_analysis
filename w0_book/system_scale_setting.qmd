@@ -500,30 +500,71 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 library(stringr)
+path<-"/home/garofalo/analysis/flow/data/fit_all_beta/"
 basenames <- c(
-    "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_N3_a2"
+    "fit_fpi_N3_a2",
+    "fit_fpi_N3_a2_noBOS_noBtm_noBWTI",
+    "fit_fpi_N3_a2_a4",
+    "fit_fpi_N3_a2_Husung0.42",
+    "fit_fpi_N3_a2_Husung0.21"
 )
+
+count <- length(basenames)
+df <- data.frame(
+  "fit" = rep("", count),
+  "res" = rep(0, count),
+  "err" = rep(0, count),
+  "chi2dof" = rep(0, count),
+  "dof" = rep(0, count),
+  "Npar" = rep(0, count),
+  "Ndat" = rep(0, count),
+  "mult" = rep(0, count),
+  "k" = rep(0, count)
+)
+
 # extract the C value from the string 
 labels <- list(c("WTI","tm","OS"))
 
 for (j in seq_along(basenames)) {
   print(basenames[j])
-  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  fit <- Rose::read_fit_P_file(paste0(path,basenames[j], "_fit_P.dat"))
   print(make_table_fit_result(fit))
-  gg <- plot_fit(basenames[j], "a2",
+  df[j, 1] <- basenames[j]
+  M <- data.matrix(fit$C)
+  for (i in c(1:dim(M)[1])) {
+    for (l in c(1:dim(M)[1])) {
+      M[i, l] <- as.numeric(fit$C[i, l])
+    }
+  }
+  e <- eigen(M)
+
+  lmin <- min(abs(e$values))
+  lmax <- max(abs(e$values))
+  k <- lmax / lmin
+  df[j, -1] <- c(fit$P[1, 2], fit$P[1, 3], fit$chi2dof, fit$dof, fit$npar, fit$ndata, 1, k)
+
+  gg <- plot_fit(paste0(path,basenames[j]), "a2",
     # noline = TRUE,
-    data_type =labels[[j]],
+    data_type =labels[[1]],
     gg = gg,
     id_x = 1,
-    single_name_for_fit = "fit",
+    single_name_for_fit = basenames[j],
     # labelfit = "fit",
     width = 0.0001,
-    nudge = j * 0.00001
+    nudge = 0,
+    noline  = TRUE
   )
 }
 fpi_FLAG <- 130.5
 gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
 gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+#### BAIC
+ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$"))
+cat("BAIC average $f_\\pi=", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>")
+
+
 
 fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
   to_print = TRUE,

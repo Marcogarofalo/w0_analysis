@@ -122,7 +122,7 @@ for (j in seq_along(basenames)) {
 # gg <- gg + geom_vline(xintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
 # gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
 
-fig <- myplotly(gg, "", "$M_\\pi/f_\\pi$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
+fig <- myplotly(gg, "", "$\\mu_\\ell$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
   to_print = TRUE,
   # yrange = c(-1, 4), 
   legend_position = c(0.7, 0.98)
@@ -154,6 +154,48 @@ basenames <- c(
   "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_B32_fpi_A0P5_deriv_fpi_A0P5_xi_xi2",
   "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_B32_OS_fpi_A0P5_deriv_fpi_A0P5_xi_xi2",
   "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_B32_fpi_A0P5_deriv_fpi_WTI_xi_xi2"
+)
+labels <- c(
+  "fpi_A0P5 ",
+  "fpi_A0P5_OS ",
+  "fpi_WTI "
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  # print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "amu",
+    # noline = TRUE,
+    data_type = labels[j],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    nudge = j * 0.00001
+  )
+}
+# fpi_FLAG <- (135.0/130.5)^2
+
+# gg <- gg + geom_vline(xintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+# gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+
+fig <- myplotly(gg, "", "$M_\\pi/f_\\pi$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
+  to_print = TRUE,
+  # yrange = c(-1, 4), 
+  legend_position = c(0.7, 0.98)
+)
+```
+
+## C48
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_C48_fpi_A0P5_deriv_fpi_A0P5_xi_xi2",
+  "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_C48_OS_fpi_A0P5_deriv_fpi_A0P5_xi_xi2",
+  "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_C48_fpi_A0P5_deriv_fpi_WTI_xi_xi2"
 )
 labels <- c(
   "fpi_A0P5 ",
