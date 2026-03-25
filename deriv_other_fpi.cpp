@@ -450,6 +450,14 @@ int main(int argc, char** argv) {
     // free(M_PS);
     check_correlatro_counter(1);
 
+    double dmu = head_rew.mus[0] - head_rew.oranges[0];
+    printf("dmu: %.12g mu1 =  %g   mu2 = %g\n", dmu, head_rew.mus[0], head_rew.oranges[0]);
+    double* deriv_M = myres->create_zero();
+    for (int j = 0; j < Njack;j++) {
+        deriv_M[j] = (M_PS[j] - M_PS_mu[j]) / dmu;
+    }
+    printf("deriv M: %.12g   %.12g\n", deriv_M[Njack - 1], myres->comp_error(deriv_M));
+
     //////////////// me  and fpi
 
     struct fit_result fit_out;
@@ -483,7 +491,7 @@ int main(int argc, char** argv) {
         jack_file);
     check_correlatro_counter(3);
 
-    double *Zfpi = myres->create_copy(fpi.P[0]);
+    double* Zfpi = myres->create_copy(fpi.P[0]);
     myres->mult(Zfpi, Z, fpi.P[0]);
     printf("Zfpi: %.12g   %.12g\n", Zfpi[Njack - 1], myres->comp_error(Zfpi));
 
@@ -508,8 +516,6 @@ int main(int argc, char** argv) {
     ///////// deriv
 
     double* deriv = myres->create_copy(M_PS);
-    double dmu = head_rew.mus[0] - head_rew.oranges[0];
-    printf("dmu: %.12g mu1 =  %g   mu2 = %g\n", dmu, head_rew.mus[0], head_rew.oranges[0]);
     for (int j = 0; j < Njack;j++) {
         deriv[j] = Z[j] * (fpi.P[0][j] - fpi_mu.P[0][j]) / dmu;
     }
@@ -545,13 +551,13 @@ int main(int argc, char** argv) {
     if (label.compare("strange") == 0)
         label = "rewsOS";
 
-    std::string name_jack_fpi = "deriv/deriv_fpi_P5A0_" + std::string(argv[3]) + "_" + std::string(argv[8]) +  ".jack_txt";
-    myres->write_jack_in_file(deriv,  name_jack_fpi.c_str());
+    std::string name_jack_fpi = "deriv/deriv_fpi_P5A0_" + std::string(argv[3]) + "_" + std::string(argv[8]) + ".jack_txt";
+    myres->write_jack_in_file(deriv, name_jack_fpi.c_str());
 
-    name_jack_fpi = "deriv/fpi_P5A0_" + std::string(argv[3]) +   ".jack_txt";
-    double *Zf = myres->create_copy(fpi.P[0]);
-    myres->mult(Zf, Z, fpi.P[0]); 
-    myres->write_jack_in_file(Zf,  name_jack_fpi.c_str());
+    name_jack_fpi = "deriv/fpi_P5A0_" + std::string(argv[3]) + ".jack_txt";
+    double* Zf = myres->create_copy(fpi.P[0]);
+    myres->mult(Zf, Z, fpi.P[0]);
+    myres->write_jack_in_file(Zf, name_jack_fpi.c_str());
 
 
 
@@ -613,7 +619,7 @@ int main(int argc, char** argv) {
 
     double* mul_over_fpi_deriv = myres->create_copy(deriv);
     for (int j = 0; j < Njack;j++) {
-        mul_over_fpi_deriv[j] =  (amuiso[0][j] / fpi.P[0][j]) * deriv[j];
+        mul_over_fpi_deriv[j] = (amuiso[0][j] / fpi.P[0][j]) * deriv[j];
     }
     printf("mul_over_fpi_deriv: %.12g   %.12g\n", mul_over_fpi_deriv[Njack - 1], myres->comp_error(mul_over_fpi_deriv));
     double* mul_over_fpi_deriv_WTI = myres->create_copy(deriv_WTI);
@@ -659,4 +665,5 @@ int main(int argc, char** argv) {
 
     fit_info.restore_default();
 
+    write_jack(deriv_M, Njack, jack_file); check_correlatro_counter(22);
 }
