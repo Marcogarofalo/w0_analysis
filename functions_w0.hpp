@@ -2,10 +2,10 @@
 #define functions_w0_H
 #include <array>
 #include "non_linear_fit.hpp"
-static constexpr std::array<double, 5> coeffs = {0, -1.0, -2.0,-5.0,-10.0 };
+static constexpr std::array<double, 5> coeffs = { 0, -1.0, -2.0,-5.0,-10.0 };
 static constexpr std::array<double, 6> coeffs_mc = { -100, -200, -400 , -800, -1600, -3200 };
 static constexpr int sid_fpi_A0 = 92 + coeffs.size() * 8 + coeffs_mc.size() * 9;
-
+static constexpr int id_fpi_OS_dWTI = sid_fpi_A0 + coeffs.size() * 2 + coeffs_mc.size() * 2 ;
 
 static constexpr double hbarc = 197.326963; // MeV*fm
 static constexpr double fpi_MeV = 130.5;

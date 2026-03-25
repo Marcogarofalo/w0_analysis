@@ -224,7 +224,7 @@ int id_deriv(int Meson, int deriv, int quark, int val_sea) {
 }
 
 
-int id_derv_fpi(int reg, int deriv, int quark, int val_sea) {
+int id_deriv_fpi(int reg, int deriv, int quark, int val_sea) {
     return 46 + reg * 7 + deriv * (1 + (quark + 3 * val_sea));
 }
 
@@ -634,45 +634,45 @@ int main(int argc, char** argv) {
     read_file_debug(data[58], files[61].c_str());// deriv sea ms fpi A0 
     read_file_debug(data[59], files[62].c_str());// deriv sea mc fpi A0
 
-    error(id_derv_fpi(0, 0, 0, 0) != 46, 1, "main", "id_derv_fpi(0, 0, 0, 0) should be 46 but it is %d", id_derv_fpi(0, 0, 0, 0));
-    error(id_derv_fpi(0, 1, 0, 0) != 47, 1, "main", "id_derv_fpi(0, 1, 0, 0) should be 47 but it is %d", id_derv_fpi(0, 1, 0, 0));
-    error(id_derv_fpi(0, 1, 1, 0) != 48, 1, "main", "id_derv_fpi(0, 1, 1, 0) should be 48 but it is %d", id_derv_fpi(0, 1, 1, 0));
-    error(id_derv_fpi(0, 1, 2, 0) != 49, 1, "main", "id_derv_fpi(0, 1, 2, 0) should be 49 but it is %d", id_derv_fpi(0, 1, 2, 0));
-    error(id_derv_fpi(0, 1, 0, 1) != 50, 1, "main", "id_derv_fpi(0, 1, 0, 1) should be 50 but it is %d", id_derv_fpi(0, 1, 0, 1));
-    error(id_derv_fpi(0, 1, 1, 1) != 51, 1, "main", "id_derv_fpi(0, 1, 1, 1) should be 51 but it is %d", id_derv_fpi(0, 1, 1, 1));
-    error(id_derv_fpi(0, 1, 2, 1) != 52, 1, "main", "id_derv_fpi(0, 1, 2, 1) should be 52 but it is %d", id_derv_fpi(0, 1, 2, 1));
+    error(id_deriv_fpi(0, 0, 0, 0) != 46, 1, "main", "id_deriv_fpi(0, 0, 0, 0) should be 46 but it is %d", id_deriv_fpi(0, 0, 0, 0));
+    error(id_deriv_fpi(0, 1, 0, 0) != 47, 1, "main", "id_deriv_fpi(0, 1, 0, 0) should be 47 but it is %d", id_deriv_fpi(0, 1, 0, 0));
+    error(id_deriv_fpi(0, 1, 1, 0) != 48, 1, "main", "id_deriv_fpi(0, 1, 1, 0) should be 48 but it is %d", id_deriv_fpi(0, 1, 1, 0));
+    error(id_deriv_fpi(0, 1, 2, 0) != 49, 1, "main", "id_deriv_fpi(0, 1, 2, 0) should be 49 but it is %d", id_deriv_fpi(0, 1, 2, 0));
+    error(id_deriv_fpi(0, 1, 0, 1) != 50, 1, "main", "id_deriv_fpi(0, 1, 0, 1) should be 50 but it is %d", id_deriv_fpi(0, 1, 0, 1));
+    error(id_deriv_fpi(0, 1, 1, 1) != 51, 1, "main", "id_deriv_fpi(0, 1, 1, 1) should be 51 but it is %d", id_deriv_fpi(0, 1, 1, 1));
+    error(id_deriv_fpi(0, 1, 2, 1) != 52, 1, "main", "id_deriv_fpi(0, 1, 2, 1) should be 52 but it is %d", id_deriv_fpi(0, 1, 2, 1));
 
-    error(id_derv_fpi(1, 0, 0, 0) != 53, 1, "main", "id_derv_fpi(1, 0, 0, 0) should be 53 but it is %d", id_derv_fpi(1, 0, 0, 0));
-    error(id_derv_fpi(1, 1, 0, 0) != 54, 1, "main", "id_derv_fpi(1, 1, 0, 0) should be 54 but it is %d", id_derv_fpi(1, 1, 0, 0));
-    error(id_derv_fpi(1, 1, 1, 0) != 55, 1, "main", "id_derv_fpi(1, 1, 1, 0) should be 55 but it is %d", id_derv_fpi(1, 1, 1, 0));
-    error(id_derv_fpi(1, 1, 2, 0) != 56, 1, "main", "id_derv_fpi(1, 1, 2, 0) should be 56 but it is %d", id_derv_fpi(1, 1, 2, 0));
-    error(id_derv_fpi(1, 1, 0, 1) != 57, 1, "main", "id_derv_fpi(1, 1, 0, 1) should be 57 but it is %d", id_derv_fpi(1, 1, 0, 1));
-    error(id_derv_fpi(1, 1, 1, 1) != 58, 1, "main", "id_derv_fpi(1, 1, 1, 1) should be 58 but it is %d", id_derv_fpi(1, 1, 1, 1));
-    error(id_derv_fpi(1, 1, 2, 1) != 59, 1, "main", "id_derv_fpi(1, 1, 2, 1) should be 59 but it is %d", id_derv_fpi(1, 1, 2, 1));
+    error(id_deriv_fpi(1, 0, 0, 0) != 53, 1, "main", "id_deriv_fpi(1, 0, 0, 0) should be 53 but it is %d", id_deriv_fpi(1, 0, 0, 0));
+    error(id_deriv_fpi(1, 1, 0, 0) != 54, 1, "main", "id_deriv_fpi(1, 1, 0, 0) should be 54 but it is %d", id_deriv_fpi(1, 1, 0, 0));
+    error(id_deriv_fpi(1, 1, 1, 0) != 55, 1, "main", "id_deriv_fpi(1, 1, 1, 0) should be 55 but it is %d", id_deriv_fpi(1, 1, 1, 0));
+    error(id_deriv_fpi(1, 1, 2, 0) != 56, 1, "main", "id_deriv_fpi(1, 1, 2, 0) should be 56 but it is %d", id_deriv_fpi(1, 1, 2, 0));
+    error(id_deriv_fpi(1, 1, 0, 1) != 57, 1, "main", "id_deriv_fpi(1, 1, 0, 1) should be 57 but it is %d", id_deriv_fpi(1, 1, 0, 1));
+    error(id_deriv_fpi(1, 1, 1, 1) != 58, 1, "main", "id_deriv_fpi(1, 1, 1, 1) should be 58 but it is %d", id_deriv_fpi(1, 1, 1, 1));
+    error(id_deriv_fpi(1, 1, 2, 1) != 59, 1, "main", "id_deriv_fpi(1, 1, 2, 1) should be 59 but it is %d", id_deriv_fpi(1, 1, 2, 1));
 
 
     for (int j = 0; j < Njack;j++) {
         for (int r = 0; r < 2; r++) {
 
-            int iddf = id_derv_fpi(r, 1, 0, 1);// ml sea needs a factor 2 because of the two quarks u and d
+            int iddf = id_deriv_fpi(r, 1, 0, 1);// ml sea needs a factor 2 because of the two quarks u and d
             double* dR = &data[iddf][j];
             *dR *= 2.0;
 
             for (int sc = 1;sc < 3;sc++) {
-                int iddf = id_derv_fpi(r, 1, sc, 1);
+                int iddf = id_deriv_fpi(r, 1, sc, 1);
                 double* dR = &data[iddf][j];
-                int idf = id_derv_fpi(r, 0, 0, 0);
+                int idf = id_deriv_fpi(r, 0, 0, 0);
                 double f = data[idf][j];
                 *dR = (*dR) * (f) / amuiso[0][j];
             }
         }
     }
 
-    id_to_correct.push_back({ id_derv_fpi(0, 0, 0, 0) });
+    id_to_correct.push_back({ id_deriv_fpi(0, 0, 0, 0) });
     // OS does not need max twist correction
     std::vector<std::vector<int>> id_correct_max_twist = id_to_correct;
 
-    id_to_correct.push_back({ id_derv_fpi(1, 0, 0, 0) });
+    id_to_correct.push_back({ id_deriv_fpi(1, 0, 0, 0) });
 
     Ls.push_back(L);
     Ls.push_back(L);
@@ -799,15 +799,15 @@ int main(int argc, char** argv) {
         printf("\n");
     }
     for (int ir = 0;ir < 2;ir++) {
-        double* M = data[id_derv_fpi(ir, 0, 0, 0)];
+        double* M = data[id_deriv_fpi(ir, 0, 0, 0)];
         printf("fpi_r%d val=%-8.3g (%-8.3g)\t", ir, M[Njack - 1], myres->comp_error(M));
         // valence
         for (int im = 0; im < 3; im++) {
-            double* dM = data[id_derv_fpi(ir, 1, im, 0)];
+            double* dM = data[id_deriv_fpi(ir, 1, im, 0)];
             printf(" dval%d = %-8.3g (%-8.3g)", im, dM[Njack - 1], myres->comp_error(dM));
         }
         for (int im = 0; im < 3; im++) {
-            double* dM = data[id_derv_fpi(ir, 1, im, 1)];
+            double* dM = data[id_deriv_fpi(ir, 1, im, 1)];
             printf(" dsea%d = %-8.3g (%-8.3g)", im, dM[Njack - 1], myres->comp_error(dM));
         }
         printf("\n");
@@ -2061,6 +2061,11 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     std::vector<double*> fpi_tm(coeffs.size());
     std::vector<double*> fpi_OS(coeffs.size());
+    // a name for fpi_OS where i take the derivative from the WTI identity:
+    std::vector<double*> fpi_OS_dWTI(coeffs.size());
+    double** fpi_tm_split = malloc_2<double>(7, Njack);
+    double** fpi_OS_split = malloc_2<double>(7, Njack);
+    double** fpi_from_w0_split = malloc_2<double>(7, Njack);
 
     for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
         const double coeff = coeffs[ic];
@@ -2132,8 +2137,13 @@ int main(int argc, char** argv) {
 
         double* a_from_w0 = myres->create_copy(data[4]);
         double* fpi_from_w0 = myres->create_copy(data[4]);
-        fpi_tm[ic] = myres->create_copy(data[id_derv_fpi(0, 0, 0, 0)]);
-        fpi_OS[ic] = myres->create_copy(data[id_derv_fpi(1, 0, 0, 0)]);
+        fpi_tm[ic] = myres->create_copy(data[id_deriv_fpi(0, 0, 0, 0)]);
+        fpi_OS[ic] = myres->create_copy(data[id_deriv_fpi(1, 0, 0, 0)]);
+        fpi_OS_dWTI[ic] = myres->create_copy(data[id_deriv_fpi(1, 0, 0, 0)]);
+
+        myres->copy(fpi_tm_split[0], data[id_deriv_fpi(0, 0, 0, 0)]);
+        myres->copy(fpi_OS_split[0], data[id_deriv_fpi(1, 0, 0, 0)]);
+        myres->copy(fpi_from_w0_split[0], data[id_deriv(3, 0, 0, 0)]);
         for (int j = 0; j < Njack;j++) {
             int ifpi = 3;
             double af = data[id_deriv(ifpi, 0, 0, 0)][j];
@@ -2144,6 +2154,7 @@ int main(int argc, char** argv) {
                     double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
                     double dm = (miso_w0[im][j] - amusim[im][j]);
                     af += dm * df;
+                    fpi_from_w0_split[1 + im + val_sea * 3][j] = dm * df;
                     double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
                     // add special case for charm sea
                     if (im == 2 && val_sea == 1) {
@@ -2159,17 +2170,48 @@ int main(int argc, char** argv) {
                     }
                     w_a += dm * dw;
 
-                    fpi_tm[ic][j] += dm * data[id_derv_fpi(0, 1, im, val_sea)][j];
-                    fpi_OS[ic][j] += dm * data[id_derv_fpi(1, 1, im, val_sea)][j];
+                    fpi_tm[ic][j] += dm * data[id_deriv_fpi(0, 1, im, val_sea)][j];
+                    fpi_OS[ic][j] += dm * data[id_deriv_fpi(1, 1, im, val_sea)][j];
+                    
+                    if(im==0)
+                        fpi_OS_dWTI[ic][j] += dm * data[id_deriv_fpi(1, 1, im, val_sea)][j];
+                    else 
+                        fpi_OS_dWTI[ic][j] += dm * data[id_deriv(ifpi, 1, im, val_sea)][j];
+
+                    fpi_tm_split[1 + im + val_sea * 3][j] = dm * data[id_deriv_fpi(0, 1, im, val_sea)][j];
+                    fpi_OS_split[1 + im + val_sea * 3][j] = dm * data[id_deriv_fpi(1, 1, im, val_sea)][j];
                 }
             }
+
             a_from_w0[j] = w0_fm / w_a;
             fpi_from_w0[j] = af / (a_from_w0[j] / hbarc);
             fpi_tm[ic][j] /= (a_from_w0[j] / hbarc);
             fpi_OS[ic][j] /= (a_from_w0[j] / hbarc);
+            fpi_OS_dWTI[ic][j] /= (a_from_w0[j] / hbarc);
+
+            for (int ii = 0; ii < 7; ii++) {
+                fpi_tm_split[ii][j] /= (a_from_w0[j] / hbarc);
+                fpi_OS_split[ii][j] /= (a_from_w0[j] / hbarc);
+                fpi_from_w0_split[ii][j] /= (a_from_w0[j] / hbarc);
+            }
         }
         printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_from_w0), myres->comp_error(a_from_w0));
-        printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
+        printf("fpi (fm): %.6g +/- %.3g =", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
+        for (int ii = 0; ii < 7; ii++) {
+            printf("%+.3g  (%.3g) ", myres->mean(fpi_from_w0_split[ii]), myres->comp_error(fpi_from_w0_split[ii]));
+        }
+        printf("\n");
+        printf("fpi_tm(fm): %.6g +/- %.3g =", myres->mean(fpi_tm[ic]), myres->comp_error(fpi_tm[ic]));
+        for (int ii = 0; ii < 7; ii++) {
+            printf("%+.3g  (%.3g) ", myres->mean(fpi_tm_split[ii]), myres->comp_error(fpi_tm_split[ii]));
+        }
+        printf("\n");
+        printf("fpi_OS(fm): %.6g +/- %.3g =", myres->mean(fpi_OS[ic]), myres->comp_error(fpi_OS[ic]));
+        for (int ii = 0; ii < 7; ii++) {
+            printf("%+.3g  (%.3g) ", myres->mean(fpi_OS_split[ii]), myres->comp_error(fpi_OS_split[ii]));
+        }
+        printf("\n");
+        printf("fpi_OS_dWTI(fm): %.6g +/- %.3g \n", myres->mean(fpi_OS_dWTI[ic]), myres->comp_error(fpi_OS_dWTI[ic]));
 
         write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(92 + ic * 8);
         write_jack(miso_w0[1], Njack, jack_file);     check_correlatro_counter(93 + ic * 8);
@@ -2277,8 +2319,8 @@ int main(int argc, char** argv) {
         double* fpi_from_w0 = myres->create_copy(data[4]);
         int iMDs = 2;
         double* MDs = myres->create_copy(data[iMDs]);
-        fpi_mc_tm[ic] = myres->create_copy(data[id_derv_fpi(0, 0, 0, 0)]);
-        fpi_mc_OS[ic] = myres->create_copy(data[id_derv_fpi(1, 0, 0, 0)]);
+        fpi_mc_tm[ic] = myres->create_copy(data[id_deriv_fpi(0, 0, 0, 0)]);
+        fpi_mc_OS[ic] = myres->create_copy(data[id_deriv_fpi(1, 0, 0, 0)]);
         for (int j = 0; j < Njack;j++) {
             int ifpi = 3;
             double af = data[id_deriv(ifpi, 0, 0, 0)][j];
@@ -2320,8 +2362,8 @@ int main(int argc, char** argv) {
                     double dM = data[id_deriv(iMDs, 1, im, val_sea)][j];
                     MDs[j] += dm * dM;
 
-                    fpi_mc_tm[ic][j] += dm * data[id_derv_fpi(0, 1, im, val_sea)][j];
-                    fpi_mc_OS[ic][j] += dm * data[id_derv_fpi(1, 1, im, val_sea)][j];
+                    fpi_mc_tm[ic][j] += dm * data[id_deriv_fpi(0, 1, im, val_sea)][j];
+                    fpi_mc_OS[ic][j] += dm * data[id_deriv_fpi(1, 1, im, val_sea)][j];
                 }
             }
 
@@ -2358,6 +2400,8 @@ int main(int argc, char** argv) {
         write_jack(fpi_mc_tm[ic], Njack, jack_file);     check_correlatro_counter(sid_fpi_A0 + coeffs.size() * 2 + ic * 2);
         write_jack(fpi_mc_OS[ic], Njack, jack_file);     check_correlatro_counter(sid_fpi_A0 + coeffs.size() * 2 + ic * 2 + 1);
     }
-
+    for (int ic = 0; ic < coeffs.size(); ic++) {
+        write_jack(fpi_OS_dWTI[ic], Njack, jack_file);     check_correlatro_counter(id_fpi_OS_dWTI+ ic);
+    }
     return 0;
 }
