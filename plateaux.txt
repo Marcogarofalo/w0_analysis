@@ -961,3 +961,99 @@ E112_s_c2.bin  M_{PS}  25 49 1
 E112_s_c3.bin  M_{PS}  25 49 1
 
 D96_P5P5_l1_l1_LMA.bin  M_{PS}    28 84 1
+
+
+B96_l1_l1_P5A0.dat  M_{PS}    20 60 1
+B96_l1_l1_P5A0.dat  M_{PS}_mu 20 60 1
+
+B64_TM_l1_l1_P5A0.dat  M_{PS}    20 60 1
+
+B24_tm_l0_l0_A0P5.dat_reweight_charm_OS_B24.dat  M_{PS} 20 23 1
+B24_tm_l1_l1_A0P5.dat_reweight_charm_OS_B24.dat  M_{PS} 20 23 1
+B24_tm_l2_l2_A0P5.dat_reweight_charm_OS_B24.dat  M_{PS} 20 23 1
+
+B32_tm_l0_l0_A0P5.dat_reweight_charm_OS_B32.dat  M_{PS} 20 30 1
+B32_tm_l1_l1_A0P5.dat_reweight_charm_OS_B32.dat  M_{PS} 20 30 1
+B32_tm_l2_l2_A0P5.dat_reweight_charm_OS_B32.dat  M_{PS} 20 30 1
+
+C48_tm_l0_l0_A0P5.dat_reweight_charm_OS_C48.dat  M_{PS} 23 47 1
+C48_tm_l1_l1_A0P5.dat_reweight_charm_OS_C48.dat  M_{PS} 23 47 1
+C48_tm_l2_l2_A0P5.dat_reweight_charm_OS_C48.dat  M_{PS} 23 47 1
+
+
+B24_OS_l0_l0_A0P5.dat_reweight_charm_OS_B24.dat  M_{PS} 20 23 1
+B24_OS_l1_l1_A0P5.dat_reweight_charm_OS_B24.dat  M_{PS} 20 23 1
+B24_OS_l2_l2_A0P5.dat_reweight_charm_OS_B24.dat  M_{PS} 20 23 1
+
+B32_OS_l0_l0_A0P5.dat_reweight_charm_OS_B32.dat  M_{PS} 20 30 1
+B32_OS_l1_l1_A0P5.dat_reweight_charm_OS_B32.dat  M_{PS} 20 30 1
+B32_OS_l2_l2_A0P5.dat_reweight_charm_OS_B32.dat  M_{PS} 20 30 1
+
+C48_OS_l0_l0_A0P5.dat_reweight_charm_OS_C48.dat  M_{PS} 23 47 1
+C48_OS_l1_l1_A0P5.dat_reweight_charm_OS_C48.dat  M_{PS} 23 47 1
+C48_OS_l2_l2_A0P5.dat_reweight_charm_OS_C48.dat  M_{PS} 23 47 1
+
+### strange
+B24_tm_l0_l0_A0P5.dat_reweight_strange_OS_B24.dat  M_{PS} 20 23 1
+B24_tm_l1_l1_A0P5.dat_reweight_strange_OS_B24.dat  M_{PS} 20 23 1
+B24_tm_l2_l2_A0P5.dat_reweight_strange_OS_B24.dat  M_{PS} 20 23 1
+
+B32_tm_l0_l0_A0P5.dat_reweight_strange_OS_B32.dat  M_{PS} 20 30 1
+B32_tm_l1_l1_A0P5.dat_reweight_strange_OS_B32.dat  M_{PS} 20 30 1
+B32_tm_l2_l2_A0P5.dat_reweight_strange_OS_B32.dat  M_{PS} 20 30 1
+
+C48_tm_l0_l0_A0P5.dat_reweight_strange_OS_C48.dat  M_{PS} 23 47 1
+C48_tm_l1_l1_A0P5.dat_reweight_strange_OS_C48.dat  M_{PS} 23 47 1
+C48_tm_l2_l2_A0P5.dat_reweight_strange_OS_C48.dat  M_{PS} 23 47 1
+
+
+B24_OS_l0_l0_A0P5.dat_reweight_strange_OS_B24.dat  M_{PS} 20 23 1
+B24_OS_l1_l1_A0P5.dat_reweight_strange_OS_B24.dat  M_{PS} 20 23 1
+B24_OS_l2_l2_A0P5.dat_reweight_strange_OS_B24.dat  M_{PS} 20 23 1
+
+B32_OS_l0_l0_A0P5.dat_reweight_strange_OS_B32.dat  M_{PS} 20 30 1
+B32_OS_l1_l1_A0P5.dat_reweight_strange_OS_B32.dat  M_{PS} 20 30 1
+B32_OS_l2_l2_A0P5.dat_reweight_strange_OS_B32.dat  M_{PS} 20 30 1
+
+C48_OS_l0_l0_A0P5.dat_reweight_strange_OS_C48.dat  M_{PS} 23 47 1
+C48_OS_l1_l1_A0P5.dat_reweight_strange_OS_C48.dat  M_{PS} 23 47 1
+C48_OS_l2_l2_A0P5.dat_reweight_strange_OS_C48.dat  M_{PS} 23 47 1
+
+
+
+# 4betas
+onlinemeas_B64_LMA.dat   ZA_RIMOM  0.76263 0.00023 1   
+onlinemeas_C80_LMA.dat   ZA_RIMOM  0.77363 0.00023 1
+onlinemeas_D96.dat       ZA_RIMOM  0.78488 0.00025 1
+onlinemeas_E112_LMA.dat  ZA_RIMOM  0.79419 0.00022 1
+
+# 4betas
+onlinemeas_B64_LMA.dat   ZV_RIMOM  0.72316 0.00033 1
+onlinemeas_C80_LMA.dat   ZV_RIMOM  0.73744 0.00036 1
+onlinemeas_D96.dat       ZV_RIMOM  0.75217 0.00028 1
+onlinemeas_E112_LMA.dat  ZV_RIMOM  0.76392 0.00026 1
+
+
+B64_tm_l0_l0_A0P5.dat_reweight_light_OS_B64_LMA.dat  M_{PS}   20 60 1
+B64_OS_l0_l0_A0P5.dat_reweight_light_OS_B64_LMA.dat  M_{PS}   20 60 1
+B64_tm_l0_l0_A0P5.dat  M_{PS}    20 60 1
+B64_OS_l0_l0_A0P5.dat  M_{PS}    20 60 1
+
+
+C80_tm_l0_l0_A0P5.dat_reweight_light_OS_C80_LMA.dat  M_{PS}   23 70 1
+C80_OS_l0_l0_A0P5.dat_reweight_light_OS_C80_LMA.dat  M_{PS}   23 70 1
+C80_tm_l0_l0_A0P5.dat  M_{PS}    23 70 1
+C80_OS_l0_l0_A0P5.dat  M_{PS}    23 70 1
+
+D96_tm_l0_l0_A0P5.dat_reweight_light_OS_D96.dat  M_{PS}   28 84 1
+D96_OS_l0_l0_A0P5.dat_reweight_light_OS_D96.dat  M_{PS}   28 84 1
+D96_tm_l0_l0_A0P5.dat  M_{PS}  28 84 1
+D96_OS_l0_l0_A0P5.dat  M_{PS}  28 84 1
+
+E112_tm_l0_l0_A0P5.dat_reweight_light_OS_E112_LMA.dat  M_{PS}   33 98 1
+E112_OS_l0_l0_A0P5.dat_reweight_light_OS_E112_LMA.dat  M_{PS}   33 98 1
+E112_tm_l0_l0_A0P5.dat  M_{PS}  33 98 1
+E112_OS_l0_l0_A0P5.dat  M_{PS}  33 98 1
+
+
+E112_l_s1.bin  M_{PS}  40 98 1
