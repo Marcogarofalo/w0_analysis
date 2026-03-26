@@ -228,6 +228,31 @@ int id_deriv_fpi(int reg, int deriv, int quark, int val_sea) {
     return 46 + reg * 7 + deriv * (1 + (quark + 3 * val_sea));
 }
 
+void weighted_average(double* M0, double* M1) {
+    double dM0 = myres->comp_error(M0);
+    double dM1 = myres->comp_error(M1);
+    double wM0 = 1.0 / (dM0 * dM0);
+    double wM1 = 1.0 / (dM1 * dM1);
+
+    for (int j = 0; j < myres->Njack; j++) {
+        M0[j] = (wM0 * M0[j] + wM1 * M1[j]) / (wM0 + wM1);
+    }
+}
+
+double get_linear_deriv_w0c(double** data, std::vector<double*>amuiso, double* previous_a, int j) {
+    double dw;
+    double P0 = data[41][j];
+    double P1 = data[42][j];
+    // remove the prefactor in dw0/dmc(sea)
+    double mul = amuiso[0][j];
+    double w0 = data[4][j];
+    double a = previous_a[j];
+    P0 *= w0 / mul;
+    P1 *= w0 / mul;
+    dw = P0 + P1 * a * a;
+    return dw;
+}
+
 int main(int argc, char** argv) {
     error(argc != 5, 1, "main ",
         "usage:./fit_all_phi4  jack/boot   path_to_jack   output_dir    file_inputs");
@@ -380,7 +405,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // read the jacks
     //////////////////////////////////////////////////////////////
-    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2;
+    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2 + 2;
     printf("%d\n", file_to_read);
     error(files.size() - 2 != file_to_read, 1, "main", "No input files found in  file %s we need %d lines but we have %d", argv[4], file_to_read, files.size() - 2);
     double** data = malloc_2<double>(file_to_read, Njack);
@@ -608,6 +633,9 @@ int main(int argc, char** argv) {
 
     std::vector<std::vector<int>> id_to_correct = { {0,3} };
     std::vector<int> Ls = { L };
+    std::vector<bool> correct_M = { true };
+    std::vector<bool> correct_M_twist = { true };
+    std::vector<std::vector<int>> id_average;
     if (strcmp(files[46].c_str(), "skip") != 0 &&
         strcmp(files[47].c_str(), "skip") != 0 &&
         strcmp(files[48].c_str(), "skip") != 0) {
@@ -616,6 +644,10 @@ int main(int argc, char** argv) {
         read_file_debug(data[44], files[46].c_str());// mpi 
         read_file_debug(data[45], files[47].c_str());// fpi
         Ls.push_back(std::stoi(files[48]));
+        correct_M.push_back(true);
+        correct_M_twist.push_back(true);
+        id_average.push_back({ 0, 44 });
+        id_average.push_back({ 3, 45 });
     }
 
     read_file_debug(data[46], files[49].c_str());// fpi A0 tm
@@ -668,14 +700,41 @@ int main(int argc, char** argv) {
         }
     }
 
-    id_to_correct.push_back({ id_deriv_fpi(0, 0, 0, 0) });
+    id_to_correct.push_back({ id_deriv(0, 0, 0, 0)  ,id_deriv_fpi(0, 0, 0, 0) });
+    correct_M.push_back(false);
+    correct_M_twist.push_back(false);
+    Ls.push_back(L);
+
     // OS does not need max twist correction
     std::vector<std::vector<int>> id_correct_max_twist = id_to_correct;
 
-    id_to_correct.push_back({ id_deriv_fpi(1, 0, 0, 0) });
+    id_to_correct.push_back({ id_deriv(0, 0, 0, 0), id_deriv_fpi(1, 0, 0, 0) });
+    correct_M.push_back(false);
+    correct_M_twist.push_back(false);
+    Ls.push_back(L);
 
-    Ls.push_back(L);
-    Ls.push_back(L);
+    // B96 fpi OS and tm
+    if (strcmp(files[63].c_str(), "skip") != 0 &&
+        strcmp(files[64].c_str(), "skip") != 0) {
+
+        read_file_debug(data[60], files[63].c_str());// fpi tm B96 
+        id_correct_max_twist.push_back({ 44, 60 });// mass , fpi
+        id_to_correct.push_back({ 44, 60 });
+        correct_M.push_back(false);
+        correct_M_twist.push_back(true);
+        Ls.push_back(std::stoi(files[48]));
+        id_average.push_back({ id_deriv_fpi(0, 0, 0, 0), 60 });
+
+
+        read_file_debug(data[61], files[64].c_str());// fpi OS B96
+        id_to_correct.push_back({ 44, 61 });
+        correct_M.push_back(false);
+        correct_M_twist.push_back(false);
+        Ls.push_back(std::stoi(files[48]));
+        id_average.push_back({ id_deriv_fpi(1, 0, 0, 0), 61 });
+    }
+
+
 
     //////////////////////////////////////////////////////////////
     // max twist correction
@@ -685,14 +744,10 @@ int main(int argc, char** argv) {
     for (int i = 0; i < id_correct_max_twist.size(); i++) {
         int idM;
         int idf;
-        if (id_correct_max_twist[i].size() == 2) {
-            idM = id_correct_max_twist[i][0];
-            idf = id_correct_max_twist[i][1];
-        }
-        else if (id_correct_max_twist[i].size() == 1) {
-            idM = 0;
-            idf = id_correct_max_twist[i][0];
-        }
+
+        idM = id_correct_max_twist[i][0];
+        idf = id_correct_max_twist[i][1];
+
         printf("Mpi before max twist correction id=%d: %.12g  %.12g\n", idM, data[idM][Njack - 1], myres->comp_error(data[idM]));
         printf("fpi before max twist correction id=%d: %.12g  %.12g\n", idf, data[idf][Njack - 1], myres->comp_error(data[idf]));
         for (int j = 0; j < Njack;j++) {
@@ -700,7 +755,7 @@ int main(int argc, char** argv) {
             double cl = sqrt(1 + mr * mr);
             double* Mpi = &data[idM][j];
             double* fpi = &data[idf][j];
-            if (id_correct_max_twist[i].size() == 2) *Mpi = *Mpi / sqrt(cl);
+            if (correct_M_twist[i]) *Mpi = *Mpi / sqrt(cl);
             *fpi = *fpi * cl;
         }
         printf("Mpi after max twist correction id=%d: %.12g  %.12g\n", idM, data[idM][Njack - 1], myres->comp_error(data[idM]));
@@ -721,14 +776,10 @@ int main(int argc, char** argv) {
     for (int i = 0; i < id_to_correct.size(); i++) {
         int idM;
         int idf;
-        if (id_to_correct[i].size() == 2) {
-            idM = id_to_correct[i][0];
-            idf = id_to_correct[i][1];
-        }
-        else if (id_to_correct[i].size() == 1) {
-            idM = 0;
-            idf = id_to_correct[i][0];
-        }
+
+        idM = id_to_correct[i][0];
+        idf = id_to_correct[i][1];
+
         for (int j = 0; j < Njack;j++) {
             double* Mpi = &data[idM][j];
             double* fpi = &data[idf][j];
@@ -736,42 +787,54 @@ int main(int argc, char** argv) {
             double delta_FVE = FVE_GL_Mpi(Ls[i], xi, (*fpi));
             // *Mpi /= (1 - 0.25 * delta_FVE);
             // *fpi /= (1 + delta_FVE);
+
             delta_fve_NNLO_CDH  d = Delta_pi_NNLO_CDH(Ls[i], xi, (*fpi));
-            if (j == Njack - 1) printf("delta FVE M (L=%d) = %g   %g\n", Ls[i], -0.25 * delta_FVE, d.dM);
-            if (j == Njack - 1) printf("delta FVE f (L=%d) = %g   %g\n", Ls[i], delta_FVE, d.df);
-            if (id_correct_max_twist[i].size() == 2)*Mpi /= (1 + d.dM);
+            // if (j == Njack - 1) printf("delta FVE M (L=%d) = %g   %g\n", Ls[i], -0.25 * delta_FVE, d.dM);
+            // if (j == Njack - 1) printf("delta FVE f (L=%d) = %g   %g\n", Ls[i], delta_FVE, d.df);
+            if (correct_M[i])*Mpi /= (1 + d.dM);
             *fpi /= (1 + d.df);
 
         }
-        printf("Mpi after FVE correction: %.12g  %.12g\n", data[idM][Njack - 1], myres->comp_error(data[idM]));
-        printf("fpi after FVE correction: %.12g  %.12g\n", data[idf][Njack - 1], myres->comp_error(data[idf]));
+        printf("Mpi after FVE correction id[%d] L=%d: %.12g  %.12g\n", idM, Ls[i], data[idM][Njack - 1], myres->comp_error(data[idM]));
+        printf("fpi after FVE correction id[%d] L=%d: %.12g  %.12g\n", idf, Ls[i], data[idf][Njack - 1], myres->comp_error(data[idf]));
     }
 
 
-    if (strcmp(files[46].c_str(), "skip") != 0 && strcmp(files[47].c_str(), "skip") != 0) {
+    // if (strcmp(files[46].c_str(), "skip") != 0 && strcmp(files[47].c_str(), "skip") != 0) {
+    //     printf("averaging volumes:\n");
+    //     int idM0 = id_to_correct[0][0];
+    //     int idf0 = id_to_correct[0][1];
+    //     int idM1 = id_to_correct[1][0];
+    //     int idf1 = id_to_correct[1][1];
+    //     // double dM0 = myres->comp_error(data[idM0]);
+    //     // double df0 = myres->comp_error(data[idf0]);
+    //     // double dM1 = myres->comp_error(data[idM1]);
+    //     // double df1 = myres->comp_error(data[idf1]);
+    //     // double wM0 = 1.0 / (dM0 * dM0);
+    //     // double wM1 = 1.0 / (dM1 * dM1);
+    //     // double wf0 = 1.0 / (df0 * df0);
+    //     // double wf1 = 1.0 / (df1 * df1);
+
+    //     // for (int j = 0; j < Njack;j++) {
+    //     //     double* M0 = &data[idM0][j];
+    //     //     double* f0 = &data[idf0][j];
+    //     //     double* M1 = &data[idM1][j];
+    //     //     double* f1 = &data[idf1][j];
+    //     //     *M0 = (wM0 * (*M0) + wM1 * (*M1)) / (wM0 + wM1);
+    //     //     *f0 = (wf0 * (*f0) + wf1 * (*f1)) / (wf0 + wf1);
+    //     // }
+    //     weighted_average(data[idM0], data[idM1]);
+    //     weighted_average(data[idf0], data[idf1]);
+    // }
+    if (id_average.size() > 0)
         printf("averaging volumes:\n");
-        int idM0 = id_to_correct[0][0];
-        int idf0 = id_to_correct[0][1];
-        int idM1 = id_to_correct[1][0];
-        int idf1 = id_to_correct[1][1];
-        double dM0 = myres->comp_error(data[idM0]);
-        double df0 = myres->comp_error(data[idf0]);
-        double dM1 = myres->comp_error(data[idM1]);
-        double df1 = myres->comp_error(data[idf1]);
-        double wM0 = 1.0 / (dM0 * dM0);
-        double wM1 = 1.0 / (dM1 * dM1);
-        double wf0 = 1.0 / (df0 * df0);
-        double wf1 = 1.0 / (df1 * df1);
-
-        for (int j = 0; j < Njack;j++) {
-            double* M0 = &data[idM0][j];
-            double* f0 = &data[idf0][j];
-            double* M1 = &data[idM1][j];
-            double* f1 = &data[idf1][j];
-            *M0 = (wM0 * (*M0) + wM1 * (*M1)) / (wM0 + wM1);
-            *f0 = (wf0 * (*f0) + wf1 * (*f1)) / (wf0 + wf1);
-        }
+    for (int i = 0; i < id_average.size(); i++) {
+        int idO0 = id_average[i][0];
+        int idO1 = id_average[i][1];
+        weighted_average(data[idO0], data[idO1]);
+        printf("obs %d after averaging with %d volumes: %.12g  %.12g\n", idO0, idO1, data[idO0][Njack - 1], myres->comp_error(data[idO0]));
     }
+
     printf("Mpi after averaging volumes: %.12g  %.12g\n", data[0][Njack - 1], myres->comp_error(data[0]));
     printf("fpi after averaging volumes: %.12g  %.12g\n", data[3][Njack - 1], myres->comp_error(data[3]));
 
@@ -812,6 +875,8 @@ int main(int argc, char** argv) {
         }
         printf("\n");
     }
+
+    double* w0_lin_deriv = myres->create_copy(data[4]);
 
     double* Rds = myres->create_copy(data[id_deriv(2, 0, 0, 0)]);
     myres->div(Rds, Rds, data[id_deriv(3, 0, 0, 0)]);
@@ -939,6 +1004,7 @@ int main(int argc, char** argv) {
                     double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
                     // if (val_sea != 1 && im != 2)
                     w_a += dm * dw;
+
                 }
             }
 
@@ -1004,6 +1070,22 @@ int main(int argc, char** argv) {
 
                 w0_from_fpi_hybrid[j] *= a_fm[j];
             }
+        }
+        // linear deriv mc
+        for (int j = 0; j < Njack;j++) {
+            for (int im = 0; im < 3; im++) {
+                int val_sea = 1;
+                double dm = (miso[im][j] - amusim[im][j]);
+                double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                if (im == 2 && val_sea == 1) {
+                    if (j == Njack - 1) printf("replacing dw0/dmc = %g\n", dw);
+                    dw = get_linear_deriv_w0c(data, amuiso, previous_a, j);
+                    if (j == Njack - 1) printf("with      dw0/dmc = %g\n", dw);
+                }
+
+                w0_lin_deriv[j] += dm * dw;
+            }
+            w0_lin_deriv[j] *= a_fm[j];
         }
 
         double** data_m_a = malloc_2<double>(4, Njack);
@@ -2061,10 +2143,12 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     std::vector<double*> fpi_tm(coeffs.size());
     std::vector<double*> fpi_OS(coeffs.size());
+    std::vector<double*> afpi_OS(coeffs.size());
     // a name for fpi_OS where i take the derivative from the WTI identity:
     std::vector<double*> fpi_OS_dWTI(coeffs.size());
     double** fpi_tm_split = malloc_2<double>(7, Njack);
     double** fpi_OS_split = malloc_2<double>(7, Njack);
+    double** afpi_OS_split = malloc_2<double>(7, Njack);
     double** fpi_from_w0_split = malloc_2<double>(7, Njack);
 
     for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
@@ -2139,10 +2223,12 @@ int main(int argc, char** argv) {
         double* fpi_from_w0 = myres->create_copy(data[4]);
         fpi_tm[ic] = myres->create_copy(data[id_deriv_fpi(0, 0, 0, 0)]);
         fpi_OS[ic] = myres->create_copy(data[id_deriv_fpi(1, 0, 0, 0)]);
+        afpi_OS[ic] = myres->create_copy(fpi_OS[ic]);
         fpi_OS_dWTI[ic] = myres->create_copy(data[id_deriv_fpi(1, 0, 0, 0)]);
 
         myres->copy(fpi_tm_split[0], data[id_deriv_fpi(0, 0, 0, 0)]);
         myres->copy(fpi_OS_split[0], data[id_deriv_fpi(1, 0, 0, 0)]);
+        myres->copy(afpi_OS_split[0], fpi_OS_split[0]);
         myres->copy(fpi_from_w0_split[0], data[id_deriv(3, 0, 0, 0)]);
         for (int j = 0; j < Njack;j++) {
             int ifpi = 3;
@@ -2172,20 +2258,21 @@ int main(int argc, char** argv) {
 
                     fpi_tm[ic][j] += dm * data[id_deriv_fpi(0, 1, im, val_sea)][j];
                     fpi_OS[ic][j] += dm * data[id_deriv_fpi(1, 1, im, val_sea)][j];
-                    
-                    if(im==0)
+                    if (im == 0)
                         fpi_OS_dWTI[ic][j] += dm * data[id_deriv_fpi(1, 1, im, val_sea)][j];
-                    else 
+                    else
                         fpi_OS_dWTI[ic][j] += dm * data[id_deriv(ifpi, 1, im, val_sea)][j];
 
                     fpi_tm_split[1 + im + val_sea * 3][j] = dm * data[id_deriv_fpi(0, 1, im, val_sea)][j];
                     fpi_OS_split[1 + im + val_sea * 3][j] = dm * data[id_deriv_fpi(1, 1, im, val_sea)][j];
+                    afpi_OS_split[1 + im + val_sea * 3][j] = fpi_OS_split[1 + im + val_sea * 3][j];
                 }
             }
 
             a_from_w0[j] = w0_fm / w_a;
             fpi_from_w0[j] = af / (a_from_w0[j] / hbarc);
             fpi_tm[ic][j] /= (a_from_w0[j] / hbarc);
+            afpi_OS[ic][j] = fpi_OS[ic][j];
             fpi_OS[ic][j] /= (a_from_w0[j] / hbarc);
             fpi_OS_dWTI[ic][j] /= (a_from_w0[j] / hbarc);
 
@@ -2209,6 +2296,11 @@ int main(int argc, char** argv) {
         printf("fpi_OS(fm): %.6g +/- %.3g =", myres->mean(fpi_OS[ic]), myres->comp_error(fpi_OS[ic]));
         for (int ii = 0; ii < 7; ii++) {
             printf("%+.3g  (%.3g) ", myres->mean(fpi_OS_split[ii]), myres->comp_error(fpi_OS_split[ii]));
+        }
+        printf("\n");
+        printf("afpi_OS(fm): %.6g +/- %.3g =", myres->mean(afpi_OS[ic]), myres->comp_error(afpi_OS[ic]));
+        for (int ii = 0; ii < 7; ii++) {
+            printf("%+.3g  (%.3g) ", myres->mean(afpi_OS_split[ii]), myres->comp_error(afpi_OS_split[ii]));
         }
         printf("\n");
         printf("fpi_OS_dWTI(fm): %.6g +/- %.3g \n", myres->mean(fpi_OS_dWTI[ic]), myres->comp_error(fpi_OS_dWTI[ic]));
@@ -2401,7 +2493,9 @@ int main(int argc, char** argv) {
         write_jack(fpi_mc_OS[ic], Njack, jack_file);     check_correlatro_counter(sid_fpi_A0 + coeffs.size() * 2 + ic * 2 + 1);
     }
     for (int ic = 0; ic < coeffs.size(); ic++) {
-        write_jack(fpi_OS_dWTI[ic], Njack, jack_file);     check_correlatro_counter(id_fpi_OS_dWTI+ ic);
+        write_jack(fpi_OS_dWTI[ic], Njack, jack_file);     check_correlatro_counter(id_fpi_OS_dWTI + ic);
     }
+
+    write_jack(w0_lin_deriv, Njack, jack_file);     check_correlatro_counter(id_w0_lin_deriv);
     return 0;
 }

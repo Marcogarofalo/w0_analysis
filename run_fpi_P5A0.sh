@@ -9,13 +9,15 @@ run(){
 }
 gammas=("A0P5"  "P5P5")
 reg=("tm"  "OS")
+
+#### B64
 for ((ir=0; ir<${#reg[@]}; ir++)); do
 for ((ig=0; ig<${#gammas[@]}; ig++)); do
 run  "./derivative_corr  -p ../../data_fpi_A0/ B64_${reg[ir]}_l0_l0_${gammas[ig]}.dat -bin 1 jack B64_${reg[ir]}_l1_l1_${gammas[ig]}.dat  B64_${reg[ir]}_val_deriv_${gammas[ig]}.dat" res
 done
 done
 
-#### B64
+
 
 run "./other_fpi  -p ../../data_fpi_A0   B64_tm_l0_l0_A0P5.dat  -bin 20  jack  B64_tm_l0_l0_P5P5.dat  B64_tm_val_deriv_A0P5.dat  B64_tm_val_deriv_P5P5.dat  onlinemeas_B64_LMA.dat" res
 run "./other_fpi  -p ../../data_fpi_A0   B64_OS_l0_l0_A0P5.dat  -bin 20  jack  B64_OS_l0_l0_P5P5.dat  B64_OS_val_deriv_A0P5.dat  B64_OS_val_deriv_P5P5.dat  onlinemeas_B64_LMA.dat" res
@@ -23,6 +25,11 @@ run "./other_fpi  -p ../../data_fpi_A0   B64_OS_l0_l0_A0P5.dat  -bin 20  jack  B
 
 run "./deriv_other_fpi  -p ../../data_fpi_A0   B64_tm_l0_l0_A0P5.dat  -bin 20  jack  B64_tm_l0_l0_P5P5.dat   reweight_light_OS_B64_LMA.dat  onlinemeas_B64_LMA.dat"  res
 run "./deriv_other_fpi  -p ../../data_fpi_A0   B64_OS_l0_l0_A0P5.dat  -bin 20  jack  B64_OS_l0_l0_P5P5.dat   reweight_light_OS_B64_LMA.dat  onlinemeas_B64_LMA.dat"  res
+
+### B96
+## the valence deivative is garbage, just to run the sim value
+run "./other_fpi  -p ../../data_fpi_A0   B96_tm_l0_l0_A0P5.dat  -bin 20  jack  B96_tm_l0_l0_P5P5.dat  B96_tm_l0_l0_A0P5.dat  B96_tm_l0_l0_P5P5.dat  onlinemeas_B64_LMA.dat" res
+run "./other_fpi  -p ../../data_fpi_A0   B96_OS_l0_l0_A0P5.dat  -bin 20  jack  B96_OS_l0_l0_P5P5.dat  B96_OS_l0_l0_A0P5.dat  B96_OS_l0_l0_P5P5.dat  onlinemeas_B64_LMA.dat" res
 
 ### C80
 

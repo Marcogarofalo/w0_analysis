@@ -490,6 +490,9 @@ int main(int argc, char** argv) {
     myres->write_jack_in_file(deriv, name_jack_fpi.c_str());
 
 
+    name_jack_fpi = "deriv/fpi_P5A0_" + std::string(argv[3]) + ".jack_txt";
+    myres->write_jack_in_file(Z_fpi, name_jack_fpi.c_str());
+
     write_jack(deriv, Njack, jack_file);
     check_correlatro_counter(6);
 

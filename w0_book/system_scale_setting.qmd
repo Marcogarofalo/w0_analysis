@@ -237,7 +237,8 @@ basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta_sim/fit_w0_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta_no_m0//fit_w0_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_ens_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_hybrid_cont_a2"
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_hybrid_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_lin_deriv_cont_a2"
   # "/home/garofalo/analysis/flow/data/fit_all_beta_nocharmw0//fit_w0_cont_a2",
   # "/home/garofalo/analysis/flow/data/fit_all_beta_nocharmw0_decorr///fit_w0_cont_a2"
 )
@@ -246,7 +247,8 @@ labels <- c(
   "sim-point",
   "no m0 corr",
   "sea-deriv-ens",
-  "hybrid"
+  "hybrid",
+  "lin_deriv"
   # "no-charm-corr-w0",
   # "no-charm-corr-w0-decorr"
 )
@@ -392,6 +394,10 @@ cat("BAIC average $f_\\pi=", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{Me
 dff <- df[!grepl("a4", df$fit), ]
 ave_BAICf <- BAIC(v = dff$res, err = dff$err, chi2dof = dff$chi2dof, dof = dff$dof, npar = dff$Npar, multiplicity = dff$mult)
 cat("BAIC average no a4 $f_\\pi=", mean_print(ave_BAICf$m, ave_BAICf$dm), "\\,[\\text{MeV}]$<br>")
+####
+dff <- df[c(1,2), ]
+ave_BAICf <- BAIC(v = dff$res, err = dff$err, chi2dof = dff$chi2dof, dof = dff$dof, npar = dff$Npar, multiplicity = dff$mult)
+cat("BAIC 1,2 $f_\\pi=", mean_print(ave_BAICf$m, ave_BAICf$dm), "\\,[\\text{MeV}]$<br>")
 
 
 
@@ -413,7 +419,11 @@ basenames <- c(
     "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_lin_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-1.000000_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-2.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-3.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-4.000000_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-5.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-6.000000_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-7.000000_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_wp25_C-10.000000_cont_a2"
 )
 # extract the C value from the string 
@@ -434,7 +444,8 @@ for (j in seq_along(basenames)) {
     single_name_for_fit = labels[j],
     width = 0.0001,
     nudge = j * 0.00001,
-    noribbon = TRUE
+    noribbon = FALSE,
+    noline = TRUE
   )
 }
 fpi_FLAG <- 130.5
@@ -502,11 +513,11 @@ gg <- NULL
 library(stringr)
 path<-"/home/garofalo/analysis/flow/data/fit_all_beta/"
 basenames <- c(
-    "fit_fpi_N3_a2",
-    "fit_fpi_N3_a2_noBOS_noBtm_noBWTI",
-    "fit_fpi_N3_a2_a4",
-    "fit_fpi_N3_a2_Husung0.42",
-    "fit_fpi_N3_a2_Husung0.21"
+    "fit_fpi_C0.000000_N3_a2",
+    "fit_fpi_C0.000000_N3_a2_noBOS_noBtm_noBWTI",
+    "fit_fpi_C0.000000_N3_a2_a4",
+    "fit_fpi_C0.000000_N3_a2_Husung0.42",
+    "fit_fpi_C0.000000_N3_a2_Husung0.21"
 )
 
 count <- length(basenames)
@@ -528,14 +539,15 @@ labels <- list(c("WTI","tm","OS"))
 for (j in seq_along(basenames)) {
   print(basenames[j])
   fit <- Rose::read_fit_P_file(paste0(path,basenames[j], "_fit_P.dat"))
-  print(make_table_fit_result(fit))
+  # print(make_table_fit_result(fit))
   df[j, 1] <- basenames[j]
-  M <- data.matrix(fit$C)
-  for (i in c(1:dim(M)[1])) {
-    for (l in c(1:dim(M)[1])) {
-      M[i, l] <- as.numeric(fit$C[i, l])
-    }
-  }
+  # M <- data.matrix(fit$C)
+  # for (i in c(1:dim(M)[1])) {
+  #   for (l in c(1:dim(M)[1])) {
+  #     M[i, l] <- as.numeric(fit$C[i, l])
+  #   }
+  # }
+  M <- matrix(as.numeric(as.matrix(fit$C)), nrow = nrow(fit$C))  
   e <- eigen(M)
 
   lmin <- min(abs(e$values))
@@ -564,6 +576,11 @@ tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_pr
 kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$"))
 cat("BAIC average $f_\\pi=", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>")
 
+## only linear fit
+df1<- df[c(1,2),]
+ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("BAIC average linear only $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>")
+
 
 
 fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
@@ -573,6 +590,183 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
 )
 ```
 
+## fpi 3 reg + C -5
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+library(stringr)
+path<-"/home/garofalo/analysis/flow/data/fit_all_beta/"
+basenames <- c(
+    "fit_fpi_C-5.000000_N3_a2",
+    "fit_fpi_C-5.000000_N3_a2_noBOS_noBtm_noBWTI",
+    "fit_fpi_C-5.000000_N3_a2_a4",
+    "fit_fpi_C-5.000000_N3_a2_Husung0.42",
+    "fit_fpi_C-5.000000_N3_a2_Husung0.21",
+    "fit_fpi_C-5.000000_N3_a2_noCOS_noCtm_noCWTI"
+)
+
+count <- length(basenames)
+df <- data.frame(
+  "fit" = rep("", count),
+  "res" = rep(0, count),
+  "err" = rep(0, count),
+  "chi2dof" = rep(0, count),
+  "dof" = rep(0, count),
+  "Npar" = rep(0, count),
+  "Ndat" = rep(0, count),
+  "mult" = rep(0, count),
+  "k" = rep(0, count)
+)
+
+# extract the C value from the string 
+labels <- list(c("WTI","tm","OS"))
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(path,basenames[j], "_fit_P.dat"))
+  # print(make_table_fit_result(fit))
+  df[j, 1] <- basenames[j]
+  # M <- data.matrix(fit$C)
+  # for (i in c(1:dim(M)[1])) {
+  #   for (l in c(1:dim(M)[1])) {
+  #     M[i, l] <- as.numeric(fit$C[i, l])
+  #   }
+  # }
+  M <- matrix(as.numeric(as.matrix(fit$C)), nrow = nrow(fit$C))  
+  e <- eigen(M)
+
+  lmin <- min(abs(e$values))
+  lmax <- max(abs(e$values))
+  k <- lmax / lmin
+  df[j, -1] <- c(fit$P[1, 2], fit$P[1, 3], fit$chi2dof, fit$dof, fit$npar, fit$ndata, 1, k)
+
+  gg <- plot_fit(paste0(path,basenames[j]), "a2",
+    # noline = TRUE,
+    data_type =labels[[1]],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit =  gsub("00+(_)", "\\1", gsub("fit_fpi_", "", basenames[j])) ,
+    # labelfit = "fit",
+    width = 0.0001,
+    nudge = 0,
+    noline  = TRUE
+  )
+}
+fpi_FLAG <- 130.5
+gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+#### BAIC
+ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$"))
+cat("BAIC average $f_\\pi=", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>")
+
+## only linear fit
+df1<- df[c(1,2,6),]
+ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("BAIC average linear noB noC $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>")
+## only linear fit
+df1<- df[c(1,2),]
+ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("BAIC average linear noB  $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>")
+
+
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+## fpi 3 reg + C -3
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+library(stringr)
+path<-"/home/garofalo/analysis/flow/data/fit_all_beta/"
+basenames <- c(
+    "fit_fpi_C-3.000000_N3_a2",
+    "fit_fpi_C-3.000000_N3_a2_noBOS_noBtm_noBWTI",
+    "fit_fpi_C-3.000000_N3_a2_a4",
+    "fit_fpi_C-3.000000_N3_a2_Husung0.42",
+    "fit_fpi_C-3.000000_N3_a2_Husung0.21",
+    "fit_fpi_C-3.000000_N3_a2_noCOS_noCtm_noCWTI"
+)
+
+count <- length(basenames)
+df <- data.frame(
+  "fit" = rep("", count),
+  "res" = rep(0, count),
+  "err" = rep(0, count),
+  "chi2dof" = rep(0, count),
+  "dof" = rep(0, count),
+  "Npar" = rep(0, count),
+  "Ndat" = rep(0, count),
+  "mult" = rep(0, count),
+  "k" = rep(0, count)
+)
+
+# extract the C value from the string 
+labels <- list(c("WTI","tm","OS"))
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(path,basenames[j], "_fit_P.dat"))
+  # print(make_table_fit_result(fit))
+  df[j, 1] <- basenames[j]
+  # M <- data.matrix(fit$C)
+  # for (i in c(1:dim(M)[1])) {
+  #   for (l in c(1:dim(M)[1])) {
+  #     M[i, l] <- as.numeric(fit$C[i, l])
+  #   }
+  # }
+  M <- matrix(as.numeric(as.matrix(fit$C)), nrow = nrow(fit$C))  
+  e <- eigen(M)
+
+  lmin <- min(abs(e$values))
+  lmax <- max(abs(e$values))
+  k <- lmax / lmin
+  df[j, -1] <- c(fit$P[1, 2], fit$P[1, 3], fit$chi2dof, fit$dof, fit$npar, fit$ndata, 1, k)
+
+  gg <- plot_fit(paste0(path,basenames[j]), "a2",
+    # noline = TRUE,
+    data_type =labels[[1]],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit =  gsub("00+(_)", "\\1", gsub("fit_fpi_", "", basenames[j])) ,
+    # labelfit = "fit",
+    width = 0.0001,
+    nudge = 0,
+    noline  = TRUE
+  )
+}
+fpi_FLAG <- 130.5
+gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+#### BAIC
+ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$"))
+cat("BAIC average $f_\\pi=", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>")
+
+## only linear fit
+df1<- df[c(1,2,6),]
+ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("BAIC average linear only noB noC $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>")
+## only linear fit
+df1<- df[c(1,2),]
+ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+cat("BAIC average linear noB  $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>")
+
+
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
 
 ## MDs
 

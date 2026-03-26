@@ -254,10 +254,10 @@ double rhs_a2_N3_Husung(int n, int Nvar, double* x, int Npar, double* P) {
     double a2 = x[0];
     static constexpr double lam = 295 / hbarc;
     static constexpr double lam2 = lam * lam;
-    
-    
+
+
     r = P[0] + a2 * P[1 + n] + a2 / std::pow(-std::log(a2 * lam2), C) * P[1 + 3 + n];
-    
+
     return r;
 }
 
@@ -634,13 +634,14 @@ int main(int argc, char** argv) {
     // fitting
     //////////////////////////////////////////////////////////////
     std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid", "fpi_wp25_lin", "fpi_wp25_lin_laRDs",  "fpi_wp25_lin_laRDs_exact",
-         "MDs_wp25_lin_laRDs_exact", "fpi_wp25_lin_la_mc_exact", "MDs_wp25_lin_la_mc_exact" };
+         "MDs_wp25_lin_laRDs_exact", "fpi_wp25_lin_la_mc_exact", "MDs_wp25_lin_la_mc_exact" ,
+        "w0_lin_deriv"};
 
     std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57, 62, 70, 78 ,
-        82, 87, 91
+        82, 87, 91, id_w0_lin_deriv
     };
     std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56, 61, 69, 77 ,
-         77, 86, 86
+         77, 86, 86,33
     };
 
     for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
@@ -1018,58 +1019,65 @@ int main(int argc, char** argv) {
          {{1,2,3}, {1,2,3}, {1,2,3} },
          {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
          {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} }
+         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
+         {{0,2,3}, {0,2,3}, {0,2,3} },
     };
-    std::vector<std::string> fits_fpi = { "N3_a2", "N3_a2_noBOS_noBtm_noBWTI" ,"N3_a2_a4", "N3_a2_Husung0.42", "N3_a2_Husung0.21" };
-    double (*funcArray_fpi[])(int, int, double*, int, double*) = { rhs_a2_N3, rhs_a2_N3, rhs_a2_N3_a4 , rhs_a2_N3_Husung<0.42>, rhs_a2_N3_Husung<0.21>};
-    std::vector<int> Npars_fpi = { 4, 4, 7, 7 ,7 };
+    std::vector<std::string> fits_fpi = { "N3_a2", "N3_a2_noBOS_noBtm_noBWTI" ,"N3_a2_a4", "N3_a2_Husung0.42", "N3_a2_Husung0.21","N3_a2_noCOS_noCtm_noCWTI" };
+    double (*funcArray_fpi[])(int, int, double*, int, double*) = { rhs_a2_N3, rhs_a2_N3, rhs_a2_N3_a4 , rhs_a2_N3_Husung<0.42>, rhs_a2_N3_Husung<0.21>,
+     rhs_a2_N3};
+    std::vector<int> Npars_fpi = { 4, 4, 7, 7 ,7,4 };
 
-    for (auto [ifit, fit] : std::views::enumerate(fits_fpi)) {
+    for (int ic = 0;ic < coeffs.size();ic++) {
+        int id_a_of_ic=95 + ic * 8;
+        for (auto [ifit, fit] : std::views::enumerate(fits_fpi)) {
 
-        fit_type fit_info;
-        fit_info.corr_id = { 62, sid_fpi_A0 + 0 * 2, id_fpi_OS_dWTI/* sid_fpi_A0 + 0 * 2 + 1  */ };
-        fit_info.N = 3;
-        fit_info.Nxen = std::vector<std::vector<int>>(fit_info.N);
-        for (int n = 0; n < fit_info.N; n++) {
-            // fit_info.Nxen[n].resize(ens_to_fit[ifit].size());
-            // for (int b = 0; b < ens_to_fit[ifit].size(); b++) {
-            //     fit_info.Nxen[n][b] = ens_to_fit[ifit][b];  // the charm is in myen[beta][0]
-            // }
-            fit_info.Nxen[n] = points[ifit][n];
-        }
-        fit_info.init_N_etot_form_Nxen();
-        fit_info.function = funcArray_fpi[ifit];
-        fit_info.linear_fit = true;
-        fit_info.Npar = Npars_fpi[ifit];
-        fit_info.Nvar = 1; // a2
-        fit_info.Njack = jackall.en[0].Njack;
-        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
-
-        int count = 0;
-        for (int n = 0; n < fit_info.N; n++) {
-            for (int e : fit_info.Nxen[n]) {
-                for (int j = 0; j < Njack; j++) {
-                    fit_info.x[0][count][j] = pow(jackall.en[e].jack[id_a[0]][j], 2); // a^2 fm^2
-                }
-                count++;
+            fit_type fit_info;
+            fit_info.corr_id = {
+                96 + ic * 8,
+                sid_fpi_A0 + ic * 2,
+                id_fpi_OS_dWTI + ic/* sid_fpi_A0 + 0 * 2 + 1  */ };
+            fit_info.N = 3;
+            fit_info.Nxen = std::vector<std::vector<int>>(fit_info.N);
+            for (int n = 0; n < fit_info.N; n++) {
+                // fit_info.Nxen[n].resize(ens_to_fit[ifit].size());
+                // for (int b = 0; b < ens_to_fit[ifit].size(); b++) {
+                //     fit_info.Nxen[n][b] = ens_to_fit[ifit][b];  // the charm is in myen[beta][0]
+                // }
+                fit_info.Nxen[n] = points[ifit][n];
             }
+            fit_info.init_N_etot_form_Nxen();
+            fit_info.function = funcArray_fpi[ifit];
+            fit_info.linear_fit = true;
+            fit_info.Npar = Npars_fpi[ifit];
+            fit_info.Nvar = 1; // a2
+            fit_info.Njack = jackall.en[0].Njack;
+            fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+            int count = 0;
+            for (int n = 0; n < fit_info.N; n++) {
+                for (int e : fit_info.Nxen[n]) {
+                    for (int j = 0; j < Njack; j++) {
+                        fit_info.x[0][count][j] = pow(jackall.en[e].jack[id_a_of_ic][j], 2); // a^2 fm^2
+                    }
+                    count++;
+                }
+            }
+            // fit_info.linear_fit = false;
+            fit_info.verbosity = 0;
+            // fit_info.covariancey = true;
+            // fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+            // fit_info.make_covariance_block_diagonal_in_n();
+            // fit_info.compute_cov1_fit();
+
+            std::string namefit = "fit_fpi_C" + std::to_string(coeffs[ic])+ "_" + fit;
+
+            fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun_N3, fit_info, namefit.c_str());
+            fit_info.band_range = { 0, 0.008145209846823482 };
+            print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
+            der_fpi_const_full.clear();
+
+            fit_info.restore_default();
+
         }
-        // fit_info.linear_fit = false;
-        fit_info.verbosity = 0;
-        // fit_info.covariancey = true;
-        // fit_info.compute_cov_fit(argv, jackall, lhs_fun);
-        // fit_info.make_covariance_block_diagonal_in_n();
-        // fit_info.compute_cov1_fit();
-
-        std::string namefit = "fit_fpi_" + fit;
-
-        fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun_N3, fit_info, namefit.c_str());
-        fit_info.band_range = { 0, 0.008145209846823482 };
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
-        der_fpi_const_full.clear();
-
-        fit_info.restore_default();
-
     }
-
 }
