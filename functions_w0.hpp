@@ -7,6 +7,7 @@ static constexpr std::array<double, 6> coeffs_mc = { -100, -200, -400 , -800, -1
 static constexpr int sid_fpi_A0 = 92 + coeffs.size() * 8 + coeffs_mc.size() * 9;
 static constexpr int id_fpi_OS_dWTI = sid_fpi_A0 + coeffs.size() * 2 + coeffs_mc.size() * 2 ;
 static constexpr int id_w0_lin_deriv = id_fpi_OS_dWTI + coeffs.size() ;
+static constexpr int id_sqrtt0_from_fpi = id_w0_lin_deriv+1;
 
 static constexpr double hbarc = 197.326963; // MeV*fm
 static constexpr double fpi_MeV = 130.5;

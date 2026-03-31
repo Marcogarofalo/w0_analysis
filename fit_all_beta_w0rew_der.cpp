@@ -444,21 +444,24 @@ int main(int argc, char** argv) {
     // amusim[2] = myres->create_fake(mean, err, seed);
     //
     int id_dw0_dmu = 4;
+    int id_dsqrtt0_dmu = 24;
+    int id_w0 = 1;
+    int id_sqrtt0 = 21;
 
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////
-    std::vector<std::string> der_name = { "w0" };
-    std::vector<int> id_der = { id_dw0_dmu };
+    std::vector<std::string> der_name = { "w0","sqrtt0" };
+    std::vector<int> id_der = { id_dw0_dmu , id_dsqrtt0_dmu };
+    std::vector<int> id_Obs = { id_w0 , id_sqrtt0 };
 
     int id_amuliso = 13;
     int id_a_fm = 16;
-    int id_w0 = 1;
     int id_mu = 11;
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < der_name.size(); i++) {
         fit_type fit_info;
 
-        fit_info.corr_id = { id_dw0_dmu, id_amuliso, id_w0 };
+        fit_info.corr_id = { id_der[i], id_amuliso, id_Obs[i] };
 
         fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
         for (int n = 0; n < myen.size(); n++) {
@@ -499,8 +502,8 @@ int main(int argc, char** argv) {
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
 
         // // compute fpi at the charm point
-        file_out_name f_name_c_full(argv[3], namefit.c_str());
-        compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full, id_w0, f_name_c_full);
+        // file_out_name f_name_c_full(argv[3], namefit.c_str());
+        // compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full, id_Obs[i], f_name_c_full);
 
         //////////////////////////////////////////////////////////////
         // a+b*mu
@@ -516,8 +519,8 @@ int main(int argc, char** argv) {
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full_poly, der_fpi_const_full_poly, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
 
         // // compute fpi at the charm point
-        file_out_name f_name_c_full_poly(argv[3], namefit.c_str());
-        compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full_poly, id_w0, f_name_c_full_poly);
+        // file_out_name f_name_c_full_poly(argv[3], namefit.c_str());
+        // compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full_poly, id_w0, f_name_c_full_poly);
 
         //////////////////////////////////////////////////////////////
         // enlarge error such that chi2/dof=1
@@ -695,5 +698,20 @@ int main(int argc, char** argv) {
 
     myres->write_jack_in_file(der_charm_w0_5pt.P[0], "deriv/P0_fit_mul_over_w0_dw_dmuc_a2_5pt_jack.txt");
     myres->write_jack_in_file(der_charm_w0_5pt.P[1], "deriv/P1_fit_mul_over_w0_dw_dmuc_a2_5pt_jack.txt");
+
+    //////////////////////////////////////////////////////////////
+    // sqrtt0
+    //////////////////////////////////////////////////////////////
+    fit_info.corr_id = { id_dsqrtt0_dmu, id_amuliso, id_sqrtt0 };
+
+    namefit = "der_sqrtt0_charm_a2_5pt";
+
+    fit_result der_charm_sqrtt0_5pt = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+    fit_info.band_range = { 0, 0.008145209846823482 };
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_charm_sqrtt0_5pt, der_charm_sqrtt0_5pt, 0, 0 /* set the other variables to the first of the n*/, 0.001, {});
+
+    myres->write_jack_in_file(der_charm_sqrtt0_5pt.P[0], "deriv/P0_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack.txt");
+    myres->write_jack_in_file(der_charm_sqrtt0_5pt.P[1], "deriv/P1_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack.txt");
+
 
 }

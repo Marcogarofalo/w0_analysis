@@ -227,6 +227,9 @@ int id_deriv(int Meson, int deriv, int quark, int val_sea) {
 int id_deriv_fpi(int reg, int deriv, int quark, int val_sea) {
     return 46 + reg * 7 + deriv * (1 + (quark + 3 * val_sea));
 }
+int id_deriv_sqrtt0(int deriv, int quark, int val_sea) {
+    return 62 + deriv * (1 + (quark + 3 * val_sea));
+}
 
 void weighted_average(double* M0, double* M1) {
     double dM0 = myres->comp_error(M0);
@@ -246,6 +249,19 @@ double get_linear_deriv_w0c(double** data, std::vector<double*>amuiso, double* p
     // remove the prefactor in dw0/dmc(sea)
     double mul = amuiso[0][j];
     double w0 = data[4][j];
+    double a = previous_a[j];
+    P0 *= w0 / mul;
+    P1 *= w0 / mul;
+    dw = P0 + P1 * a * a;
+    return dw;
+}
+double get_linear_deriv_sqrtt0c(double** data, std::vector<double*>amuiso, double* previous_a, int j) {
+    double dw;
+    double P0 = data[73][j];
+    double P1 = data[74][j];
+    // remove the prefactor in dw0/dmc(sea)
+    double mul = amuiso[0][j];
+    double w0 = data[id_deriv_sqrtt0(0, 0, 0)][j];
     double a = previous_a[j];
     P0 *= w0 / mul;
     P1 *= w0 / mul;
@@ -405,7 +421,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // read the jacks
     //////////////////////////////////////////////////////////////
-    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2 + 2;
+    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2 + 2 + (7 + 4 + 2);
     printf("%d\n", file_to_read);
     error(files.size() - 2 != file_to_read, 1, "main", "No input files found in  file %s we need %d lines but we have %d", argv[4], file_to_read, files.size() - 2);
     double** data = malloc_2<double>(file_to_read, Njack);
@@ -735,6 +751,50 @@ int main(int argc, char** argv) {
     }
 
 
+    read_file_debug(data[62], files[65].c_str());// sqrtt0
+    read_file_debug(data[63], files[66].c_str());// deriv val ml fpi A0 
+    read_file_debug(data[64], files[67].c_str());// deriv val ms fpi A0 
+    read_file_debug(data[65], files[68].c_str());// deriv val mc fpi A0 
+    read_file_debug(data[66], files[69].c_str());// deriv sea ml fpi A0 
+    for (int j = 0; j < Njack;j++) {
+        data[66][j] *= 2; // this should be zero but we put the factor 2 for consistency with the other two
+    }
+    read_file_debug(data[67], files[70].c_str());// deriv sea ms fpi A0 
+    for (int j = 0; j < Njack;j++) {
+        double mul = amuiso[0][j];
+        double f = data[3][j];
+        double sqrtt0 = data[64][j];
+        double* dR = &data[67][j];
+        *dR = (*dR) * (sqrtt0) / mul;
+    }
+    read_file_debug(data[68], files[71].c_str());// deriv sea mc fpi A0
+    for (int j = 0; j < Njack;j++) {
+        double mul = amuiso[0][j];
+        double f = data[3][j];
+        double sqrtt0 = data[64][j];
+        double* dR = &data[68][j]; // remove prefactor in dw0/dmc(sea)
+        *dR = (*dR) * (sqrtt0) / mul;
+    }
+    error(id_deriv_sqrtt0(0, 0, 0) != 62, 1, "main", "id_deriv_sqrtt0(0, 0, 0) should be 62 but it is %d", id_deriv_sqrtt0(0, 0, 0));
+    error(id_deriv_sqrtt0(1, 0, 0) != 63, 1, "main", "id_deriv_sqrtt0(1, 0, 0) should be 63 but it is %d", id_deriv_sqrtt0(1, 0, 0));
+    error(id_deriv_sqrtt0(1, 1, 0) != 64, 1, "main", "id_deriv_sqrtt0(1, 1, 0) should be 64 but it is %d", id_deriv_sqrtt0(1, 1, 0));
+    error(id_deriv_sqrtt0(1, 2, 0) != 65, 1, "main", "id_deriv_sqrtt0(1, 2, 0) should be 65 but it is %d", id_deriv_sqrtt0(1, 2, 0));
+    error(id_deriv_sqrtt0(1, 0, 1) != 66, 1, "main", "id_deriv_sqrtt0(1, 0, 1) should be 66 but it is %d", id_deriv_sqrtt0(1, 0, 1));
+    error(id_deriv_sqrtt0(1, 1, 1) != 67, 1, "main", "id_deriv_sqrtt0(1, 1, 1) should be 67 but it is %d", id_deriv_sqrtt0(1, 1, 1));
+    error(id_deriv_sqrtt0(1, 2, 1) != 68, 1, "main", "id_deriv_sqrtt0(1, 2, 1) should be 68 but it is %d", id_deriv_sqrtt0(1, 2, 1));
+
+
+
+    // read delta m0 and m0 derivative
+    read_file_debug(data[69], files[72].c_str());// dm0
+    read_file_debug(data[70], files[73].c_str());// dw0/dm0l
+    read_file_debug(data[71], files[74].c_str());// dw0/dm0s
+    read_file_debug(data[72], files[75].c_str());// dw0/dm0c
+
+    read_file_debug(data[73], files[76].c_str());// dw0/dms_sea P0
+    read_file_debug(data[74], files[77].c_str());// dw0/dmc_sea P1
+
+
 
     //////////////////////////////////////////////////////////////
     // max twist correction
@@ -767,6 +827,11 @@ int main(int argc, char** argv) {
         double dw0_dm0 = data[36][j] + 0.5 * (data[37][j] + data[38][j]);
         double delta = dm0 * dw0_dm0;
         data[iw0][j] += delta;
+
+
+        double dsqrtt0_dm0 = data[70][j] + 0.5 * (data[71][j] + data[72][j]);
+        double delta_sqrtt0 = dm0 * dsqrtt0_dm0;
+        data[id_deriv_sqrtt0(0, 0, 0)][j] += delta_sqrtt0;
     }
 
     //////////////////////////////////////////////////////////////
@@ -890,6 +955,7 @@ int main(int argc, char** argv) {
     double** dm_fpi = malloc_2<double>(3, Njack);
     double* w0_from_fpi_ensemble = myres->create_copy(data[iw0]);
     double* w0_from_fpi_hybrid = myres->create_copy(data[iw0]);
+    double* sqrtt0_from_fpi = myres->create_copy(data[id_deriv_sqrtt0(0, 0, 0)]);
     {
         for (int j = 0; j < Njack;j++) {
 
@@ -1077,15 +1143,19 @@ int main(int argc, char** argv) {
                 int val_sea = 1;
                 double dm = (miso[im][j] - amusim[im][j]);
                 double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                double dt = data[id_deriv_sqrtt0(1, im, val_sea)][j];
                 if (im == 2 && val_sea == 1) {
                     if (j == Njack - 1) printf("replacing dw0/dmc = %g\n", dw);
                     dw = get_linear_deriv_w0c(data, amuiso, previous_a, j);
+                    dt = get_linear_deriv_sqrtt0c(data, amuiso, previous_a, j);
                     if (j == Njack - 1) printf("with      dw0/dmc = %g\n", dw);
                 }
 
                 w0_lin_deriv[j] += dm * dw;
+                sqrtt0_from_fpi[j] += dm * dt;
             }
             w0_lin_deriv[j] *= a_fm[j];
+            sqrtt0_from_fpi[j] *= a_fm[j];
         }
 
         double** data_m_a = malloc_2<double>(4, Njack);
@@ -2497,5 +2567,7 @@ int main(int argc, char** argv) {
     }
 
     write_jack(w0_lin_deriv, Njack, jack_file);     check_correlatro_counter(id_w0_lin_deriv);
+
+    write_jack(sqrtt0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_sqrtt0_from_fpi);
     return 0;
 }

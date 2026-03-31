@@ -77,3 +77,17 @@ deriv/average_mul_over_fpi_df_dmuc_smallV_OS_fpi_A0P5_deriv_fpi_A0P5
 #######
 skip
 skip
+#### sqrtt0
+deriv/sqrtt0_flow_E112_LMA.dat
+deriv/zero.dat
+deriv/zero.dat
+deriv/zero.dat
+deriv/der_rewlOS_flow_E112_LMA.dat
+deriv/mul_sqrtt0_dsqrtt0_dmu_strange_small_volume_const_jack.txt
+deriv/mul_sqrtt0_dsqrtt0_dmu_charm_small_volume_const_jack.txt
+../../data_l/E112_delta_m0.dat
+deriv/der_sqrtt0_m0_flow_E112_LMA.dat_P5_mu4.4000e-04.bin
+deriv/der_sqrtt0_m0_flow_E112_LMA.dat_P5_mu1.1759e-02.bin
+deriv/der_sqrtt0_m0_flow_E112_LMA.dat_P5_mu1.4150e-01.bin
+deriv/P0_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack.txt
+deriv/P1_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack.txt

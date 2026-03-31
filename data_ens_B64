@@ -55,12 +55,9 @@ deriv/P1_fit_mul_over_w0_dw_dmuc_a2_5pt_jack.txt
 ####
 ../../data_l/mpcac_and_dm0/B64/mpcac_fullstat.dat
 #####
- ../../data_l/B96/MPi_sim.dat
- ../../data_l/B96/fpi_sim.dat
- 96
-#skip
-#skip
-#skip
+../../data_l/B96/MPi_sim.dat
+../../data_l/B96/fpi_sim.dat
+96
 ############ fpi_P5A0 tm
 deriv/fpi_P5A0_B64_tm_l0_l0_A0P5.dat.jack_txt
 deriv/deriv_val_fpi_P5A0_B64_tm_l0_l0_A0P5.dat.jack_txt
@@ -82,3 +79,17 @@ deriv/average_mul_over_fpi_df_dmuc_smallV_OS_fpi_A0P5_deriv_fpi_A0P5
 #deriv/fpi_P5A0_B96_OS_l0_l0_A0P5.dat.jack_txt
 skip 
 skip
+#### sqrtt0
+deriv/sqrtt0_flow_B64_LMA.dat
+deriv/zero.dat
+deriv/zero.dat
+deriv/zero.dat
+deriv/der_rewlOS_flow_B64_LMA.dat
+deriv/mul_sqrtt0_dsqrtt0_dmu_strange_small_volume_const_jack.txt
+deriv/mul_sqrtt0_dsqrtt0_dmu_charm_small_volume_const_jack.txt
+../../data_l/B64_delta_m0.dat
+deriv/der_sqrtt0_m0_flow_B64_LMA.dat_P5_mu1.8250e-02.bin
+deriv/der_sqrtt0_m0_flow_B64_LMA.dat_P5_mu2.3770e-01.bin
+deriv/der_sqrtt0_m0_flow_B64_LMA.dat_P5_mu7.2000e-04.bin  
+deriv/P0_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack.txt
+deriv/P1_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack.txt

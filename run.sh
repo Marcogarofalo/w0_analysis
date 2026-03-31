@@ -211,6 +211,8 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ./w0_rew  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_charm_OS_B32.dat rewcOS
 ./w0_rew  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_strange_OS_B32.dat rewsOS
 ./w0_rew  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_light_OS_B32.dat rewlOS
+
+./w0_second_deriv  -p ../../data/ flow_B32.dat  -bin 20 jack reweight_charm_OS_B32.dat rewcOS  reweight_charm_m_OS_B32.dat  reweight_charm_2_OS_B32.dat reweight_charm_2m_OS_B32.dat
 ## w0 B24
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_charm_OS_B24.dat rewcOS
 ./w0_rew  -p ../../data/ flow_B24.dat  -bin 20 jack reweight_strange_OS_B24.dat rewsOS
@@ -236,8 +238,10 @@ file_autoc_c=w0+muc_B64_autocorr_bintoNb.dat
 ## A32
 ./w0_rew  -p ../../data_p/ flow_A32.dat  -bin 20 jack reweight_charm_OS_A32.dat rewcOS
 ./w0_rew  -p ../../data_p/ flow_A32.dat  -bin 20 jack reweight_strange_OS_A32.dat rewsOS
-# ./w0_rew  -p ../../data/ flow_A32.dat  -bin 20 jack reweight_light_OS_A32.dat rewlOS
 
+./w0_rew  -p ../../data/ flow_A32.dat  -bin 20 jack reweight_light_OS_A32.dat rewlOS
+./w0_rew  -p ../../data/ flow_A32.dat  -bin 20 jack reweight_strange_OS_A32.dat rewsOS
+./w0_rew  -p ../../data/ flow_A32.dat  -bin 20 jack reweight_charm_OS_A32.dat rewcOS
 
 #B64
 ./w0_rew  -p ../../data/ flow_B64_LMA.dat  -bin 20 jack reweight_charm_0.1_OS_B64_LMA.dat rewcOS

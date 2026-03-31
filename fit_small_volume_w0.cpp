@@ -398,18 +398,22 @@ int main(int argc, char** argv) {
     // amusim[2] = myres->create_fake(mean, err, seed);
     //
     int id_dw0_dmu = 4;
+    int id_dsqrtt0_dmu = 24;
+    int id_w0 = 1;
+    int id_sqrtt0 = 21;
 
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////
-    std::vector<std::string> der_name = { "w0" };
-    std::vector<int> id_der = { id_dw0_dmu };
+    std::vector<std::string> der_name = { "w0","sqrtt0" };
+    std::vector<int> id_der = { id_dw0_dmu , id_dsqrtt0_dmu };
+    std::vector<int> id_Obs = { id_w0 , id_sqrtt0 };
+
 
     int id_amuliso = 13;
     int id_a_fm = 16;
-    int id_w0 = 1;
     int id_mu = 11;
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < der_name.size(); i++) {
         fit_type fit_info;
 
         fit_info.corr_id = { id_dw0_dmu, id_amuliso, id_w0 };
@@ -460,27 +464,29 @@ int main(int argc, char** argv) {
 
         file_out_name f_name_c_full(argv[3], namefit.c_str());
         // compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full, id_w0, f_name_c_full);
-        myres->write_jack_in_file(der_fpi_const_full.P[0],  "deriv/mul_w0_dw0_dmu_charm_small_volume_const_jack.txt");
-        printf("constant fit = %.12g  +- %.12g\n", der_fpi_const_full.P[0][Njack-1],myres->comp_error(der_fpi_const_full.P[0]));
+        std::string der_mane_out ="deriv/mul_"+der_name[i]+"_d"+der_name[i]+"_dmu_charm_small_volume_const_jack.txt";
+        myres->write_jack_in_file(der_fpi_const_full.P[0], der_mane_out.c_str());
+        printf("constant fit = %.12g  +- %.12g\n", der_fpi_const_full.P[0][Njack - 1], myres->comp_error(der_fpi_const_full.P[0]));
         ////////////////////////////////////////////////////////////////
         // strange
         //////////////////////////////////////////////////////////////
         for (int n = 0; n < fit_info.N; n++) {
             fit_info.Nxen[n].resize(myen.size());
             for (int b = 0; b < myen.size(); b++) {
-                fit_info.Nxen[n][b] = myen[b][1];  // the charm is in myen[beta][0]
+                fit_info.Nxen[n][b] = myen[b][1];  // the strange is in myen[beta][1]
             }
         }
         fit_info.init_N_etot_form_Nxen();
 
-        namefit = "der_" + der_name[i] + "_strange_small_volume_const";        
+        namefit = "der_" + der_name[i] + "_strange_small_volume_const";
         fit_result der_w0_strange = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
         fit_info.band_range = { 23, 33 };
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "L_a", der_w0_strange, der_w0_strange, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
 
-        myres->write_jack_in_file(der_w0_strange.P[0],  "deriv/mul_w0_dw0_dmu_strange_small_volume_const_jack.txt");
-        printf("constant fit = %.12g  +- %.12g\n", der_w0_strange.P[0][Njack-1],myres->comp_error(der_w0_strange.P[0]));
-        
+        der_mane_out ="deriv/mul_"+der_name[i]+"_d"+der_name[i]+"_dmu_strange_small_volume_const_jack.txt";
+        myres->write_jack_in_file(der_w0_strange.P[0], der_mane_out.c_str());
+        printf("constant fit = %.12g  +- %.12g\n", der_w0_strange.P[0][Njack - 1], myres->comp_error(der_w0_strange.P[0]));
+
         fit_info.restore_default();
     }
 }

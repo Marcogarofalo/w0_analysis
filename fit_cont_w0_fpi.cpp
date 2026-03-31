@@ -248,6 +248,30 @@ double rhs_a2_N3_a4(int n, int Nvar, double* x, int Npar, double* P) {
     r = P[0] + a2 * P[1 + n] + a2 * a2 * P[1 + 3 + n];
     return r;
 }
+double rhs_a2_N3_a4WTI(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    r = P[0] + a2 * P[1 + n];
+    if (n == 0) r += a2 * a2 * P[4];
+    return r;
+}
+double rhs_a2_N3_a4tm(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    r = P[0] + a2 * P[1 + n];
+    if (n == 1) r += a2 * a2 * P[4];
+    return r;
+}
+double rhs_a2_N3_a4OS(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    r = P[0] + a2 * P[1 + n];
+    if (n == 2) r += a2 * a2 * P[4];
+    return r;
+}
+
+
+
 template <double C>
 double rhs_a2_N3_Husung(int n, int Nvar, double* x, int Npar, double* P) {
     double r;
@@ -635,13 +659,13 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid", "fpi_wp25_lin", "fpi_wp25_lin_laRDs",  "fpi_wp25_lin_laRDs_exact",
          "MDs_wp25_lin_laRDs_exact", "fpi_wp25_lin_la_mc_exact", "MDs_wp25_lin_la_mc_exact" ,
-        "w0_lin_deriv"};
+        "w0_lin_deriv" ,"sqrtt0_from_fpi"};
 
     std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57, 62, 70, 78 ,
-        82, 87, 91, id_w0_lin_deriv
+        82, 87, 91, id_w0_lin_deriv, id_sqrtt0_from_fpi
     };
     std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56, 61, 69, 77 ,
-         77, 86, 86,33
+         77, 86, 86,33, 33
     };
 
     for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
@@ -1021,14 +1045,43 @@ int main(int argc, char** argv) {
          {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
          {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
          {{0,2,3}, {0,2,3}, {0,2,3} },
+         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
+         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
+         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} }
     };
-    std::vector<std::string> fits_fpi = { "N3_a2", "N3_a2_noBOS_noBtm_noBWTI" ,"N3_a2_a4", "N3_a2_Husung0.42", "N3_a2_Husung0.21","N3_a2_noCOS_noCtm_noCWTI" };
-    double (*funcArray_fpi[])(int, int, double*, int, double*) = { rhs_a2_N3, rhs_a2_N3, rhs_a2_N3_a4 , rhs_a2_N3_Husung<0.42>, rhs_a2_N3_Husung<0.21>,
-     rhs_a2_N3};
-    std::vector<int> Npars_fpi = { 4, 4, 7, 7 ,7,4 };
+    std::vector<std::string> fits_fpi = { "N3_a2", "N3_a2_noBOS_noBtm_noBWTI" ,"N3_a2_a4", 
+    "N3_a2_Husung0.42", "N3_a2_Husung0.21",
+    "N3_a2_noCOS_noCtm_noCWTI",
+    "N3_a2_a4WTI",
+    "N3_a2_a4tm",
+    "N3_a2_a4OS"
+    };
+    // double (*funcArray_fpi[])(int, int, double*, int, double*) = { rhs_a2_N3, rhs_a2_N3, rhs_a2_N3_a4 , rhs_a2_N3_Husung<0.42>, rhs_a2_N3_Husung<0.21>,
+    //  rhs_a2_N3,
+    // rhs_a2_N3_a4WTI,
+    // rhs_a2_N3_a4tm,
+    // rhs_a2_N3_a4OS
+    // };
+    std::vector<double (*)(int, int, double*, int, double*)> funcArray_fpi = {
+    rhs_a2_N3,
+    rhs_a2_N3,
+    rhs_a2_N3_a4,
+    rhs_a2_N3_Husung<0.42>,
+    rhs_a2_N3_Husung<0.21>,
+    rhs_a2_N3,
+    rhs_a2_N3_a4WTI,
+    rhs_a2_N3_a4tm,
+    rhs_a2_N3_a4OS
+    };
+    std::vector<int> Npars_fpi = { 4, 4, 7, 7 ,7,4,
+        5,5,5 };
+
+    error(fits_fpi.size() != Npars_fpi.size(), 1,"main", "fits_fpi  %zu  and Npars_fpi  %zu  must have the same size", fits_fpi.size(), Npars_fpi.size());
+    error(fits_fpi.size() != points.size(), 1, "main", "fits_fpi  %zu  and points  %zu  must have the same size", fits_fpi.size(), points.size());
+    error(fits_fpi.size() != funcArray_fpi.size(), 1, "main", "fits_fpi  %zu  and funcArray_fpi  %zu  must have the same size", fits_fpi.size(), funcArray_fpi.size());
 
     for (int ic = 0;ic < coeffs.size();ic++) {
-        int id_a_of_ic=95 + ic * 8;
+        int id_a_of_ic = 95 + ic * 8;
         for (auto [ifit, fit] : std::views::enumerate(fits_fpi)) {
 
             fit_type fit_info;
@@ -1069,7 +1122,7 @@ int main(int argc, char** argv) {
             // fit_info.make_covariance_block_diagonal_in_n();
             // fit_info.compute_cov1_fit();
 
-            std::string namefit = "fit_fpi_C" + std::to_string(coeffs[ic])+ "_" + fit;
+            std::string namefit = "fit_fpi_C" + std::to_string(coeffs[ic]) + "_" + fit;
 
             fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun_N3, fit_info, namefit.c_str());
             fit_info.band_range = { 0, 0.008145209846823482 };
