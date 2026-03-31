@@ -101,6 +101,7 @@ macro(add_target_with_libs TARGETNAME)
 
 endmacro()
 add_target_with_libs(w0_rew w0_rew.cpp)
+add_target_with_libs(w0_second_deriv w0_second_deriv.cpp)
 add_target_with_libs(w0 w0.cpp)
 add_target_with_libs(w0_m0 w0_m0.cpp)
 
