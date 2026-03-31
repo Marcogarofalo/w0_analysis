@@ -1,0 +1,86 @@
+## Higer deriv
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+# library(hadron)
+# library(kableExtra) # breaks latex
+# library(tidyverse)
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+# widgetframe::frameableWidget(ggplotly(ggp)%>%config(mathjax = "cdn") )
+```
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+library(stringr)
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/out/w0_charm_lin",
+  "/home/garofalo/analysis/flow/data/out/w0_charm_mu2",
+  "/home/garofalo/analysis/flow/data/out/w0_charm_shift_mu",
+  "/home/garofalo/analysis/flow/data/out/w0_charm_shift_mu2",
+  "/home/garofalo/analysis/flow/data/out/w0_charm_shift_mu3",
+  "/home/garofalo/analysis/flow/data/out/w0_charm_shift_mu4",
+  "/home/garofalo/analysis/flow/data/out/w0_charm_pade_2_2_shift_mu"
+)
+labels <-  basename(basenames)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "mu",
+    # noline = TRUE,
+    data_type = "data",
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    nudge = 0 * 0.00001,
+    noline = TRUE,
+    noribbon  = FALSE
+  )
+}
+my_fun <- function(x) {
+  dx = x - 0.228599
+   -2.81791 *dx + (17359.3/2) * dx^2 + (-3.49096e+09/6) * dx^3
+}
+gg<- gg+ geom_function(fun =  my_fun,map=aes(color="3rd deriv",shape="3rd deriv", fill="3rd deriv"),  linetype = "dashed", size = 0.5)
+my_fun <- function(x) {
+  dx = x - 0.228599
+   -2.81791 *dx + (17359.3/2) * dx^2 
+}
+gg<- gg+ geom_function(fun =  my_fun,map=aes(color="2sd deriv",shape="2sd deriv", fill="2sd deriv"),  linetype = "dashed", size = 0.5)
+my_fun <- function(x) {
+  dx = x - 0.228599
+   -2.81791 *dx 
+}
+gg<- gg+ geom_function(fun =  my_fun,map=aes(color="1st deriv",shape="1st deriv", fill="1st deriv"),  linetype = "dashed", size = 0.5)
+
+
+gg<- gg + geom_vline(xintercept = 0.23134, linetype = "dashed", color = "black") 
+# fpi_FLAG <- 130.5
+# gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+# gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+
+fig <- myplotly(gg, "", "$a\\mu_c$", "$w_0-w_0(\\mu_c)$",
+  to_print = TRUE,
+  yrange = c(-0.0055, 0.004),
+  legend_position = c(0.7, 0.98)
+)
+```

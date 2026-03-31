@@ -27,6 +27,7 @@ book:
     - system_scale_setting.qmd
     - quark_masses.qmd
     - test_removing_la.qmd
+    - higer_deriv.qmd
     - params.qmd
     - summary.qmd
     - references.qmd
