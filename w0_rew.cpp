@@ -23,35 +23,31 @@
 #include "functions_w0.hpp"
 struct kinematic kinematic_2pt;
 
-generic_header read_head(FILE *stream)
-{
+generic_header read_head(FILE* stream) {
     generic_header header;
     return header;
 }
-void write_header_g2(FILE *jack_file, generic_header head)
-{
+void write_header_g2(FILE* jack_file, generic_header head) {
     int fi = 0;
     fi += fwrite(&head.T, sizeof(int), 1, jack_file);
     fi += fwrite(&head.L, sizeof(int), 1, jack_file);
     int nmu = head.mus.size();
     fi += fwrite(&nmu, sizeof(int), 1, jack_file);
-    for (double mu : head.mus)
-    {
+    for (double mu : head.mus) {
         fi += fwrite(&mu, sizeof(double), 1, jack_file);
     }
 }
 
-char **argv_to_options(char **argv)
-{
-    char **option;
-    option = (char **)malloc(sizeof(char *) * 7);
-    option[0] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option[1] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option[2] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option[3] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option[4] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option[5] = (char *)malloc(sizeof(char) * NAMESIZE);
-    option[6] = (char *)malloc(sizeof(char) * NAMESIZE);
+char** argv_to_options(char** argv) {
+    char** option;
+    option = (char**)malloc(sizeof(char*) * 7);
+    option[0] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option[1] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option[2] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option[3] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option[4] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option[5] = (char*)malloc(sizeof(char) * NAMESIZE);
+    option[6] = (char*)malloc(sizeof(char) * NAMESIZE);
 
     mysprintf(option[1], NAMESIZE, "read_plateaux"); // blind/see/read_plateaux
     mysprintf(option[2], NAMESIZE, "-p");            // -p
@@ -62,25 +58,23 @@ char **argv_to_options(char **argv)
     return option;
 }
 
-void init_global_head(generic_header head)
-{
+void init_global_head(generic_header head) {
     file_head.l1 = head.L;
     file_head.l0 = head.T;
     file_head.l2 = head.L;
     file_head.l3 = head.L;
     file_head.nk = 2;
     file_head.musea = head.mus[0];
-    file_head.k = (double *)malloc(sizeof(double) * file_head.nk * 2);
+    file_head.k = (double*)malloc(sizeof(double) * file_head.nk * 2);
     file_head.k[0] = 0;
     file_head.k[1] = 0;
     file_head.k[2] = head.mus[0];
     file_head.k[3] = head.mus[0];
 
     file_head.nmoms = 1;
-    file_head.mom = (double **)malloc(sizeof(double *) * file_head.nmoms);
-    for (int i = 0; i < file_head.nmoms; i++)
-    {
-        file_head.mom[i] = (double *)malloc(sizeof(double) * 4);
+    file_head.mom = (double**)malloc(sizeof(double*) * file_head.nmoms);
+    for (int i = 0; i < file_head.nmoms; i++) {
+        file_head.mom[i] = (double*)malloc(sizeof(double) * 4);
         file_head.mom[i][0] = 0;
         file_head.mom[i][1] = 0;
         file_head.mom[i][2] = 0;
@@ -88,8 +82,7 @@ void init_global_head(generic_header head)
     }
 }
 
-void read_twopt(FILE *stream, double ***to_write, generic_header head)
-{
+void read_twopt(FILE* stream, double*** to_write, generic_header head) {
     // write your function to read the data
     // int fi = 0;
     // for (int k = 0; k < head.ncorr; k++) {
@@ -104,38 +97,33 @@ void read_twopt(FILE *stream, double ***to_write, generic_header head)
     int fi = 0;
     int id;
     int i = fread(&id, sizeof(int), 1, stream);
-    for (int k = 0; k < head.ncorr; k++)
-    {
-        for (int t = 0; t < head.T; t++)
-        {
+    for (int k = 0; k < head.ncorr; k++) {
+        for (int t = 0; t < head.T; t++) {
             fi += fread(to_write[k][t], sizeof(double), 2, stream);
         }
     }
 }
 
-double int2flowt(double i)
-{
+double int2flowt(double i) {
     return 0.010000 + i * 0.02;
 }
 
-double poly3(int n, int Nvar, double *x, int Npar, double *P)
-{
+double poly3(int n, int Nvar, double* x, int Npar, double* P) {
     double it = x[0];
     double tf = int2flowt(x[0]);
     return P[0] + P[1] * tf + P[2] * tf * tf + P[3] * tf * tf * tf;
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
     error(argc != 9, 1, "main ",
-          "usage:././w0_rew -p path file -bin $bin  jack/boot   reweighting_factors  name_rew\n separate "
-          "path and file please");
+        "usage:././w0_rew -p path file -bin $bin  jack/boot   reweighting_factors  name_rew\n separate "
+        "path and file please");
 
     char resampling[NAMESIZE];
     mysprintf(resampling, NAMESIZE, argv[6]);
     printf("resampling: %s\n", resampling);
 
-    char **option = argv_to_options(argv);
+    char** option = argv_to_options(argv);
 
     char namefile[NAMESIZE];
     mysprintf(namefile, NAMESIZE, "%s/%s", option[3], option[6]);
@@ -143,7 +131,7 @@ int main(int argc, char **argv)
     char namefile_plateaux[NAMESIZE];
     mysprintf(namefile_plateaux, NAMESIZE, "plateaux.txt");
 
-    FILE *infile = open_file(namefile, "r");
+    FILE* infile = open_file(namefile, "r");
 
     //////////////////////////////////// read and setup header
     generic_header head;
@@ -156,33 +144,31 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
 
     mysprintf(namefile, NAMESIZE, "%s/%s", option[3], argv[7]);
-    FILE *infile_rew = open_file(namefile, "r");
+    FILE* infile_rew = open_file(namefile, "r");
 
     generic_header head_rew;
     head_rew.read_header_debug(infile_rew);
     error(head.Njack != head_rew.Njack, 1, "main", "Najck w0 = %d   while Njack rew  = %d", head.Njack, head_rew.Njack);
-    double ****data_rew = calloc_corr(head_rew.Njack, head_rew.ncorr, head_rew.T);
-    for (int iconf = 0; iconf < head_rew.Njack; iconf++)
-    {
+    double**** data_rew = calloc_corr(head_rew.Njack, head_rew.ncorr, head_rew.T);
+    for (int iconf = 0; iconf < head_rew.Njack; iconf++) {
         read_twopt(infile_rew, data_rew[iconf], head_rew);
         error(head.smearing[iconf].compare(head_rew.smearing[iconf]) != 0, 2, "main",
-              "configuration order differ at %d\n flow file conf: %s\n loops conf: %s ", iconf,
-              head.smearing[iconf].c_str(), head_rew.smearing[iconf].c_str());
+            "configuration order differ at %d\n flow file conf: %s\n loops conf: %s ", iconf,
+            head.smearing[iconf].c_str(), head_rew.smearing[iconf].c_str());
     }
 
     //////////////////////////////////////////////////////////////
     // reading flow
     //////////////////////////////////////////////////////////////
     int ncorr_new = head.ncorr;    // current number of correlators
-    int Max_corr = head.ncorr + 2; // max number of correlators
+    int Max_corr = head.ncorr + 4; // max number of correlators
 
-    double ****data = calloc_corr(head.Njack, Max_corr, head.T);
+    double**** data = calloc_corr(head.Njack, Max_corr, head.T);
 
     printf("confs=%d\n", head.Njack);
     printf("ncorr=%d\n", head.ncorr);
     printf("kappa=%g\n", head.kappa);
-    for (int iconf = 0; iconf < head.Njack; iconf++)
-    {
+    for (int iconf = 0; iconf < head.Njack; iconf++) {
         read_twopt(infile, data[iconf], head);
     }
     //////////////////////////////////////////////////////////////
@@ -243,8 +229,7 @@ int main(int argc, char **argv)
     // for (int i = 0; i < head_rew.ncorr; i++)
     // {
     double sum_r = 0;
-    for (int j = 0; j < head.Njack; j++)
-    {
+    for (int j = 0; j < head.Njack; j++) {
         // for (int j1 = 0; j1 < head.Njack; j1++)
         // {
         //     r += exp(data_rew[j1][0][0][0] - data_rew[j][0][0][0]);
@@ -256,12 +241,16 @@ int main(int argc, char **argv)
         // printf("rew %d %d %g\n", i, j, r);
 
         double r = data_rew[j][0][0][1]; // the im part is the exponentiated subtracted reweighting factor
-        for (int tf = 0; tf < head.T; tf++)
-        {
+        for (int tf = 0; tf < head.T; tf++) {
             data[j][head.ncorr + 0][tf][0] = data[j][6][tf][0] * r;
             data[j][head.ncorr + 0][tf][1] = data[j][6][tf][1] * r;
             data[j][head.ncorr + 1][tf][0] = data_rew[j][0][0][1];
             data[j][head.ncorr + 1][tf][1] = 0;
+            data[j][head.ncorr + 2][tf][0] = data[j][5][tf][0] * r;
+            data[j][head.ncorr + 2][tf][1] = data[j][5][tf][1] * r;
+            data[j][head.ncorr + 3][tf][0] = data_rew[j][0][0][1];
+            data[j][head.ncorr + 3][tf][1] = 0;
+
         }
     }
     // printf("sum_r = %g\n",sum_r/head.Njack);
@@ -277,18 +266,15 @@ int main(int argc, char **argv)
     // int Neff = confs / bin; // standard binning
     int Neff = bin; // bin2N
     int Njack;
-    if (strcmp(argv[6], "jack") == 0)
-    {
+    if (strcmp(argv[6], "jack") == 0) {
         Njack = Neff + 1;
         myres = new resampling_jack(Neff);
     }
-    else if (strcmp(argv[6], "boot") == 0)
-    {
+    else if (strcmp(argv[6], "boot") == 0) {
         Njack = (Neff * 2 + 1);
         myres = new resampling_boot(Neff * 2);
     }
-    else
-    {
+    else {
         Njack = 0;
         error(1 == 1, 1, "main", "argv[7]= %s is not jack or boot", argv[7]);
     }
@@ -298,10 +284,11 @@ int main(int argc, char **argv)
     //////////////////////////////////// setup output files
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_output", option[3], option[6], argv[7]);
     printf("writing output in :\n %s \n", namefile);
-    FILE *outfile = open_file(namefile, "w+");
+    FILE* outfile = open_file(namefile, "w+");
 
     mysprintf(namefile, NAMESIZE, "%s/jackknife/%s_%s_%s", option[3], option[4], option[6], argv[7]);
-    FILE *jack_file = open_file(namefile, "w+");
+    printf("writing jackknife in :\n %s \n", namefile);
+    FILE* jack_file = open_file(namefile, "w+");
     // write_header_g2(jack_file, head);
     head.write_header(jack_file);
 
@@ -315,8 +302,8 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
     // making custom jackknifes
     //////////////////////////////////////////////////////////////
-    double ****data_bin = bin_intoN(data, Max_corr, head.T, confs, bin); // binning into N=bin with not integer
-    double ****conf_jack = myres->create(Neff, Max_corr, head.T, data_bin);
+    double**** data_bin = bin_intoN(data, Max_corr, head.T, confs, bin); // binning into N=bin with not integer
+    double**** conf_jack = myres->create(Neff, Max_corr, head.T, data_bin);
     free_corr(Neff, Max_corr, head.T, data_bin);
 
     // double ****conf_jack_Orew = calloc_corr(head.Njack, head_rew.ncorr, head.T);
@@ -392,68 +379,66 @@ int main(int argc, char **argv)
     free_corr(head.Njack, 6, head.T, data);
 
     printf("corr at time 10 jacks\n");
-    for (int j = 0; j < head.Njack; j++)
-    {
+    for (int j = 0; j < head.Njack; j++) {
         printf("%d %.12g  %.12g %.12g\n", j, conf_jack[j][head.ncorr + 0][10][0], conf_jack[j][head.ncorr + 1][0][0], conf_jack[j][6][10][0]);
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
     // print all the effective masses correlators
     // set the option to not read for a plateaux
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_meff_correlators", option[3], option[6], argv[7]);
-    FILE *outfile_meff_corr = open_file(namefile, "w+");
+    FILE* outfile_meff_corr = open_file(namefile, "w+");
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_raw_correlators", option[3], option[6], argv[7]);
-    FILE *outfile_raw_corr = open_file(namefile, "w+");
+    FILE* outfile_raw_corr = open_file(namefile, "w+");
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_shifted_correlators", option[3], option[6], argv[7]);
-    FILE *outfile_shifted_corr = open_file(namefile, "w+");
+    FILE* outfile_shifted_corr = open_file(namefile, "w+");
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_log_meff_shifted", option[3], option[6], argv[7]);
-    FILE *outfile_log_meff_shifted = open_file(namefile, "w+");
+    FILE* outfile_log_meff_shifted = open_file(namefile, "w+");
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_gamma", option[3], option[6], argv[7]);
-    FILE *out_gamma = open_file(namefile, "w+");
+    FILE* out_gamma = open_file(namefile, "w+");
 
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_HLT_kernel", option[3], option[6], argv[7]);
-    FILE *outfile_HLT_kernel = open_file(namefile, "w+");
+    FILE* outfile_HLT_kernel = open_file(namefile, "w+");
     mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_HLT_AoverB", option[3], option[6], argv[7]);
-    FILE *outfile_HLT_AoverB = open_file(namefile, "w+");
+    FILE* outfile_HLT_AoverB = open_file(namefile, "w+");
 
     char save_option[NAMESIZE];
     sprintf(save_option, "%s", option[1]);
     sprintf(option[1], "blind");
-    FILE *dev_null = open_file("/dev/null", "w");
+    FILE* dev_null = open_file("/dev/null", "w");
     struct fit_type fit_info_silent;
     fit_info_silent.verbosity = -1;
     fit_info_silent.chi2_gap_jackboot = 1e+6;
     fit_info_silent.guess_per_jack = 0;
 
-    for (int icorr = 0; icorr < head.ncorr; icorr++)
-    {
+    for (int icorr = 0; icorr < head.ncorr; icorr++) {
         // log effective mass
-        double *tmp_meff_corr = plateau_correlator_function(
-            option, kinematic_2pt, (char *)"P5P5", conf_jack, Njack,
+        double* tmp_meff_corr = plateau_correlator_function(
+            option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
             namefile_plateaux, outfile_meff_corr, icorr, "log", M_eff_log, dev_null,
             fit_info_silent);
         free(tmp_meff_corr);
         // raw correlator
         file_head.l0 = head.T * 2;
         tmp_meff_corr = plateau_correlator_function(
-            option, kinematic_2pt, (char *)"P5P5", conf_jack, Njack,
+            option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
             namefile_plateaux, outfile_raw_corr, icorr, "cor", identity, dev_null,
             fit_info_silent);
         free(tmp_meff_corr);
         tmp_meff_corr = plateau_correlator_function(
-            option, kinematic_2pt, (char *)"P5P5", conf_jack, Njack,
+            option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
             namefile_plateaux, outfile_raw_corr, icorr, "cor", identity_im,
             dev_null, fit_info_silent);
         free(tmp_meff_corr);
         file_head.l0 = head.T;
         // shifted correlator
         tmp_meff_corr = plateau_correlator_function(
-            option, kinematic_2pt, (char *)"P5P5", conf_jack, Njack,
+            option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
             namefile_plateaux, outfile_shifted_corr, icorr, "shift_cor", shift_corr,
             dev_null, fit_info_silent);
         free(tmp_meff_corr);
         // log_meff shifted correlator
         tmp_meff_corr = plateau_correlator_function(
-            option, kinematic_2pt, (char *)"P5P5", conf_jack, Njack,
+            option, kinematic_2pt, (char*)"P5P5", conf_jack, Njack,
             namefile_plateaux, outfile_log_meff_shifted, icorr, "log_shift",
             M_eff_log_shift, dev_null, fit_info_silent);
         free(tmp_meff_corr);
@@ -509,12 +494,10 @@ int main(int argc, char **argv)
     fit_info.linear_fit = true;
     fit_info.T = head.T * 2;
     printf("T = %d\n", fit_info.T);
-    fit_info.corr_id = {6};
+    fit_info.corr_id = { 6 };
 
-    for (int t = 1; t < head.T; t++)
-    {
-        if (lhs_function_w0_eg(Njack - 1, conf_jack, t, fit_info) > 0.3)
-        {
+    for (int t = 1; t < head.T; t++) {
+        if (lhs_function_w0_eg(Njack - 1, conf_jack, t, fit_info) > 0.3) {
             fit_info.tmin = t - 2;
             fit_info.tmax = t + 1;
             break;
@@ -535,17 +518,16 @@ int main(int argc, char **argv)
     // }
     // c++ 0 || r 1
     struct fit_result fit_W = fit_fun_to_fun_of_corr(
-        option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
+        option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
         outfile, lhs_function_w0_eg, "W(t)", fit_info,
         jack_file);
     check_correlatro_counter(0);
 
-    double **tif = swap_indices(fit_info.Npar, Njack, fit_W.P);
+    double** tif = swap_indices(fit_info.Npar, Njack, fit_W.P);
     std::vector<double> swapped_x(fit_info.Nvar);
     std::vector<double> w0(Njack);
 
-    for (size_t j = 0; j < Njack; j++)
-    {
+    for (size_t j = 0; j < Njack; j++) {
         w0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
         w0[j] = int2flowt(w0[j]);
         w0[j] = std::sqrt(w0[j]);
@@ -555,8 +537,8 @@ int main(int argc, char **argv)
     check_correlatro_counter(1);
 
     char name_w0[NAMESIZE];
-    mysprintf(name_w0, NAMESIZE, "deriv/w0_%s",  argv[3]);
-    myres->write_jack_in_file(w0.data(),name_w0);
+    mysprintf(name_w0, NAMESIZE, "deriv/w0_%s", argv[3]);
+    myres->write_jack_in_file(w0.data(), name_w0);
 
 
     print_result_in_file(outfile, w0.data(), "w0", 0.0, fit_info.tmin, fit_info.tmax);
@@ -566,13 +548,11 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
     std::vector<double> w0_rew(Njack);
     {
-        fit_info.corr_id = {head.ncorr + 0, head.ncorr + 1};
+        fit_info.corr_id = { head.ncorr + 0, head.ncorr + 1 };
         // fit_info.linear_fit = false;
 
-        for (int t = 1; t < head.T; t++)
-        {
-            if (lhs_function_W_rew(Njack - 1, conf_jack, t, fit_info) > 0.3)
-            {
+        for (int t = 1; t < head.T; t++) {
+            if (lhs_function_W_rew(Njack - 1, conf_jack, t, fit_info) > 0.3) {
                 fit_info.tmin = t - 2;
                 fit_info.tmax = t + 1;
                 break;
@@ -582,9 +562,8 @@ int main(int argc, char **argv)
         }
 
         // print for frezzotti
-        double *tmp = (double *)malloc(sizeof(double) * Njack);
-        for (int j = 0; j < Njack; j++)
-        {
+        double* tmp = (double*)malloc(sizeof(double) * Njack);
+        for (int j = 0; j < Njack; j++) {
             tmp[j] = lhs_function_W_rew(j, conf_jack, 150, fit_info);
         }
         char name[NAMESIZE];
@@ -607,17 +586,16 @@ int main(int argc, char **argv)
         char name_rew[NAMESIZE];
         mysprintf(name_rew, NAMESIZE, "W_%s(t)", argv[8]);
         struct fit_result fit_W = fit_fun_to_fun_of_corr(
-            option, kinematic_2pt, (char *)"P5P5", conf_jack, namefile_plateaux,
+            option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
             outfile, lhs_function_W_rew, name_rew, fit_info,
             jack_file);
         check_correlatro_counter(2);
 
-        double **tif = swap_indices(fit_info.Npar, Njack, fit_W.P);
+        double** tif = swap_indices(fit_info.Npar, Njack, fit_W.P);
         std::vector<double> swapped_x(fit_info.Nvar);
 
         mysprintf(name_rew, NAMESIZE, "w0_%s", argv[8]);
-        for (size_t j = 0; j < Njack; j++)
-        {
+        for (size_t j = 0; j < Njack; j++) {
             w0_rew[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin - 5, fit_info.tmax + 5, 1e-10, 2);
             w0_rew[j] = int2flowt(w0_rew[j]);
             w0_rew[j] = std::sqrt(w0_rew[j]);
@@ -635,7 +613,7 @@ int main(int argc, char **argv)
     //////////////////////////////////////////////////////////////
     // reading onlinemeas parameters
     //////////////////////////////////////////////////////////////
-    std::vector<double *> amuiso(3);
+    std::vector<double*> amuiso(3);
     double mean, err;
     int seed;
     std::string name_in(option[6]);
@@ -650,7 +628,7 @@ int main(int argc, char **argv)
     line_read_param(option, "muciso", mean, err, seed, namefile_plateaux);
     amuiso[2] = myres->create_fake(mean, err, seed);
 
-    std::vector<double *> amusim(3);
+    std::vector<double*> amusim(3);
     line_read_param(option, "mulsim", mean, err, seed, namefile_plateaux);
     amusim[0] = myres->create_fake(mean, err, seed);
     line_read_param(option, "mussim", mean, err, seed, namefile_plateaux);
@@ -659,15 +637,14 @@ int main(int argc, char **argv)
     amusim[2] = myres->create_fake(mean, err, seed);
 
     line_read_param(option, "a", mean, err, seed, namefile_plateaux);
-    double *a_fm = myres->create_fake(mean, err, seed);
+    double* a_fm = myres->create_fake(mean, err, seed);
 
     mysprintf(option[6], NAMESIZE, "%s", name_in.c_str());
 
     //// end reading onlinemeas parameters
     double dmu = head_rew.oranges[0] - head_rew.mus[0];
-    printf("dmu =   %.12g  -  %.12g  = %.12g\n",head_rew.oranges[0] , head_rew.mus[0], dmu);
-    for (size_t j = 0; j < Njack; j++)
-    {
+    printf("dmu =   %.12g  -  %.12g  = %.12g\n", head_rew.oranges[0], head_rew.mus[0], dmu);
+    for (size_t j = 0; j < Njack; j++) {
         der[j] = (w0_rew[j] - w0[j]) / dmu;
     }
     char name_rew[NAMESIZE];
@@ -679,7 +656,7 @@ int main(int argc, char **argv)
     check_correlatro_counter(4);
 
     mysprintf(name_rew, NAMESIZE, "deriv/der_%s_%s", argv[8], argv[3]);
-    myres->write_jack_in_file(der.data(),name_rew);
+    myres->write_jack_in_file(der.data(), name_rew);
 
     std::vector<double> zeros(Njack, 0.0);
     write_jack(zeros.data(), Njack, jack_file);
@@ -689,7 +666,7 @@ int main(int argc, char **argv)
     write_jack(zeros.data(), Njack, jack_file);
     write_jack(zeros.data(), Njack, jack_file);
 
-    double *tmp = myres->create_fake(head_rew.mus[0], 1e-20, 1);
+    double* tmp = myres->create_fake(head_rew.mus[0], 1e-20, 1);
     print_result_in_file(outfile, tmp, "mu_in", 0, 0, 0);
     write_jack(tmp, Njack, jack_file);
     check_correlatro_counter(11);
@@ -717,4 +694,112 @@ int main(int argc, char **argv)
     check_correlatro_counter(19);
 
     fit_info.restore_default();
+
+
+    //////////////////////////////////////////////////////////////
+    // t0
+    //////////////////////////////////////////////////////////////
+    std::vector<double> sqrtt0(Njack);
+    {
+        fit_info.Nvar = 1;
+        fit_info.Npar = 4;
+        fit_info.N = 1;
+        fit_info.Njack = Njack;
+        fit_info.codeplateaux = true;
+        fit_info.function = poly3;
+        fit_info.linear_fit = true;
+        fit_info.T = head.T * 2;
+        fit_info.corr_id = { 5 };
+
+        for (int t = 1; t < head.T; t++) {
+            if (lhs_function_w0_eg(Njack - 1, conf_jack, t, fit_info) > 0.3) {
+                fit_info.tmin = t - 2;
+                fit_info.tmax = t + 1;
+                break;
+            }
+        }
+        struct fit_result fit_E = fit_fun_to_fun_of_corr(
+            option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
+            outfile, lhs_function_w0_eg, "E(t)", fit_info,
+            jack_file);
+        check_correlatro_counter(20);
+
+        double** tif = swap_indices(fit_info.Npar, Njack, fit_E.P);
+        std::vector<double> swapped_x(fit_info.Nvar);
+
+        for (size_t j = 0; j < Njack; j++) {
+            sqrtt0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
+            sqrtt0[j] = int2flowt(sqrtt0[j]);
+            sqrtt0[j] = std::sqrt(sqrtt0[j]);
+        }
+        printf("sqrtt0 = %g  %g\n", sqrtt0[Njack - 1], myres->comp_error(sqrtt0.data()));
+        write_jack(sqrtt0.data(), Njack, jack_file);
+        check_correlatro_counter(21);
+
+        char name_t0[NAMESIZE];
+        mysprintf(name_t0, NAMESIZE, "deriv/sqrtt0_%s", argv[3]);
+        myres->write_jack_in_file(sqrtt0.data(), name_t0);
+
+
+        print_result_in_file(outfile, sqrtt0.data(), "sqrtt0", 0.0, fit_info.tmin, fit_info.tmax);
+        free_2(Njack, tif);
+    }
+
+    std::vector<double> sqrtt0_rew(Njack);
+    {
+        fit_info.corr_id = { head.ncorr + 2, head.ncorr + 3 };
+        // fit_info.linear_fit = false;
+
+        for (int t = 1; t < head.T; t++) {
+            if (lhs_function_W_rew(Njack - 1, conf_jack, t, fit_info) > 0.3) {
+                fit_info.tmin = t - 2;
+                fit_info.tmax = t + 1;
+                break;
+            }
+            if (t == head.T - 1)
+                printf("Warning: W(t) with charm reweighting never gets to 0.3\n");
+        }
+
+        
+
+        char name_rew[NAMESIZE];
+        mysprintf(name_rew, NAMESIZE, "E_%s(t)", argv[8]);
+        struct fit_result fit_E = fit_fun_to_fun_of_corr(
+            option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
+            outfile, lhs_function_W_rew, name_rew, fit_info,
+            jack_file);
+        check_correlatro_counter(22);
+
+        double** tif = swap_indices(fit_info.Npar, Njack, fit_E.P);
+        std::vector<double> swapped_x(fit_info.Nvar);
+
+        mysprintf(name_rew, NAMESIZE, "sqrtt0_%s", argv[8]);
+        for (size_t j = 0; j < Njack; j++) {
+            sqrtt0_rew[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin - 5, fit_info.tmax + 5, 1e-10, 2);
+            sqrtt0_rew[j] = int2flowt(sqrtt0_rew[j]);
+            sqrtt0_rew[j] = std::sqrt(sqrtt0_rew[j]);
+        }
+        printf("%s = %g  %g\n", name_rew, sqrtt0_rew[Njack - 1], myres->comp_error(sqrtt0_rew.data()));
+        write_jack(sqrtt0_rew.data(), Njack, jack_file);
+        check_correlatro_counter(23);
+
+        print_result_in_file(outfile, sqrtt0_rew.data(), name_rew, 0.0, fit_info.tmin, fit_info.tmax);
+        free_2(Njack, tif);
+    }
+
+    std::vector<double> der_sqrtt0(Njack);
+    for (size_t j = 0; j < Njack; j++) {
+        der_sqrtt0[j] = (sqrtt0_rew[j] - sqrtt0[j]) / dmu;
+    }
+    mysprintf(name_rew, NAMESIZE, "dsqrtt0/d%s", argv[7]);
+    printf("%s = %g  %g\n", name_rew, der_sqrtt0[Njack - 1], myres->comp_error(der_sqrtt0.data()));
+    print_result_in_file(outfile, der_sqrtt0.data(), name_rew, 0.0, fit_info.tmin, fit_info.tmax);
+
+    write_jack(der_sqrtt0.data(), Njack, jack_file);
+    check_correlatro_counter(24);
+
+    mysprintf(name_rew, NAMESIZE, "deriv/der_sqrtt0_%s_%s", argv[8], argv[3]);
+    myres->write_jack_in_file(der_sqrtt0.data(), name_rew);
+    printf("Nobs=%d\n", corr_counter);
+
 }
