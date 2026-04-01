@@ -2212,6 +2212,7 @@ int main(int argc, char** argv) {
     // loop over the different coeff in the lattice artefact and see how the results change
     //////////////////////////////////////////////////////////////
     std::vector<double*> fpi_tm(coeffs.size());
+    std::vector<double*> sqrtt0_wp25_C(coeffs.size());
     std::vector<double*> fpi_OS(coeffs.size());
     std::vector<double*> afpi_OS(coeffs.size());
     // a name for fpi_OS where i take the derivative from the WTI identity:
@@ -2295,6 +2296,7 @@ int main(int argc, char** argv) {
         fpi_OS[ic] = myres->create_copy(data[id_deriv_fpi(1, 0, 0, 0)]);
         afpi_OS[ic] = myres->create_copy(fpi_OS[ic]);
         fpi_OS_dWTI[ic] = myres->create_copy(data[id_deriv_fpi(1, 0, 0, 0)]);
+        sqrtt0_wp25_C[ic] = myres->create_copy(data[id_deriv_sqrtt0(0, 0, 0)]);
 
         myres->copy(fpi_tm_split[0], data[id_deriv_fpi(0, 0, 0, 0)]);
         myres->copy(fpi_OS_split[0], data[id_deriv_fpi(1, 0, 0, 0)]);
@@ -2351,6 +2353,20 @@ int main(int argc, char** argv) {
                 fpi_OS_split[ii][j] /= (a_from_w0[j] / hbarc);
                 fpi_from_w0_split[ii][j] /= (a_from_w0[j] / hbarc);
             }
+
+
+            //sqrtt0_wp25_C
+            for (int im = 0; im < 3; im++) {
+                int val_sea = 1;
+                double dm = (miso[im][j] - amusim[im][j]);
+                double dt = data[id_deriv_sqrtt0(1, im, val_sea)][j];
+                if (im == 2 && val_sea == 1) {
+                    dt = get_linear_deriv_sqrtt0c(data, amuiso, previous_a, j);
+                }
+                sqrtt0_wp25_C[ic][j] += dm * dt;
+            }
+            sqrtt0_wp25_C[ic][j] *= a_from_w0[j];
+
         }
         printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_from_w0), myres->comp_error(a_from_w0));
         printf("fpi (fm): %.6g +/- %.3g =", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
@@ -2569,5 +2585,8 @@ int main(int argc, char** argv) {
     write_jack(w0_lin_deriv, Njack, jack_file);     check_correlatro_counter(id_w0_lin_deriv);
 
     write_jack(sqrtt0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_sqrtt0_from_fpi);
+    for (int ic = 0; ic < coeffs.size(); ic++) {
+        write_jack(sqrtt0_wp25_C[ic], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_from_fpi + 1 + ic);
+    }
     return 0;
 }

@@ -687,6 +687,13 @@ int main(int argc, char** argv) {
         id_obs.push_back(100 + coeffs.size() * 8 + ic * 9);
         id_a.push_back(95 + coeffs.size() * 8 + ic * 9);
     }
+    for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
+        const double coeff = coeffs[ic];
+        obs.push_back("sqrtt0_wp25_C" + std::to_string(coeff));
+        id_obs.push_back(id_sqrtt0_from_fpi + 1 + ic);
+        id_a.push_back(95 + ic * 8);
+    }
+
     int id_amuliso = 13;
     int id_a_fm = 16;
     int id_w0 = 1;
