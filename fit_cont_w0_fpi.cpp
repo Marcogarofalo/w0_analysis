@@ -269,6 +269,30 @@ double rhs_a2_N3_a4OS(int n, int Nvar, double* x, int Npar, double* P) {
     if (n == 2) r += a2 * a2 * P[4];
     return r;
 }
+double rhs_a2_N3_a4_noa4WTI(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    r = P[0] + a2 * P[1 + n];
+    if (n == 1) r += a2 * a2 * P[4];
+    if (n == 2) r += a2 * a2 * P[5];
+    return r;
+}
+double rhs_a2_N3_a4_noa4tm(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    r = P[0] + a2 * P[1 + n];
+    if (n == 0) r += a2 * a2 * P[4];
+    if (n == 2) r += a2 * a2 * P[5];
+    return r;
+}
+double rhs_a2_N3_a4_noa4OS(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    r = P[0] + a2 * P[1 + n];
+    if (n == 0) r += a2 * a2 * P[4];
+    if (n == 1) r += a2 * a2 * P[5];
+    return r;
+}
 
 
 
@@ -284,7 +308,37 @@ double rhs_a2_N3_Husung(int n, int Nvar, double* x, int Npar, double* P) {
 
     return r;
 }
+template <double C>
+double rhs_a2_N3_HusungWTI(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    static constexpr double lam = 295 / hbarc;
+    static constexpr double lam2 = lam * lam;
 
+    r = P[0] + a2 * P[1 + n];
+    if (n == 0) r += a2 / std::pow(-std::log(a2 * lam2), C) * P[4];
+    return r;
+}
+template <double C>
+double rhs_a2_N3_Husungtm(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    static constexpr double lam = 295 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    r = P[0] + a2 * P[1 + n];
+    if (n == 1) r += a2 / std::pow(-std::log(a2 * lam2), C)  * P[4];
+    return r;
+}
+template <double C>
+double rhs_a2_N3_HusungOS(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    static constexpr double lam = 295 / hbarc;
+    static constexpr double lam2 = lam * lam;
+    r = P[0] + a2 * P[1 + n];
+    if (n == 2) r += a2 / std::pow(-std::log(a2 * lam2), C) * P[4];
+    return r;
+}
 
 
 int main(int argc, char** argv) {
@@ -659,7 +713,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid", "fpi_wp25_lin", "fpi_wp25_lin_laRDs",  "fpi_wp25_lin_laRDs_exact",
          "MDs_wp25_lin_laRDs_exact", "fpi_wp25_lin_la_mc_exact", "MDs_wp25_lin_la_mc_exact" ,
-        "w0_lin_deriv" ,"sqrtt0_from_fpi"};
+        "w0_lin_deriv" ,"sqrtt0_from_fpi" };
 
     std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57, 62, 70, 78 ,
         82, 87, 91, id_w0_lin_deriv, id_sqrtt0_from_fpi
@@ -1054,14 +1108,18 @@ int main(int argc, char** argv) {
          {{0,2,3}, {0,2,3}, {0,2,3} },
          {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
          {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} }
+         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
+         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },{{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },{{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
+         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },{{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },{{0,1,2,3}, {0,1,2,3}, {0,1,2,3} }
     };
-    std::vector<std::string> fits_fpi = { "N3_a2", "N3_a2_noBOS_noBtm_noBWTI" ,"N3_a2_a4", 
+    std::vector<std::string> fits_fpi = { "N3_a2", "N3_a2_noBOS_noBtm_noBWTI" ,"N3_a2_a4",
     "N3_a2_Husung0.42", "N3_a2_Husung0.21",
     "N3_a2_noCOS_noCtm_noCWTI",
     "N3_a2_a4WTI",
     "N3_a2_a4tm",
-    "N3_a2_a4OS"
+    "N3_a2_a4OS",
+    "N3_a2_a4_noa4WTI","N3_a2_a4_noa4tm","N3_a2_a4_noa4OS",
+    "N3_a2_HusungWTI", "N3_a2_Husungtm", "N3_a2_HusungOS"
     };
     // double (*funcArray_fpi[])(int, int, double*, int, double*) = { rhs_a2_N3, rhs_a2_N3, rhs_a2_N3_a4 , rhs_a2_N3_Husung<0.42>, rhs_a2_N3_Husung<0.21>,
     //  rhs_a2_N3,
@@ -1078,12 +1136,17 @@ int main(int argc, char** argv) {
     rhs_a2_N3,
     rhs_a2_N3_a4WTI,
     rhs_a2_N3_a4tm,
-    rhs_a2_N3_a4OS
+    rhs_a2_N3_a4OS,
+    rhs_a2_N3_a4_noa4WTI, rhs_a2_N3_a4_noa4tm, rhs_a2_N3_a4_noa4OS,
+    rhs_a2_N3_HusungWTI<0.42>, rhs_a2_N3_Husungtm<0.42>, rhs_a2_N3_HusungOS<0.42>
     };
     std::vector<int> Npars_fpi = { 4, 4, 7, 7 ,7,4,
-        5,5,5 };
+        5,5,5 ,
+        6,6,6,
+        5,5,5
+     };
 
-    error(fits_fpi.size() != Npars_fpi.size(), 1,"main", "fits_fpi  %zu  and Npars_fpi  %zu  must have the same size", fits_fpi.size(), Npars_fpi.size());
+    error(fits_fpi.size() != Npars_fpi.size(), 1, "main", "fits_fpi  %zu  and Npars_fpi  %zu  must have the same size", fits_fpi.size(), Npars_fpi.size());
     error(fits_fpi.size() != points.size(), 1, "main", "fits_fpi  %zu  and points  %zu  must have the same size", fits_fpi.size(), points.size());
     error(fits_fpi.size() != funcArray_fpi.size(), 1, "main", "fits_fpi  %zu  and funcArray_fpi  %zu  must have the same size", fits_fpi.size(), funcArray_fpi.size());
 
