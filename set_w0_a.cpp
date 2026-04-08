@@ -2588,5 +2588,155 @@ int main(int argc, char** argv) {
     for (int ic = 0; ic < coeffs.size(); ic++) {
         write_jack(sqrtt0_wp25_C[ic], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_from_fpi + 1 + ic);
     }
+
+    //////////////////////////////////////////////////////////////
+    // system fpi wp25 C-5
+    //////////////////////////////////////////////////////////////
+    printf("//////////////////////////////////////////////////////////////\n");
+    printf("// fpi systemone wp25 C-5\n");
+    printf("//////////////////////////////////////////////////////////////\n");
+
+    double *fpi_MeV_wp25_Cm5_j=myres->create_fake(fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5,-1);
+    printf("fpi_MeV_wp25_Cm5  : %g +/- %g\n",  fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5);
+    printf("fpi_MeV_wp25_Cm5_j: %g +/- %g\n",  myres->mean(fpi_MeV_wp25_Cm5_j), myres->comp_error(fpi_MeV_wp25_Cm5_j));
+
+    {
+        for (int j = 0; j < Njack;j++) {
+
+            y[0] = Mpi_MeV / fpi_MeV_wp25_Cm5_j[j];
+            y[1] = MK_MeV / fpi_MeV_wp25_Cm5_j[j];
+            y[2] = MDs_MeV / fpi_MeV_wp25_Cm5_j[j];
+            int ifpi = 3;
+            double f = data[id_deriv(ifpi, 0, 0, 0)][j];
+
+            for (int iM = 0; iM < 2; iM++) {
+
+                double M = data[id_deriv(iM, 0, 0, 0)][j];
+
+                for (int im = 0; im < 3; im++) {
+                    Mat[iM][im] = 0.0;
+                    // valence
+                    double dM = data[id_deriv(iM, 1, im, 0)][j];
+                    double df = data[id_deriv(ifpi, 1, im, 0)][j];
+                    Mat[iM][im] += 2 * M * dM / (f * f) - 2 * M * M * df / (f * f * f);
+                    // sea
+                    dM = data[id_deriv(iM, 1, im, 1)][j];
+                    df = data[id_deriv(ifpi, 1, im, 1)][j];
+                    Mat[iM][im] += 2 * M * dM / (f * f) - 2 * M * M * df / (f * f * f);
+                    Matj[iM][im][j] = Mat[iM][im];
+                }
+                y[iM] *= y[iM];
+                // if (j==Njack-1) printf(" %.12g   %g   %g   %g\n ",y[iM], M / f, f, M);
+                y[iM] -= (M / f) * (M / f);
+                yj[iM][j] = y[iM];
+
+            }
+            for (int iM = 2; iM < 3; iM++) {
+
+                double M = data[id_deriv(iM, 0, 0, 0)][j];
+
+                for (int im = 0; im < 3; im++) {
+                    Mat[iM][im] = 0.0;
+                    // valence
+                    double dM = data[id_deriv(iM, 1, im, 0)][j];
+                    double df = data[id_deriv(ifpi, 1, im, 0)][j];
+                    Mat[iM][im] += dM / f - M * df / (f * f);
+                    // sea
+                    dM = data[id_deriv(iM, 1, im, 1)][j];
+                    df = data[id_deriv(ifpi, 1, im, 1)][j];
+                    Mat[iM][im] += dM / f - M * df / (f * f);
+                    Matj[iM][im][j] = Mat[iM][im];
+
+                }
+                // if (j == Njack - 1) printf(" %.12g   %g   %g   %g\n ", y[iM], M / f, f, M);
+                y[iM] -= M / f;
+                yj[iM][j] = y[iM];
+
+            }
+            double* P = LU_decomposition_solver(3, Mat, y);
+            miso[0][j] = (amusim[0][j] + P[0]);
+            miso[1][j] = (amusim[1][j] + P[1]);
+            miso[2][j] = (amusim[2][j] + P[2]);
+            for (int im = 0; im < 3; im++) {
+                dm_fpi[im][j] = P[im];
+            }
+            
+            free(P);
+        }
+        printf("Results for m^iso (MeV):\n");
+        for (int i = 0; i < 3; i++) {
+            double mean = myres->mean(miso[i]);
+            double err = myres->comp_error(miso[i]);
+            printf("m^iso_%d = %-12g +/- %-12g   starting from %-12g +/- %-12g\n", i, mean, err, myres->mean(amuiso[i]), myres->comp_error(amuiso[i]));
+        }
+        printf("sim values:\n");
+        for (int i = 0; i < 3; i++) {
+            printf("m^sim_%d = %g \n", i, myres->mean(amusim[i]));
+        }
+
+
+        double* a_fm = myres->create_copy(data[4]);
+        for (int j = 0; j < Njack;j++) {
+            int ifpi = 3;
+            double af = data[id_deriv(ifpi, 0, 0, 0)][j];
+            for (int im = 0; im < 3; im++) {
+                for (int val_sea = 0; val_sea < 2; val_sea++) {
+                    double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
+                    double dm = (miso[im][j] - amusim[im][j]);
+                    af += dm * df;
+                    
+
+                }
+            }
+
+            a_fm[j] = af / (fpi_MeV_wp25_Cm5_j[j] / hbarc);
+        }
+        
+
+        write_jack(miso[0], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_wp25_Cm5);
+        write_jack(miso[1], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_wp25_Cm5+1);
+        write_jack(miso[2], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_wp25_Cm5+2);
+        write_jack(a_fm, Njack, jack_file);     check_correlatro_counter(id_a_fpi_wp25_Cm5);
+        printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_fm), myres->comp_error(a_fm));
+
+        
+       
+        // linear deriv mc
+        for (int j = 0; j < Njack;j++) {
+            w0_lin_deriv[j]=data[id_deriv(iw0, 0, 0, 0)][j];
+            sqrtt0_from_fpi[j]=data[id_deriv_sqrtt0( 0, 0, 0)][j];
+            for (int im = 0; im < 3; im++) {
+                int val_sea = 1;
+                double dm = (miso[im][j] - amusim[im][j]);
+                double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                double dt = data[id_deriv_sqrtt0(1, im, val_sea)][j];
+                if (im == 2 && val_sea == 1) {
+                    if (j == Njack - 1) printf("replacing dw0/dmc = %g\n", dw);
+                    dw = get_linear_deriv_w0c(data, amuiso, previous_a, j);
+                    dt = get_linear_deriv_sqrtt0c(data, amuiso, previous_a, j);
+                    if (j == Njack - 1) printf("with      dw0/dmc = %g\n", dw);
+                }
+
+                w0_lin_deriv[j] += dm * dw;
+                sqrtt0_from_fpi[j] += dm * dt;
+            }
+            w0_lin_deriv[j] *= a_fm[j];
+            sqrtt0_from_fpi[j] *= a_fm[j];
+        }
+        printf("w0_fpi_wp25_Cm5: %g +/- %g\n", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
+        write_jack(w0_lin_deriv, Njack, jack_file);     check_correlatro_counter(id_w0_fpi_wp25_Cm5);
+        write_jack(sqrtt0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5);
+        
+        write_jack(dm_fpi[0], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5+1);
+        write_jack(dm_fpi[1], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5+2);
+        write_jack(dm_fpi[2], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5+3);
+        printf("dmu = %g +/- %g\n", myres->mean(dm_fpi[0]), myres->comp_error(dm_fpi[0]));
+        printf("dms = %g +/- %g\n", myres->mean(dm_fpi[1]), myres->comp_error(dm_fpi[1]));
+        printf("dmc = %g +/- %g\n", myres->mean(dm_fpi[2]), myres->comp_error(dm_fpi[2]));
+
+    }
+
+
+
     return 0;
 }
