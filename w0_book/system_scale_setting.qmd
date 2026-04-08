@@ -233,22 +233,24 @@ fig <- myplotly(gg, "", "$a^2$", "$\\delta\\mu_c /\\mu_\\ell$",
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_cont_a2",
+  #"/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_cont_a2",
   "/home/garofalo/analysis/flow/data/fit_all_beta_sim/fit_w0_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta_no_m0//fit_w0_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_ens_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_hybrid_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_lin_deriv_cont_a2"
+  #"/home/garofalo/analysis/flow/data/fit_all_beta_no_m0//fit_w0_cont_a2",
+  #"/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_ens_cont_a2",
+  #"/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_hybrid_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_lin_deriv_cont_a2",
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_fpi_wp25_Cm5_cont_a2"
   # "/home/garofalo/analysis/flow/data/fit_all_beta_nocharmw0//fit_w0_cont_a2",
   # "/home/garofalo/analysis/flow/data/fit_all_beta_nocharmw0_decorr///fit_w0_cont_a2"
 )
 labels <- c(
-  "P[0]+ P[1]*a2 ",
+  #"P[0]+ P[1]*a2 ",
   "sim-point",
-  "no m0 corr",
-  "sea-deriv-ens",
-  "hybrid",
-  "lin_deriv"
+  #"no m0 corr",
+  #"sea-deriv-ens",
+  #"hybrid",
+  "lin_deriv",
+  "fpi-from-wp25+C-5"
   # "no-charm-corr-w0",
   # "no-charm-corr-w0-decorr"
 )
