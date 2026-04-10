@@ -249,7 +249,7 @@ labels <- c(
   #"no m0 corr",
   #"sea-deriv-ens",
   #"hybrid",
-  "lin_deriv",
+  "FLAG-lin-deriv",
   "fpi-from-wp25+C-5"
   # "no-charm-corr-w0",
   # "no-charm-corr-w0-decorr"
