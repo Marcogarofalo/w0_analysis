@@ -56,7 +56,7 @@ generic_header read_header(FILE* stream) {
     return header;
 }
 
-double read_single_Nobs(FILE* stream, int header_size, int Njack) {
+int read_single_Nobs(FILE* stream, int header_size, int Njack) {
     int Nobs;
     long int tmp;
     int s = header_size;
@@ -448,6 +448,13 @@ int main(int argc, char** argv) {
 
     }
 
+    data_all jack_interpol;
+    jack_interpol.create(2, 2, Njack, argv[1]);
+    for (int j = 0;j < Njack;j++) {
+        jack_interpol.en[0].jack[0][j] = fpi_MeV;
+        jack_interpol.en[1].jack[0][j] = fpi_MeV_interpol;
+    }
+
     //////////////////////////////////////////////////////////////
     // make table results
     //////////////////////////////////////////////////////////////
@@ -713,13 +720,13 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     std::vector<std::string> obs = { "w0" ,"fpi", "w0_ens", "w0_hybrid", "fpi_hybrid", "fpi_Mpi_wp25_hybrid", "fpi_wp25_lin", "fpi_wp25_lin_laRDs",  "fpi_wp25_lin_laRDs_exact",
          "MDs_wp25_lin_laRDs_exact", "fpi_wp25_lin_la_mc_exact", "MDs_wp25_lin_la_mc_exact" ,
-        "w0_lin_deriv" ,"sqrtt0_from_fpi" ,"w0_fpi_wp25_Cm5" };
+        "w0_lin_deriv" ,"sqrtt0_from_fpi" ,"w0_fpi_wp25_Cm5" , "w0_fpi_interpol" };
 
     std::vector<int> id_obs = { 34, 39, 46 ,47, 52, 57, 62, 70, 78 ,
-        82, 87, 91, id_w0_lin_deriv, id_sqrtt0_from_fpi, id_w0_fpi_wp25_Cm5
+        82, 87, 91, id_w0_lin_deriv, id_sqrtt0_from_fpi, id_w0_fpi_wp25_Cm5, id_w0_fpi_interpol
     };
     std::vector<int> id_a = { 33, 38 , 33, 33 ,51, 56, 61, 69, 77 ,
-         77, 86, 86,33, 33, id_a_fpi_wp25_Cm5
+         77, 86, 86,33, 33, id_a_fpi_wp25_Cm5, id_a_fpi_interpol
     };
 
     for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
@@ -799,6 +806,15 @@ int main(int argc, char** argv) {
         fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
         fit_info.band_range = { 0, 0.008145209846823482 };
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
+
+        if (obs[i] == "w0_lin_deriv") {
+            myres->copy(jack_interpol.en[0].jack[1], der_fpi_const_full.P[0]);
+        }
+        if (obs[i] == "w0_fpi_interpol") {
+            myres->copy(jack_interpol.en[1].jack[1], der_fpi_const_full.P[0]);
+        }
+
+
         der_fpi_const_full.clear();
         // if (i < 2)
         //     for (size_t imr = 0; imr < obs2.size(); imr++) {
@@ -1126,7 +1142,7 @@ int main(int argc, char** argv) {
     // rhs_a2_N3_a4tm,
     // rhs_a2_N3_a4OS
     // };
-    std::vector<double (*)(int, int, double*, int, double*)> funcArray_fpi = {    rhs_a2_N3,    rhs_a2_N3,
+    std::vector<double (*)(int, int, double*, int, double*)> funcArray_fpi = { rhs_a2_N3,    rhs_a2_N3,
     rhs_a2_N3_a4,
     rhs_a2_N3_Husung<0.42>,    rhs_a2_N3_Husung<0.21>,
     rhs_a2_N3,
@@ -1200,4 +1216,49 @@ int main(int argc, char** argv) {
 
         }
     }
+
+    //////////////////////////////////////////////////////////////
+    // interpolation w0
+    //////////////////////////////////////////////////////////////
+    double *fpi_MeV_wp25_Cm5_j=myres->create_fake(fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5,1234);
+    double *w0_interpolated_j=myres->create_zero();
+    {
+        fit_type fit_info;
+        fit_info.corr_id = { 1};
+        fit_info.N = 1;
+        fit_info.Nxen = {{0,1}};
+        fit_info.init_N_etot_form_Nxen();
+        fit_info.function = rhs_a2;
+        fit_info.linear_fit = true;
+        fit_info.Npar = 2;
+        fit_info.Nvar = 1; // fpi
+        fit_info.Njack = jack_interpol.en[0].Njack;
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+        int count = 0;
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
+                    fit_info.x[0][count][j] = jack_interpol.en[e].jack[0][j]; // fpi MeV
+                }
+                count++;
+            }
+        }
+        fit_info.verbosity = 0;
+        std::string namefit = "fit_w0_interpolation_fpi";
+        fit_result der_fpi_const_full = fit_all_data(argv, jack_interpol, lhs_identity, fit_info, namefit.c_str());
+        fit_info.band_range = { jack_interpol.en[0].jack[0][Njack-1]-0.1,jack_interpol.en[1].jack[0][Njack-1] +0.1};
+        print_fit_band(argv, jack_interpol, fit_info, fit_info, namefit.c_str(), "fpi", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.1, {});
+   
+        der_fpi_const_full.fit_to_tif();
+        std::vector<double> tmpx(1);
+        for(int j = 0; j < Njack ;j++){
+            tmpx[0] = fpi_MeV_wp25_Cm5_j[j]; // fpi MeV
+            w0_interpolated_j[j] = fit_info.function(0, fit_info.Nvar, tmpx.data(), fit_info.Npar, der_fpi_const_full.tif[j]);
+        }
+
+        der_fpi_const_full.clear();
+
+        // interpolate at fpi_MeV_interpol_j
+    }
+    printf("w0_fpi_interpol    %.12g    %.12g\n", myres->mean(w0_interpolated_j), myres->comp_error(w0_interpolated_j));
 }

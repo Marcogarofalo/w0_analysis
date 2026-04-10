@@ -8,10 +8,23 @@ static constexpr int sid_fpi_A0 = 92 + coeffs.size() * 8 + coeffs_mc.size() * 9;
 static constexpr int id_fpi_OS_dWTI = sid_fpi_A0 + coeffs.size() * 2 + coeffs_mc.size() * 2 ;
 static constexpr int id_w0_lin_deriv = id_fpi_OS_dWTI + coeffs.size() ;
 static constexpr int id_sqrtt0_from_fpi = id_w0_lin_deriv+1;
+static constexpr int id_miso_fpi_wp25_Cm5 = id_sqrtt0_from_fpi+ coeffs.size()+1;
+static constexpr int id_a_fpi_wp25_Cm5 = id_miso_fpi_wp25_Cm5+3;
+static constexpr int id_w0_fpi_wp25_Cm5 = id_miso_fpi_wp25_Cm5+4;
+static constexpr int id_sqrtt0_fpi_wp25_Cm5 = id_miso_fpi_wp25_Cm5+5;
+static constexpr int id_miso_fpi_interpol = id_sqrtt0_fpi_wp25_Cm5+4;
+static constexpr int id_a_fpi_interpol = id_miso_fpi_interpol+3;
+static constexpr int id_w0_fpi_interpol = id_a_fpi_interpol+1;
 
 static constexpr double hbarc = 197.326963; // MeV*fm
 static constexpr double fpi_MeV = 130.5;
 static constexpr double fpi_MeV_err = 0.04;
+
+static constexpr double fpi_MeV_wp25_Cm5 = 131.26;
+static constexpr double fpi_MeV_err_wp25_Cm5 = 0.27;
+
+static constexpr double fpi_MeV_interpol = 132.00;
+static constexpr double fpi_MeV_err_interpol = 1e-20;
 
 static constexpr double Mpi_MeV = 135;
 static constexpr double Mpi_MeV_err = 0.2;
