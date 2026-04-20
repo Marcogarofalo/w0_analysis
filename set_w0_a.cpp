@@ -255,6 +255,17 @@ double get_linear_deriv_w0c(double** data, std::vector<double*>amuiso, double* p
     dw = P0 + P1 * a * a;
     return dw;
 }
+double get_linear_deriv_w0c_with_pref(double** data, std::vector<double*>amuiso, double* previous_a, int j) {
+    double dw;
+    double P0 = data[41][j];
+    double P1 = data[42][j];
+    // remove the prefactor in dw0/dmc(sea)
+    
+    double a = previous_a[j];
+    dw = P0 + P1 * a * a;
+    return dw;
+}
+
 double get_linear_deriv_sqrtt0c(double** data, std::vector<double*>amuiso, double* previous_a, int j) {
     double dw;
     double P0 = data[73][j];
@@ -343,9 +354,23 @@ int main(int argc, char** argv) {
     // jackall.create_generalised_resampling();
     // // data_all jackall;
 
+    std::ifstream filep(files[0].c_str());
+    if (!filep.is_open()) {
+        std::cerr << "Could not open the file!" << std::endl;
+        return 1;
+    }
 
+    int line_count = 0;
+    std::string linep;
+
+    // Read the file line by line
+    while (std::getline(filep, linep)) {
+        line_count++;
+    }
+    filep.close();
+    std::cout << "Total lines: " << line_count << std::endl;
     // jack setup
-    int Njack = 21;
+    int Njack = line_count - 1;
 
     if (strcmp(argv[1], "jack") == 0) {
         myres = new resampling_jack(Njack - 1);
@@ -910,15 +935,15 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // print dw0/dmc lin der
     //////////////////////////////////////////////////////////////
-    double *dw0_dmc_lin_der = myres->create_zero();
+    double* dw0_dmc_lin_der = myres->create_zero();
     for (int j = 0; j < Njack;j++) {
         dw0_dmc_lin_der[j] = get_linear_deriv_w0c(data, amuiso, previous_a, j);
     }
-    std::string filename = "deriv/dw0_dmc_lin_der"+ensemble+".jack";
+    std::string filename = "deriv/dw0_dmc_lin_der" + ensemble + "_jack" + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(dw0_dmc_lin_der, filename.c_str());
-    filename = "deriv/dw0_dms_lin_der"+ensemble+".jack";
+    filename = "deriv/dw0_dms_lin_der" + ensemble + "_jack" + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(data[id_deriv(iw0, 1, 1, 1)], filename.c_str());
-    filename = "deriv/dw0_dml_lin_der"+ensemble+".jack";
+    filename = "deriv/dw0_dml_lin_der" + ensemble + "_jack" + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(data[id_deriv(iw0, 0, 1, 1)], filename.c_str());
     //////////////////////////////////////////////////////////////
     // sistemone fpi
@@ -934,8 +959,16 @@ int main(int argc, char** argv) {
             printf(" dval%d = %-8.3g (%-8.3g)", im, dM[Njack - 1], myres->comp_error(dM));
         }
         for (int im = 0; im < 3; im++) {
-            double* dM = data[id_deriv(iM, 1, im, 1)];
-            printf(" dsea%d = %-8.3g (%-8.3g)", im, dM[Njack - 1], myres->comp_error(dM));
+            if (iM == 4 && im == 2) {
+                double *dM = (double*)malloc(sizeof(double) * Njack);
+                for (int j = 0; j < Njack;j++)
+                    dM[j] = get_linear_deriv_w0c(data, amuiso, previous_a, j);
+                printf(" dsea%d = %-8.3g (%-8.3g)", im, dM[Njack - 1], myres->comp_error(dM));
+            }
+            else {
+                double* dM = data[id_deriv(iM, 1, im, 1)];
+                printf(" dsea%d = %-8.3g (%-8.3g)", im, dM[Njack - 1], myres->comp_error(dM));
+            }
         }
         printf("\n");
     }
@@ -1097,9 +1130,9 @@ int main(int argc, char** argv) {
             myres->mean(diff_a), myres->comp_error(diff_a));
         printf("w0 (fm): %g +/- %g\n", myres->mean(w0_from_fpi), myres->comp_error(w0_from_fpi));
         char name_out[NAMESIZE];
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_fpi.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_fpi_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(a_fm, name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_w0_from_fpi.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_w0_from_fpi_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(w0_from_fpi, name_out);
 
         write_jack(miso[0], Njack, jack_file);     check_correlatro_counter(30);
@@ -1170,21 +1203,25 @@ int main(int argc, char** argv) {
             w0_lin_deriv[j] *= a_fm[j];
             sqrtt0_from_fpi[j] *= a_fm[j];
         }
-
+        // printf("w0 from fpi (ensemble deriv): %g +/- %g\n", myres->mean(w0_from_fpi_ensemble), myres->comp_error(w0_from_fpi_ensemble));
+        // printf("w0 from fpi (hybrid): %g +/- %g\n", myres->mean(w0_from_fpi_hybrid), myres->comp_error(w0_from_fpi_hybrid));
+        printf("w0 from fpi (linear deriv): %g +/- %g\n", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
+        printf("sqrt(t0) from fpi (linear deriv): %g +/- %g\n", myres->mean(sqrtt0_from_fpi), myres->comp_error(sqrtt0_from_fpi));
         double** data_m_a = malloc_2<double>(4, Njack);
         for (int j = 0; j < Njack;j++) {
-            data_m_a[0][j] = miso[0][j];
-            data_m_a[1][j] = miso[1][j];
-            data_m_a[2][j] = miso[2][j];
-            data_m_a[3][j] = a_fm[j];
+            data_m_a[0][j] = a_fm[j];
+            data_m_a[1][j] = miso[0][j];
+            data_m_a[2][j] = miso[1][j];
+            data_m_a[3][j] = miso[2][j];
         }
         double** cov_m_a = myres->comp_cov(4, data_m_a);
         printf("covariance matrix for (in order) m^iso l,s,c and a, ens: %s\n", ensemble.c_str());
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                // double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
+                double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
+                printf("%-22.12g", corr);
                 // if (std::fabs(corr) > 0.4)
-                printf("%-22.12g", cov_m_a[i][j]);
+                // printf("%-22.12g", cov_m_a[i][j]);
             }
             printf("\n");
         }
@@ -1288,9 +1325,9 @@ int main(int argc, char** argv) {
         printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
 
         char name_out[NAMESIZE];
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(a_from_w0, name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(fpi_from_w0, name_out);
 
         write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(35);
@@ -1463,9 +1500,9 @@ int main(int argc, char** argv) {
         printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0_h), myres->comp_error(fpi_from_w0_h));
 
         char name_out[NAMESIZE];
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_hybrid.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(a_from_w0_hybrid, name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_hybrid.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(fpi_from_w0_h, name_out);
 
         write_jack(miso_w0_h[0], Njack, jack_file);     check_correlatro_counter(48);
@@ -1478,11 +1515,11 @@ int main(int argc, char** argv) {
         write_jack(dm_w0_h[1], Njack, jack_file);     check_correlatro_counter(54);
         write_jack(dm_w0_h[2], Njack, jack_file);     check_correlatro_counter(55);
 
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_l_wp25_hybrid.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_l_wp25_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(dm_w0_h[0], name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_s_wp25_hybrid.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_s_wp25_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(dm_w0_h[1], name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_c_wp25_hybrid.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_c_wp25_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(dm_w0_h[2], name_out);
 
 
@@ -1612,9 +1649,9 @@ int main(int argc, char** argv) {
         printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
 
         char name_out[NAMESIZE];
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(a_from_w0, name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0.jack", files[36].c_str());
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_jack%d.dat", files[36].c_str(), Njack - 1);
         myres->write_jack_in_file(fpi_from_w0, name_out);
 
         write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(58);
@@ -2609,9 +2646,9 @@ int main(int argc, char** argv) {
     printf("// fpi systemone wp25 C-5\n");
     printf("//////////////////////////////////////////////////////////////\n");
 
-    double *fpi_MeV_wp25_Cm5_j=myres->create_fake(fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5,1234);
-    printf("fpi_MeV_wp25_Cm5  : %g +/- %g\n",  fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5);
-    printf("fpi_MeV_wp25_Cm5_j: %g +/- %g\n",  myres->mean(fpi_MeV_wp25_Cm5_j), myres->comp_error(fpi_MeV_wp25_Cm5_j));
+    double* fpi_MeV_wp25_Cm5_j = myres->create_fake(fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5, 1234);
+    printf("fpi_MeV_wp25_Cm5  : %g +/- %g\n", fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5);
+    printf("fpi_MeV_wp25_Cm5_j: %g +/- %g\n", myres->mean(fpi_MeV_wp25_Cm5_j), myres->comp_error(fpi_MeV_wp25_Cm5_j));
 
     {
         for (int j = 0; j < Njack;j++) {
@@ -2673,7 +2710,7 @@ int main(int argc, char** argv) {
             for (int im = 0; im < 3; im++) {
                 dm_fpi[im][j] = P[im];
             }
-            
+
             free(P);
         }
         printf("Results for m^iso (MeV):\n");
@@ -2697,27 +2734,27 @@ int main(int argc, char** argv) {
                     double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
                     double dm = (miso[im][j] - amusim[im][j]);
                     af += dm * df;
-                    
+
 
                 }
             }
 
             a_fm[j] = af / (fpi_MeV_wp25_Cm5_j[j] / hbarc);
         }
-        
+
 
         write_jack(miso[0], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_wp25_Cm5);
-        write_jack(miso[1], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_wp25_Cm5+1);
-        write_jack(miso[2], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_wp25_Cm5+2);
+        write_jack(miso[1], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_wp25_Cm5 + 1);
+        write_jack(miso[2], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_wp25_Cm5 + 2);
         write_jack(a_fm, Njack, jack_file);     check_correlatro_counter(id_a_fpi_wp25_Cm5);
         printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_fm), myres->comp_error(a_fm));
 
-        
-       
+
+
         // linear deriv mc
         for (int j = 0; j < Njack;j++) {
-            w0_lin_deriv[j]=data[id_deriv(iw0, 0, 0, 0)][j];
-            sqrtt0_from_fpi[j]=data[id_deriv_sqrtt0( 0, 0, 0)][j];
+            w0_lin_deriv[j] = data[id_deriv(iw0, 0, 0, 0)][j];
+            sqrtt0_from_fpi[j] = data[id_deriv_sqrtt0(0, 0, 0)][j];
             for (int im = 0; im < 3; im++) {
                 int val_sea = 1;
                 double dm = (miso[im][j] - amusim[im][j]);
@@ -2739,13 +2776,73 @@ int main(int argc, char** argv) {
         printf("w0_fpi_wp25_Cm5: %g +/- %g\n", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
         write_jack(w0_lin_deriv, Njack, jack_file);     check_correlatro_counter(id_w0_fpi_wp25_Cm5);
         write_jack(sqrtt0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5);
-        
-        write_jack(dm_fpi[0], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5+1);
-        write_jack(dm_fpi[1], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5+2);
-        write_jack(dm_fpi[2], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5+3);
+
+        write_jack(dm_fpi[0], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5 + 1);
+        write_jack(dm_fpi[1], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5 + 2);
+        write_jack(dm_fpi[2], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_fpi_wp25_Cm5 + 3);
         printf("dmu = %g +/- %g\n", myres->mean(dm_fpi[0]), myres->comp_error(dm_fpi[0]));
         printf("dms = %g +/- %g\n", myres->mean(dm_fpi[1]), myres->comp_error(dm_fpi[1]));
         printf("dmc = %g +/- %g\n", myres->mean(dm_fpi[2]), myres->comp_error(dm_fpi[2]));
+
+        /// check if a and dmu are correlated but decorrelated from the rest
+        printf("w0_fpi_wp25_Cm5  (all_correlated): %g +/- %g\n", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
+        for (int tmp_seed = 1;tmp_seed <= 10;tmp_seed++) {
+            double** res = (double**)malloc(4 * sizeof(double*));
+            res[0] = dm_fpi[0];
+            res[1] = dm_fpi[1];
+            res[2] = dm_fpi[2];
+            res[3] = a_fm;
+            double** cov = myres->comp_cov(4, res);
+            double* mean = (double*)malloc(4 * sizeof(double));
+            mean[0] = myres->mean(dm_fpi[0]);
+            mean[1] = myres->mean(dm_fpi[1]);
+            mean[2] = myres->mean(dm_fpi[2]);
+            mean[3] = myres->mean(a_fm);
+
+            double** corr_dm = myres->create_fake_covariance(mean, 4, cov, tmp_seed);
+
+            for (int j = 0; j < Njack;j++) {
+                w0_lin_deriv[j] = data[id_deriv(iw0, 0, 0, 0)][j];
+                for (int im = 0; im < 3; im++) {
+                    int val_sea = 1;
+                    double dm = corr_dm[im][j];
+                    double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                    if (im == 2 && val_sea == 1) {
+                        dw = get_linear_deriv_w0c(data, amuiso, previous_a, j);
+                    }
+
+                    w0_lin_deriv[j] += dm * dw;
+                }
+                w0_lin_deriv[j] *= corr_dm[3][j];
+            }
+            printf("w0_fpi_wp25_Cm5 (part_correlated): %g +/- %g\n", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
+
+            double** corr_dm_decorr = (double**)malloc(4 * sizeof(double*));
+            corr_dm_decorr[0] = myres->create_fake(dm_fpi[0][Njack - 1], myres->comp_error(dm_fpi[0]), -1);
+            corr_dm_decorr[1] = myres->create_fake(dm_fpi[1][Njack - 1], myres->comp_error(dm_fpi[1]), -1);
+            corr_dm_decorr[2] = myres->create_fake(dm_fpi[2][Njack - 1], myres->comp_error(dm_fpi[2]), -1);
+            corr_dm_decorr[3] = myres->create_fake(a_fm[Njack - 1], myres->comp_error(a_fm), -1);
+            for (int j = 0; j < Njack;j++) {
+                w0_lin_deriv[j] = data[id_deriv(iw0, 0, 0, 0)][j];
+                for (int im = 0; im < 3; im++) {
+                    int val_sea = 1;
+                    double dm = corr_dm_decorr[im][j];
+                    double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                    if (im == 2 && val_sea == 1) {
+                        dw = get_linear_deriv_w0c(data, amuiso, previous_a, j);
+                    }
+
+                    w0_lin_deriv[j] += dm * dw;
+                }
+                w0_lin_deriv[j] *= corr_dm_decorr[3][j];
+            }
+            printf("w0_fpi_wp25_Cm5  (not_correlated): %g +/- %g\n", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
+            free(res);
+            free_2(4, cov);
+            free(mean);
+            free_2(4, corr_dm);
+            free_2(4, corr_dm_decorr);
+        }
 
     }
 
@@ -2756,9 +2853,9 @@ int main(int argc, char** argv) {
     printf("// fpi systemone interpolation\n");
     printf("//////////////////////////////////////////////////////////////\n");
 
-    double *fpi_MeV_interpol_j=myres->create_fake(fpi_MeV_interpol, fpi_MeV_err_interpol,1234);
-    printf("fpi_MeV_interpol  : %g +/- %g\n",  fpi_MeV_interpol, fpi_MeV_err_interpol);
-    printf("fpi_MeV_interpol_j: %g +/- %g\n",  myres->mean(fpi_MeV_interpol_j), myres->comp_error(fpi_MeV_interpol_j));
+    double* fpi_MeV_interpol_j = myres->create_fake(fpi_MeV_interpol, fpi_MeV_err_interpol, 1234);
+    printf("fpi_MeV_interpol  : %g +/- %g\n", fpi_MeV_interpol, fpi_MeV_err_interpol);
+    printf("fpi_MeV_interpol_j: %g +/- %g\n", myres->mean(fpi_MeV_interpol_j), myres->comp_error(fpi_MeV_interpol_j));
 
     {
         for (int j = 0; j < Njack;j++) {
@@ -2820,7 +2917,7 @@ int main(int argc, char** argv) {
             for (int im = 0; im < 3; im++) {
                 dm_fpi[im][j] = P[im];
             }
-            
+
             free(P);
         }
         printf("Results for m^iso (MeV):\n");
@@ -2844,27 +2941,27 @@ int main(int argc, char** argv) {
                     double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
                     double dm = (miso[im][j] - amusim[im][j]);
                     af += dm * df;
-                    
+
 
                 }
             }
 
             a_fm[j] = af / (fpi_MeV_interpol_j[j] / hbarc);
         }
-        
+
 
         write_jack(miso[0], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_interpol);
-        write_jack(miso[1], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_interpol+1);
-        write_jack(miso[2], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_interpol+2);
+        write_jack(miso[1], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_interpol + 1);
+        write_jack(miso[2], Njack, jack_file);     check_correlatro_counter(id_miso_fpi_interpol + 2);
         write_jack(a_fm, Njack, jack_file);     check_correlatro_counter(id_a_fpi_interpol);
         printf("lattice spacing (fm): %g +/- %g\n", myres->mean(a_fm), myres->comp_error(a_fm));
 
-        
-       
+
+
         // linear deriv mc
         for (int j = 0; j < Njack;j++) {
-            w0_lin_deriv[j]=data[id_deriv(iw0, 0, 0, 0)][j];
-            sqrtt0_from_fpi[j]=data[id_deriv_sqrtt0( 0, 0, 0)][j];
+            w0_lin_deriv[j] = data[id_deriv(iw0, 0, 0, 0)][j];
+            sqrtt0_from_fpi[j] = data[id_deriv_sqrtt0(0, 0, 0)][j];
             for (int im = 0; im < 3; im++) {
                 int val_sea = 1;
                 double dm = (miso[im][j] - amusim[im][j]);
@@ -2885,11 +2982,11 @@ int main(int argc, char** argv) {
         }
         printf("w0_fpi_wp25_Cm5: %g +/- %g\n", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
         write_jack(w0_lin_deriv, Njack, jack_file);     check_correlatro_counter(id_w0_fpi_interpol);
-        write_jack(sqrtt0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_w0_fpi_interpol+1);
-        
-        write_jack(dm_fpi[0], Njack, jack_file);     check_correlatro_counter(id_w0_fpi_interpol+2);
-        write_jack(dm_fpi[1], Njack, jack_file);     check_correlatro_counter(id_w0_fpi_interpol+3);
-        write_jack(dm_fpi[2], Njack, jack_file);     check_correlatro_counter(id_w0_fpi_interpol+4);
+        write_jack(sqrtt0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_w0_fpi_interpol + 1);
+
+        write_jack(dm_fpi[0], Njack, jack_file);     check_correlatro_counter(id_w0_fpi_interpol + 2);
+        write_jack(dm_fpi[1], Njack, jack_file);     check_correlatro_counter(id_w0_fpi_interpol + 3);
+        write_jack(dm_fpi[2], Njack, jack_file);     check_correlatro_counter(id_w0_fpi_interpol + 4);
         printf("dmu = %g +/- %g\n", myres->mean(dm_fpi[0]), myres->comp_error(dm_fpi[0]));
         printf("dms = %g +/- %g\n", myres->mean(dm_fpi[1]), myres->comp_error(dm_fpi[1]));
         printf("dmc = %g +/- %g\n", myres->mean(dm_fpi[2]), myres->comp_error(dm_fpi[2]));

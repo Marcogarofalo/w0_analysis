@@ -1,0 +1,482 @@
+# Njack change
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+masses <- c(
+  0.0006669,
+  0.018267,
+  0.23134
+)
+```
+
+## lattice spacing from fpi
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+Nj <- 20
+cat("## wp25_C-5  Njack = ", Nj, "\n\n")
+df_old <- read.table(paste0("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_fpi.txt"), header = TRUE)
+start_indices <- seq(2, ncol(df_old), by = 2)
+new_df <- data.frame(df_old[, c(1, start_indices)])
+colnames(new_df) <- colnames(df)[c(1, start_indices)]
+
+##############
+dft <- NULL
+for (Nj in c(20, 25, 30, 35, 40)) {
+  cat("## wp25_C-5  Njack = ", Nj, "\n")
+  df <- read.table(paste0("/home/garofalo/analysis/flow/data_", Nj, "/fit_all_beta/data_from_fpi.txt"), header = TRUE)
+  start_indices <- seq(2, ncol(df), by = 2)
+  new_df <- data.frame(df[, c(1, start_indices)])
+  colnames(new_df) <- colnames(df)[c(1, start_indices)]
+  
+  df$Njack <- Nj
+  dft <- rbind(dft, df)
+}
+### plot
+gg <- myggplot()
+gg <- gg + geom_point(data = dft, aes(x = a.fm., y =0, color = factor(Njack), shape = factor(Njack), fill = factor(Njack)))
+gg <- gg + geom_errorbar(data = dft, aes(x = a.fm., y = a.fm.- df_old$a.fm., ymin = da.fm.- df_old$a.fm. - da.fm., ymax = a.fm.- df_old$a.fm. + da.fm., color = factor(Njack), shape = factor(Njack), fill = factor(Njack)), width = 0.0004)
+
+gg <- gg + geom_point(data = df_old, aes(x = a.fm., y = 0., color = factor(paste0(Njack, "old")), shape = factor(paste0(Njack, "old")), fill = factor(paste0(Njack, "old"))))
+gg <- gg + geom_errorbar(data = df_old, aes(x = a.fm., y = 0., ymin = 0 - da.fm., ymax = 0 + da.fm., color = factor(paste0(Njack, "old")), shape = factor(paste0(Njack, "old")), fill = factor(paste0(Njack, "old"))), width = 0.0004)
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$a-\\bar{a}$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+)
+#####
+gg <- myggplot()
+gg <- gg + geom_point(data = dft, aes(x = a.fm., y =0, color = factor(Njack), shape = factor(Njack), fill = factor(Njack)))
+gg <- gg + geom_errorbar(data = dft, aes(x = a.fm., y =0, ymin = 0 - da.fm., ymax = 0 + da.fm., color = factor(Njack), shape = factor(Njack), fill = factor(Njack)), width = 0.0004)
+
+gg <- gg + geom_point(data = df_old, aes(x = a.fm., y = 0., color = factor(paste0(Njack, "old")), shape = factor(paste0(Njack, "old")), fill = factor(paste0(Njack, "old"))))
+gg <- gg + geom_errorbar(data = df_old, aes(x = a.fm., y = 0., ymin = 0 - da.fm., ymax = 0 + da.fm., color = factor(paste0(Njack, "old")), shape = factor(paste0(Njack, "old")), fill = factor(paste0(Njack, "old"))), width = 0.0004)
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$a-\\bar{a}$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+)
+
+```
+
+
+## old
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+Nj <- 20
+cat("## wp25_C-5  Njack = ", Nj, "\n\n")
+df_old <- read.table(paste0("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_wp25_lin_deriv_mc_la_MDs_C-5.txt"), header = TRUE)
+start_indices <- seq(2, ncol(df_old), by = 2)
+new_df <- data.frame(df_old[, c(1, start_indices)])
+colnames(new_df) <- colnames(df)[c(1, start_indices)]
+new_df[, 1] <- df_old[, 1]
+for (i in seq_along(start_indices)) {
+  for (row in seq_along(df_old[, 1])) {
+    new_df[row, i + 1] <- mean_print(df_old[row, start_indices[i]], df_old[row, start_indices[i] + 1], digit = 2)
+  }
+}
+df_old$Njack<-Nj
+print(kable(new_df))
+```
+
+## new data
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+dft <- NULL
+for (Nj in c(20, 25, 30, 35, 40)) {
+  cat("## wp25_C-5  Njack = ", Nj, "\n")
+  df <- read.table(paste0("/home/garofalo/analysis/flow/data_", Nj, "/fit_all_beta/data_from_wp25_lin_deriv_mc_la_MDs_C-5.txt"), header = TRUE)
+  start_indices <- seq(2, ncol(df), by = 2)
+  new_df <- data.frame(df[, c(1, start_indices)])
+  colnames(new_df) <- colnames(df)[c(1, start_indices)]
+  new_df[, 1] <- df[, 1]
+  for (i in seq_along(start_indices)) {
+    for (row in seq_along(df[, 1])) {
+      new_df[row, i + 1] <- mean_print(df[row, start_indices[i]], df[row, start_indices[i] + 1], digit = 2)
+    }
+  }
+  print(kable(new_df))
+  df$Njack <- Nj
+  dft <- rbind(dft, df)
+}
+```
+
+```{r,results='asis',echo=FALSE, warning=FALSE,dev='tikz'}
+gg <- myggplot()
+gg <- gg + geom_point(data = dft, aes(x = a.fm., y = 0., color = factor(Njack), shape = factor(Njack), fill = factor(Njack)))
+gg <- gg + geom_errorbar(data = dft, aes(x = a.fm., y = 0., ymin = 0 - da.fm., ymax = 0 + da.fm., color = factor(Njack), shape = factor(Njack), fill = factor(Njack)), width = 0.0004)
+
+gg <- gg + geom_point(data = df_old, aes(x = a.fm., y = 0., color = factor(paste0(Njack, "old")), shape = factor(paste0(Njack, "old")), fill = factor(paste0(Njack, "old"))))
+gg <- gg + geom_errorbar(data = df_old, aes(x = a.fm., y = 0., ymin = 0 - da.fm., ymax = 0 + da.fm., color = factor(paste0(Njack, "old")), shape = factor(paste0(Njack, "old")), fill = factor(paste0(Njack, "old"))), width = 0.0004)
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$a-\\bar{a}$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+)
+```
+
+```{r,results='asis',echo=FALSE, warning=FALSE,dev='tikz'}
+gg <- myggplot()
+gg <- gg + geom_point(data = dft, aes(x = a.fm., y = delta_amul, color = factor(Njack), shape = factor(Njack), fill = factor(Njack)))
+gg <- gg + geom_errorbar(data = dft, aes(x = a.fm., y = delta_amul, ymin = delta_amul - ddelta_amul, ymax = delta_amul + ddelta_amul, color = factor(Njack), shape = factor(Njack), fill = factor(Njack)), width = 0.0004)
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$a\\delta \\mu_\\ell$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+)
+```
+
+```{r,results='asis',echo=FALSE, warning=FALSE,dev='tikz'}
+gg <- myggplot()
+gg <- gg + geom_point(data = dft, aes(x = a.fm., y = delta_amus, color = factor(Njack), shape = factor(Njack), fill = factor(Njack)))
+gg <- gg + geom_errorbar(data = dft, aes(x = a.fm., y = delta_amus, ymin = delta_amus - ddelta_amus, ymax = delta_amus + ddelta_amus, color = factor(Njack), shape = factor(Njack), fill = factor(Njack)), width = 0.0004)
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$a\\delta \\mu_s$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+)
+```
+
+```{r,results='asis',echo=FALSE, warning=FALSE,dev='tikz'}
+gg <- myggplot()
+gg <- gg + geom_point(data = dft, aes(x = a.fm., y = delta_amuc, color = factor(Njack), shape = factor(Njack), fill = factor(Njack)))
+gg <- gg + geom_errorbar(data = dft, aes(x = a.fm., y = delta_amuc, ymin = delta_amuc - ddelta_amuc, ymax = delta_amuc + ddelta_amuc, color = factor(Njack), shape = factor(Njack), fill = factor(Njack)), width = 0.0004)
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$a\\delta \\mu_c$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+)
+```
+
+### w0
+
+
+### new
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_lin_deriv_cont_a2",
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_w0_lin_deriv_cont_a2",
+  "/home/garofalo/analysis/flow/data_25/fit_all_beta/fit_w0_lin_deriv_cont_a2"
+)
+labels <- c(
+  "20 old",
+  "20",
+  "25"
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c(labels[j]),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001
+  )
+}
+w0_wp25 <- 0.17236
+gg <- gg + geom_hline(yintercept = w0_wp25, linetype = "dashed")
+gg <- gg + geom_point(aes(x = 0, y = w0_wp25, color = "wp25", shape = "wp25", fill = "wp25"))
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 [\\mbox{fm}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+## fpi 3 reg
+
+### old
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+library(stringr)
+Njack <- c(20)
+dfpi_old <- data.frame("fpi" = numeric(), "dfpi" = numeric(), "Njack" = numeric())
+
+for (Nj in Njack) {
+  cat("### Njack=", Nj, "<br>\n")
+  dft <- NULL
+  for (C in c(-5)) {
+    gg <- NULL
+
+    path <- "/home/garofalo/analysis/flow/data/fit_all_beta/"
+
+    basenames <- c(
+      paste0("fit_fpi_C", C, ".000000_N3_a2"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_noBOS_noBtm_noBWTI"),
+      # paste0("fit_fpi_C", C, ".000000_N3_a2_a4"),
+      # paste0("fit_fpi_C", C, ".000000_N3_a2_Husung0.42"),
+      # paste0("fit_fpi_C", C, ".000000_N3_a2_Husung0.21"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_noCOS_noCtm_noCWTI"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4WTI"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4tm"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4OS"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4_noa4WTI"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4_noa4tm"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4_noa4OS"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_HusungWTI"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_Husungtm"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_HusungOS")
+    )
+    legend_name <- gsub("fit_fpi_|\\.000000", "", basenames)
+    count <- length(basenames)
+    df <- data.frame(
+      "fit" = rep("", count),
+      "res" = rep(0, count),
+      "err" = rep(0, count),
+      "chi2dof" = rep(0, count),
+      "dof" = rep(0, count),
+      "Npar" = rep(0, count),
+      "Ndat" = rep(0, count),
+      "mult" = rep(0, count),
+      "k" = rep(0, count)
+    )
+
+    # extract the C value from the string
+    labels <- list(c("WTI", "tm", "OS"))
+
+    for (j in seq_along(basenames)) {
+      # print(basenames[j])
+      fit <- Rose::read_fit_P_file(paste0(path, basenames[j], "_fit_P.dat"))
+      # print(make_table_fit_result(fit))
+      df[j, 1] <- basenames[j]
+      # M <- data.matrix(fit$C)
+      # for (i in c(1:dim(M)[1])) {
+      #   for (l in c(1:dim(M)[1])) {
+      #     M[i, l] <- as.numeric(fit$C[i, l])
+      #   }
+      # }
+      M <- matrix(as.numeric(as.matrix(fit$C)), nrow = nrow(fit$C))
+      e <- eigen(M)
+
+      lmin <- min(abs(e$values))
+      lmax <- max(abs(e$values))
+      k <- lmax / lmin
+      df[j, -1] <- c(fit$P[1, 2], fit$P[1, 3], fit$chi2dof, fit$dof, fit$npar, fit$ndata, 1, k)
+
+      gg <- plot_fit(paste0(path, basenames[j]), "a2",
+        # noline = TRUE,
+        data_type = labels[[1]],
+        gg = gg,
+        id_x = 1,
+        single_name_for_fit = legend_name[j],
+        # labelfit = "fit",
+        width = 0.0001,
+        nudge = 0,
+        noline = TRUE
+      )
+    }
+    cat("C=", C, "<br>\n")
+    fpi_FLAG <- 130.5
+    gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+    gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+    #### BAIC
+    ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+    tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+    print(kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$")))
+    cat("BAIC average $f_\\pi=", ave_BAIC$m, "(", ave_BAIC$stat, ")(", ave_BAIC$syst, ") =", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>\n")
+
+    ## only linear fit
+    # df1 <- df[c(1, 2, 6), ]
+    # ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+    # cat("BAIC average (1,2,6) $f_\\pi=", ave_BAIC1$m, "(", ave_BAIC1$stat, ")(", ave_BAIC1$syst, ") =", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
+    ## only linear fit
+    # df1 <- df[c(-3, -4, -5), ]
+    # ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+    # cat("BAIC average linear c(-3,-4,-5)  $f_\\pi=", ave_BAIC1$m, "(", ave_BAIC1$stat, ")(", ave_BAIC1$syst, ") =", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
+
+    ###
+    dft <- rbind(dft, df)
+
+    fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+      to_print = TRUE,
+      # yrange = c(-1, 4),
+      legend_position = c(0.7, 0.98)
+    )
+  }
+  cat("<br>BAIC average all\n\n")
+  df1 <- dft
+  ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat("BAIC $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>")
+  df1 <- dft[!grepl("a4$", dft$fit) & !grepl("Husung", dft$fit), ]
+  ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat("BAIC (no a4 all) (no log)  $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
+  df1 <- dft[!grepl("a4$", dft$fit) & !grepl("Husung", dft$fit) & !grepl("C0.0", dft$fit), ]
+  ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat("BAIC (no C0) (no a4 all) (no log)  $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
+  dfpi_old[nrow(dfpi_old) + 1, ] <- list(ave_BAIC1$m, ave_BAIC1$dm, Nj)
+}
+```
+
+### new
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+library(stringr)
+Njack <- c(20, 25, 30, 35, 40)
+dfpi <- data.frame("fpi" = numeric(), "dfpi" = numeric(), "Njack" = numeric())
+
+for (Nj in Njack) {
+  cat("### Njack=", Nj, "<br>\n")
+  dft <- NULL
+  for (C in c(-5)) {
+    gg <- NULL
+    # if (Nj == 20) {
+    #   path <- "/home/garofalo/analysis/flow/data/fit_all_beta/"
+    # } else  {
+    path <- paste0("/home/garofalo/analysis/flow/data_", Nj, "/fit_all_beta/")
+    # }
+    basenames <- c(
+      paste0("fit_fpi_C", C, ".000000_N3_a2"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_noBOS_noBtm_noBWTI"),
+      # paste0("fit_fpi_C", C, ".000000_N3_a2_a4"),
+      # paste0("fit_fpi_C", C, ".000000_N3_a2_Husung0.42"),
+      # paste0("fit_fpi_C", C, ".000000_N3_a2_Husung0.21"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_noCOS_noCtm_noCWTI"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4WTI"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4tm"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4OS"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4_noa4WTI"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4_noa4tm"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_a4_noa4OS"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_HusungWTI"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_Husungtm"),
+      paste0("fit_fpi_C", C, ".000000_N3_a2_HusungOS")
+    )
+    legend_name <- gsub("fit_fpi_|\\.000000", "", basenames)
+    count <- length(basenames)
+    df <- data.frame(
+      "fit" = rep("", count),
+      "res" = rep(0, count),
+      "err" = rep(0, count),
+      "chi2dof" = rep(0, count),
+      "dof" = rep(0, count),
+      "Npar" = rep(0, count),
+      "Ndat" = rep(0, count),
+      "mult" = rep(0, count),
+      "k" = rep(0, count)
+    )
+
+    # extract the C value from the string
+    labels <- list(c("WTI", "tm", "OS"))
+
+    for (j in seq_along(basenames)) {
+      # print(basenames[j])
+      fit <- Rose::read_fit_P_file(paste0(path, basenames[j], "_fit_P.dat"))
+      # print(make_table_fit_result(fit))
+      df[j, 1] <- basenames[j]
+      # M <- data.matrix(fit$C)
+      # for (i in c(1:dim(M)[1])) {
+      #   for (l in c(1:dim(M)[1])) {
+      #     M[i, l] <- as.numeric(fit$C[i, l])
+      #   }
+      # }
+      M <- matrix(as.numeric(as.matrix(fit$C)), nrow = nrow(fit$C))
+      e <- eigen(M)
+
+      lmin <- min(abs(e$values))
+      lmax <- max(abs(e$values))
+      k <- lmax / lmin
+      df[j, -1] <- c(fit$P[1, 2], fit$P[1, 3], fit$chi2dof, fit$dof, fit$npar, fit$ndata, 1, k)
+
+      gg <- plot_fit(paste0(path, basenames[j]), "a2",
+        # noline = TRUE,
+        data_type = labels[[1]],
+        gg = gg,
+        id_x = 1,
+        single_name_for_fit = legend_name[j],
+        # labelfit = "fit",
+        width = 0.0001,
+        nudge = 0,
+        noline = TRUE
+      )
+    }
+    cat("C=", C, "<br>\n")
+    fpi_FLAG <- 130.5
+    gg <- gg + geom_hline(yintercept = fpi_FLAG, linetype = "dashed") #+annotate("text", x = 0.0002, y = fpi_FLAG-0.2, label="FLAG")
+    gg <- gg + geom_point(aes(x = 0, y = fpi_FLAG, color = "FLAG", shape = "FLAG", fill = "FLAG"))
+    #### BAIC
+    ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+    tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+    print(kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$")))
+    cat("BAIC average $f_\\pi=", ave_BAIC$m, "(", ave_BAIC$stat, ")(", ave_BAIC$syst, ") =", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>\n")
+
+    ## only linear fit
+    # df1 <- df[c(1, 2, 6), ]
+    # ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+    # cat("BAIC average (1,2,6) $f_\\pi=", ave_BAIC1$m, "(", ave_BAIC1$stat, ")(", ave_BAIC1$syst, ") =", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
+    ## only linear fit
+    # df1 <- df[c(-3, -4, -5), ]
+    # ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+    # cat("BAIC average linear c(-3,-4,-5)  $f_\\pi=", ave_BAIC1$m, "(", ave_BAIC1$stat, ")(", ave_BAIC1$syst, ") =", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
+
+    ###
+    dft <- rbind(dft, df)
+
+    fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+      to_print = TRUE,
+      # yrange = c(-1, 4),
+      legend_position = c(0.7, 0.98)
+    )
+  }
+  cat("<br>BAIC average all\n\n")
+  df1 <- dft
+  ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat("BAIC $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>")
+  df1 <- dft[!grepl("a4$", dft$fit) & !grepl("Husung", dft$fit), ]
+  ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat("BAIC (no a4 all) (no log)  $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
+  df1 <- dft[!grepl("a4$", dft$fit) & !grepl("Husung", dft$fit) & !grepl("C0.0", dft$fit), ]
+  ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
+  cat("BAIC (no C0) (no a4 all) (no log)  $f_\\pi=", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
+  dfpi[nrow(dfpi) + 1, ] <- list(ave_BAIC1$m, ave_BAIC1$dm, Nj)
+}
+```
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE,dev='tikz'}
+gg <- myggplot()
+gg <- gg + geom_point(data = dfpi, aes(x = Njack, y = fpi, color = factor(Njack), shape = factor(Njack), fill = factor(Njack)))
+gg <- gg + geom_errorbar(
+  data = dfpi, aes(
+    x = Njack, y = fpi, ymin = fpi - dfpi, ymax = fpi + dfpi,
+    color = factor(Njack), shape = factor(Njack), fill = factor(Njack)
+  ),
+  width = 0.5
+)
+gg <- gg + geom_point(data = dfpi_old, aes(x = Njack + 1, y = fpi, color = factor(paste0(Njack, "old")), shape = factor(paste0(Njack, "old")), fill = factor(paste0(Njack, "old"))))
+gg <- gg + geom_errorbar(
+  data = dfpi_old, aes(
+    x = Njack + 1, y = fpi, ymin = fpi - dfpi, ymax = fpi + dfpi,
+    color = factor(paste0(Njack, "old")), shape = factor(paste0(Njack, "old")), fill = factor(paste0(Njack, "old"))
+  ),
+  width = 0.5
+)
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_\\pi$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+)
+```

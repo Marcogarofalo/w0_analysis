@@ -25,6 +25,8 @@ book:
     - w0_scale_setting.qmd
     - w0_small_volumes.qmd
     - system_scale_setting.qmd
+    - test_scheme_change.qmd
+    - Njack_check.qmd
     - quark_masses.qmd
     - test_removing_la.qmd
     - higer_deriv.qmd

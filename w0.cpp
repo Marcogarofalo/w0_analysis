@@ -393,7 +393,7 @@ int main(int argc, char **argv)
             tmp[j] = lhs_function_w0_eg(j, conf_jack, 150, fit_info);
         }
         char name[NAMESIZE];
-        mysprintf(name, NAMESIZE, "%s/out/W_t150_jack.txt", option[3]);
+        mysprintf(name, NAMESIZE, "%s/out/W_t150_jack%d.txt", option[3], Njack-1);
         myres->write_jack_in_file(tmp, name);
         free(tmp);
     }
@@ -604,7 +604,7 @@ int main(int argc, char **argv)
             tmp[j] = lhs_function_Wt_der_mu(j, conf_jack, 150, fit_info);
         }
         char name[NAMESIZE];
-        mysprintf(name, NAMESIZE, "%s/out/der_W_mu%s_correction_t150_jack", option[3], q_name[iq].c_str());
+        mysprintf(name, NAMESIZE, "%s/out/der_W_mu%s_correction_t150_jack%d.dat", option[3], q_name[iq].c_str(), Njack-1);
         myres->write_jack_in_file(tmp, name);
 
         // for (int t = 1; t < head.T; t++)

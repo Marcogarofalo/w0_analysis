@@ -517,7 +517,7 @@ int main(int argc, char** argv) {
         namefile_plateaux, outfile, 0, "M_{PS}", M_eff_T, jack_file);
 
     char name_f_jack_M_PS[NAMESIZE];
-    mysprintf(name_f_jack_M_PS, NAMESIZE, "%s/out/M_{PS}_jack.txt", option[3]);
+    mysprintf(name_f_jack_M_PS, NAMESIZE, "%s/out/M_{PS}_jack%d.txt", option[3], Njack-1);
     myres->write_jack_in_file(M_PS, name_f_jack_M_PS);
 
     // free(M_PS);
@@ -569,7 +569,7 @@ int main(int argc, char** argv) {
     check_correlatro_counter(2);
     // print for frezzotti
     char name_f_jack[NAMESIZE];
-    mysprintf(name_f_jack, NAMESIZE, "%s/out/%s_jack.txt", option[3], name_rew);
+    mysprintf(name_f_jack, NAMESIZE, "%s/out/%s_jack%d.txt", option[3], name_rew, Njack-1);
     myres->write_jack_in_file(M_PS_rew, name_f_jack);
     // free(M_PS_rew);
     //////////////// mpcac
@@ -687,7 +687,7 @@ int main(int argc, char** argv) {
     mysprintf(name_rew, NAMESIZE, "df_{PS}/d%s", argv[8]);
     print_result_in_file(outfile, derM, name_rew, 0, 0, 0);
     write_jack(derM, Njack, jack_file);
-    mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_df_{PS}_dmu_jack.txt", option[3], option[6], argv[7]);
+    mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_df_{PS}_dmu_jack%d.txt", option[3], option[6], argv[7], Njack-1);
     myres->write_jack_in_file(derM, namefile);
     printf("////////////////////////////\n");
     printf("f_PS_fin = %-15g  f_PS_in =%-15g\n", f_PS_rew.P[0][Njack - 1], f_PS.P[0][Njack - 1]);
@@ -830,11 +830,11 @@ int main(int argc, char** argv) {
     write_jack(d_ratio, Njack, jack_file); check_correlatro_counter(23);
 
     char file_fpi_jack[NAMESIZE];
-    mysprintf(file_fpi_jack, NAMESIZE, "%s/out/fpi_%s_%s_jack", option[3], option[6], argv[7]);
+    mysprintf(file_fpi_jack, NAMESIZE, "%s/out/fpi_%s_%s_jack%d.txt", option[3], option[6], argv[7], Njack-1);
     printf("writing file: %s\n", file_fpi_jack);
     myres->write_jack_in_file(f_PS.P[0], file_fpi_jack);
 
-    mysprintf(file_fpi_jack, NAMESIZE, "%s/out/fpi_rew_%s_%s_jack", option[3], option[6], argv[7]);
+    mysprintf(file_fpi_jack, NAMESIZE, "%s/out/fpi_rew_%s_%s_jack%d.txt", option[3], option[6], argv[7], Njack-1);
     printf("writing file: %s\n", file_fpi_jack);
     myres->write_jack_in_file(f_PS_rew.P[0], file_fpi_jack);
 

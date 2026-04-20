@@ -440,7 +440,7 @@ int main(int argc, char** argv) {
 
         // print for frezzotti
         char name_f_jack[NAMESIZE];
-        mysprintf(name_f_jack, NAMESIZE, "%s/out/%s_jack.txt", option[3], name);
+        mysprintf(name_f_jack, NAMESIZE, "%s/out/%s_jack%d.txt", option[3], name, Njack-1);
         myres->write_jack_in_file(fit_M_PSpdmu[iq].P[0], name_f_jack);
 
         fit_info.corr_id = { 1, 0, head.ncorr + 1 + iq * head.ncorr, head.ncorr + 0 + iq * head.ncorr };

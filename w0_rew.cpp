@@ -537,7 +537,7 @@ int main(int argc, char** argv) {
     check_correlatro_counter(1);
 
     char name_w0[NAMESIZE];
-    mysprintf(name_w0, NAMESIZE, "deriv/w0_%s", argv[3]);
+    mysprintf(name_w0, NAMESIZE, "deriv/w0_%s_jack%d.dat", argv[3], Njack-1);
     myres->write_jack_in_file(w0.data(), name_w0);
 
 
@@ -567,7 +567,7 @@ int main(int argc, char** argv) {
             tmp[j] = lhs_function_W_rew(j, conf_jack, 150, fit_info);
         }
         char name[NAMESIZE];
-        mysprintf(name, NAMESIZE, "%s/out/W_%s_t150_jack.txt", option[3], argv[8]);
+        mysprintf(name, NAMESIZE, "%s/out/W_%s_t150_jack%d.txt", option[3], argv[8], Njack-1);
         myres->write_jack_in_file(tmp, name);
         free(tmp);
 
@@ -655,7 +655,7 @@ int main(int argc, char** argv) {
     write_jack(der.data(), Njack, jack_file);
     check_correlatro_counter(4);
 
-    mysprintf(name_rew, NAMESIZE, "deriv/der_%s_%s", argv[8], argv[3]);
+    mysprintf(name_rew, NAMESIZE, "deriv/der_%s_%s_jack%d.dat", argv[8], argv[3], Njack-1);
     myres->write_jack_in_file(der.data(), name_rew);
 
     std::vector<double> zeros(Njack, 0.0);
@@ -737,7 +737,7 @@ int main(int argc, char** argv) {
         check_correlatro_counter(21);
 
         char name_t0[NAMESIZE];
-        mysprintf(name_t0, NAMESIZE, "deriv/sqrtt0_%s", argv[3]);
+        mysprintf(name_t0, NAMESIZE, "deriv/sqrtt0_%s_jack%d.dat", argv[3], Njack-1);
         myres->write_jack_in_file(sqrtt0.data(), name_t0);
 
 
@@ -798,7 +798,7 @@ int main(int argc, char** argv) {
     write_jack(der_sqrtt0.data(), Njack, jack_file);
     check_correlatro_counter(24);
 
-    mysprintf(name_rew, NAMESIZE, "deriv/der_sqrtt0_%s_%s", argv[8], argv[3]);
+    mysprintf(name_rew, NAMESIZE, "deriv/der_sqrtt0_%s_%s_jack%d.dat", argv[8], argv[3], Njack-1);
     myres->write_jack_in_file(der_sqrtt0.data(), name_rew);
     printf("Nobs=%d\n", corr_counter);
 

@@ -1,0 +1,90 @@
+# Test scheme change
+
+
+
+```{r ,include=FALSE}
+library(Rose)
+library(ggplot2)
+library(plotly)
+library(knitr)
+
+
+df <- data.frame(x = 1:5, y = 1:5)
+f1 <- function(df) {
+  gg <- ggplot(df, aes(x, y)) +
+    geom_point()
+  assign("ggp", plotly::ggplotly(gg), envir = parent.frame())
+  # ggp
+  df # NOT returning a plot
+}
+res1 <- f1(df)
+ggp # Let knit handle the plot
+myplotly(ggplot())
+```
+
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_interpolation_fpi"
+)
+labels <- basename(basenames)
+
+for (j in seq_along(basenames)) {
+  # print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "fpi",
+    # noline = TRUE,
+    data_type = c(labels[j]),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001
+  )
+}
+
+data <- data.frame(
+  "x" = c(131.26, 131.26+0.01),
+  "v" = c(0.172251037734, 0.172254773253),
+  "dv" = c(0.000517901994645, 0.000519339050755),
+  "lab" = c("error propagation on fpi", "iterpolation")
+)
+gg <- gg+geom_point(data = data, aes(x = x, y = v, color = lab, shape = lab, fill = lab))
+
+gg<- gg + geom_errorbar(data = data, aes(
+  x = x, y = v, ymin = v - dv, ymax = v + dv,
+  color = lab, shape = lab, fill = lab
+), width = 0.03) 
+  
+
+
+fig <- myplotly(gg, "", "$f_\\pi [\\mbox{MeV}]$", "$w_0 [\\mbox{fm}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+df<-read.table("/home/garofalo/analysis/flow/w0_analysis/build/shuffling_test.txt", header = TRUE)
+dfs<-read.table("/home/garofalo/analysis/flow/w0_analysis/build/seed_test.txt", header = TRUE)
+gg<-ggplot() + xlab("w0 error in interpolation") +
+  geom_histogram(data = df, aes(x = dw0,fill = "shuffle"), bins=30,  alpha = 0.5)+
+  theme_bw()
+gg<- gg+ geom_histogram(data = dfs, aes(x = dw0,fill = "seed"),bins=30,  alpha = 0.5)
+gg <- gg+ geom_vline(xintercept = df$dw0[1], color = "black", linetype = "dashed")
+gg
+```
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+df<-read.table("/home/garofalo/analysis/flow/w0_analysis/build/test_seed_and_Njack.txt", header = TRUE)
+gg<-ggplot() +
+  geom_histogram(data = df, aes(x = err, fill = factor(Njack), color=factor(Njack)), bins=50,  alpha = 0.5)+
+  theme_bw()
+gg <- gg+ geom_vline(xintercept = 0.1, color = "black", linetype = "dashed")
+gg
+```

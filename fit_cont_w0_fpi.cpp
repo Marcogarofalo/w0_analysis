@@ -340,6 +340,23 @@ double rhs_a2_N3_HusungOS(int n, int Nvar, double* x, int Npar, double* P) {
     return r;
 }
 
+void shuffle_jackknife(double* jack_samples, int Njack) {
+    // 1. Seed the random number generator (typically once at program start)
+    // srand(time(NULL)); 
+
+    if (Njack <= 1) return;
+
+    // start from Njack - 2 because the last one is the mean and we want to keep it at the end of the array
+    for (int i = Njack - 2; i > 0; i--) {
+        // 2. Generate a random index j such that 0 <= j <= i
+        int j = rand() % (i + 1);
+
+        // 3. Swap components at indices i and j
+        double temp = jack_samples[i];
+        jack_samples[i] = jack_samples[j];
+        jack_samples[j] = temp;
+    }
+}
 
 int main(int argc, char** argv) {
     error(argc != 4, 1, "main ",
@@ -349,10 +366,10 @@ int main(int argc, char** argv) {
     std::vector<std::string> files;
     // std::vector<std::string> beta_names;
 
-    files.emplace_back("../../data/jackknife/jack_scale_setting_system_B64");
-    files.emplace_back("../../data/jackknife/jack_scale_setting_system_C80");
-    files.emplace_back("../../data/jackknife/jack_scale_setting_system_D96");
-    files.emplace_back("../../data/jackknife/jack_scale_setting_system_E112");
+    files.emplace_back(std::string(argv[2])+"jack_scale_setting_system_B64");
+    files.emplace_back(std::string(argv[2])+"jack_scale_setting_system_C80");
+    files.emplace_back(std::string(argv[2])+"jack_scale_setting_system_D96");
+    files.emplace_back(std::string(argv[2])+"jack_scale_setting_system_E112");
 
     std::vector<std::vector<int>> myen(1, std::vector<int>(files.size()));
     for (int i = 0; i < myen[0].size(); i++) {
@@ -649,7 +666,7 @@ int main(int argc, char** argv) {
 
     for (std::size_t ic = 0; ic < coeffs.size(); ++ic) {
 
-        mysprintf(namefile, NAMESIZE, "%s/data_from_wp25_deriv_mc_a2_laC%g.txt", argv[3], coeffs[ic]);
+        mysprintf(namefile, NAMESIZE, "%s/data_from_wp25_lin_deriv_mc_la_MDs_C%g.txt", argv[3], coeffs[ic]);
         summary_out = open_file(namefile, "w+");
         fprintf(summary_out, "ens   a[fm] da[fm]  afpi dafpi  amul damul amus damus  amuc  damuc    delta_amul  ddelta_amul  delta_amus  ddelta_amus  delta_amuc   ddelta_amuc\n");
         for (int i = 0;i < myen[0].size();i++) {
@@ -1220,13 +1237,13 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // interpolation w0
     //////////////////////////////////////////////////////////////
-    double *fpi_MeV_wp25_Cm5_j=myres->create_fake(fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5,1234);
-    double *w0_interpolated_j=myres->create_zero();
+    double* fpi_MeV_wp25_Cm5_j = myres->create_fake(fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5, 1234);
+    double* w0_interpolated_j = myres->create_zero();
     {
         fit_type fit_info;
-        fit_info.corr_id = { 1};
+        fit_info.corr_id = { 1 };
         fit_info.N = 1;
-        fit_info.Nxen = {{0,1}};
+        fit_info.Nxen = { {0,1} };
         fit_info.init_N_etot_form_Nxen();
         fit_info.function = rhs_a2;
         fit_info.linear_fit = true;
@@ -1246,19 +1263,61 @@ int main(int argc, char** argv) {
         fit_info.verbosity = 0;
         std::string namefit = "fit_w0_interpolation_fpi";
         fit_result der_fpi_const_full = fit_all_data(argv, jack_interpol, lhs_identity, fit_info, namefit.c_str());
-        fit_info.band_range = { jack_interpol.en[0].jack[0][Njack-1]-0.1,jack_interpol.en[1].jack[0][Njack-1] +0.1};
+        fit_info.band_range = { jack_interpol.en[0].jack[0][Njack - 1] - 0.1,jack_interpol.en[1].jack[0][Njack - 1] + 0.1 };
         print_fit_band(argv, jack_interpol, fit_info, fit_info, namefit.c_str(), "fpi", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.1, {});
-   
+
         der_fpi_const_full.fit_to_tif();
         std::vector<double> tmpx(1);
-        for(int j = 0; j < Njack ;j++){
+        for (int j = 0; j < Njack;j++) {
             tmpx[0] = fpi_MeV_wp25_Cm5_j[j]; // fpi MeV
             w0_interpolated_j[j] = fit_info.function(0, fit_info.Nvar, tmpx.data(), fit_info.Npar, der_fpi_const_full.tif[j]);
+        }
+
+        // shuffling test
+        double* w0_tmp = myres->create_zero();
+        printf("Nshuffle  w0   dw0   fp   dfpi\n");
+        for (int j = 0; j < Njack;j++) {
+            tmpx[0] = fpi_MeV_wp25_Cm5_j[j]; // fpi MeV
+            w0_tmp[j] = fit_info.function(0, fit_info.Nvar, tmpx.data(), fit_info.Npar, der_fpi_const_full.tif[j]);
+        }
+        printf("%-5d  %-17.12g   %-17.12g   %-17.12g   %-17.12g\n", 0, myres->mean(w0_tmp), myres->comp_error(w0_tmp), myres->mean(fpi_MeV_wp25_Cm5_j), myres->comp_error(fpi_MeV_wp25_Cm5_j));
+        for (int i = 0; i < 100;i++) {
+            shuffle_jackknife(fpi_MeV_wp25_Cm5_j, Njack);
+            for (int j = 0; j < Njack;j++) {
+                tmpx[0] = fpi_MeV_wp25_Cm5_j[j]; // fpi MeV
+                w0_tmp[j] = fit_info.function(0, fit_info.Nvar, tmpx.data(), fit_info.Npar, der_fpi_const_full.tif[j]);
+            }
+            printf("%-5d  %-17.12g   %-17.12g   %-17.12g   %-17.12g\n", i + 1, myres->mean(w0_tmp), myres->comp_error(w0_tmp), myres->mean(fpi_MeV_wp25_Cm5_j), myres->comp_error(fpi_MeV_wp25_Cm5_j));
+        }
+        printf("seed  w0   dw0   fp   dfpi\n");
+        for (int i = 0; i < 100;i++) {
+            free(fpi_MeV_wp25_Cm5_j);
+            fpi_MeV_wp25_Cm5_j = myres->create_fake(fpi_MeV_wp25_Cm5, fpi_MeV_err_wp25_Cm5, i + 1);
+            for (int j = 0; j < Njack;j++) {
+                tmpx[0] = fpi_MeV_wp25_Cm5_j[j]; // fpi MeV
+                w0_tmp[j] = fit_info.function(0, fit_info.Nvar, tmpx.data(), fit_info.Npar, der_fpi_const_full.tif[j]);
+            }
+            printf("%-5d  %-17.12g   %-17.12g   %-17.12g   %-17.12g\n", i + 1, myres->mean(w0_tmp), myres->comp_error(w0_tmp), myres->mean(fpi_MeV_wp25_Cm5_j), myres->comp_error(fpi_MeV_wp25_Cm5_j));
         }
 
         der_fpi_const_full.clear();
 
         // interpolate at fpi_MeV_interpol_j
     }
+
     printf("w0_fpi_interpol    %.12g    %.12g\n", myres->mean(w0_interpolated_j), myres->comp_error(w0_interpolated_j));
+
+    FILE* fout = fopen("test_seed_and_Njack.txt", "w");
+    fprintf(fout, "seed  Njack  mean   err\n");
+    for (int n : {20, 100, 1000})
+        for (int i = 0;i < 100;i++) {
+            resampling_jack myresampling(n);
+            double* tmp;
+            tmp = myresampling.create_fake(1, 0.1, i);
+            fprintf(fout, "%-5d  %-5d %.12g   %.12g\n", i, n, myresampling.mean(tmp), myresampling.comp_error(tmp));
+            free(tmp);
+        }
+    fclose(fout);
+
+    printf("Njack: %d\n", Njack);
 }
