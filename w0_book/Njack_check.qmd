@@ -164,7 +164,6 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$a\\delta \\mu_c$",
 ### w0
 
 
-### new
 
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
@@ -172,12 +171,14 @@ gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data/fit_all_beta/fit_w0_lin_deriv_cont_a2",
   "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_w0_lin_deriv_cont_a2",
-  "/home/garofalo/analysis/flow/data_25/fit_all_beta/fit_w0_lin_deriv_cont_a2"
+  "/home/garofalo/analysis/flow/data_25/fit_all_beta/fit_w0_lin_deriv_cont_a2",
+  "/home/garofalo/analysis/flow/data_35_old/fit_all_beta/fit_w0_lin_deriv_cont_a2"
 )
 labels <- c(
   "20 old",
   "20",
-  "25"
+  "25",
+  "35 old"
 )
 
 
@@ -205,6 +206,39 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 [\\mbox{fm}]$",
 )
 ```
 
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_fpi_C-5.000000_N3_a2",
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_fpi_C-5.000000_N3_a2"
+)
+labels <- c(
+  "20 old",
+  "20"
+)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c(labels[j]),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001
+  )
+}
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_\\pi [\\mbox{MeV}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
 
 ## fpi 3 reg
 
@@ -330,12 +364,13 @@ for (Nj in Njack) {
 }
 ```
 
+
 ### new
 
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 library(stringr)
-Njack <- c(20, 25, 30, 35, 40)
+Njack <- c(20, 25, 30, 35)
 dfpi <- data.frame("fpi" = numeric(), "dfpi" = numeric(), "Njack" = numeric())
 
 for (Nj in Njack) {
@@ -423,23 +458,15 @@ for (Nj in Njack) {
     print(kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$")))
     cat("BAIC average $f_\\pi=", ave_BAIC$m, "(", ave_BAIC$stat, ")(", ave_BAIC$syst, ") =", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>\n")
 
-    ## only linear fit
-    # df1 <- df[c(1, 2, 6), ]
-    # ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
-    # cat("BAIC average (1,2,6) $f_\\pi=", ave_BAIC1$m, "(", ave_BAIC1$stat, ")(", ave_BAIC1$syst, ") =", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
-    ## only linear fit
-    # df1 <- df[c(-3, -4, -5), ]
-    # ave_BAIC1 <- BAIC(v = df1$res, err = df1$err, chi2dof = df1$chi2dof, dof = df1$dof, npar = df1$Npar, multiplicity = df1$mult)
-    # cat("BAIC average linear c(-3,-4,-5)  $f_\\pi=", ave_BAIC1$m, "(", ave_BAIC1$stat, ")(", ave_BAIC1$syst, ") =", mean_print(ave_BAIC1$m, ave_BAIC1$dm), "\\,[\\text{MeV}]$<br>\n")
-
+    
     ###
     dft <- rbind(dft, df)
 
-    fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
-      to_print = TRUE,
-      # yrange = c(-1, 4),
-      legend_position = c(0.7, 0.98)
-    )
+    # fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+    #   to_print = TRUE,
+    #   # yrange = c(-1, 4),
+    #   legend_position = c(0.7, 0.98)
+    # )
   }
   cat("<br>BAIC average all\n\n")
   df1 <- dft
