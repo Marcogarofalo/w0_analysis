@@ -226,8 +226,8 @@ int main(int argc, char** argv) {
         myres = new resampling_jack(Neff);
     }
     else if (strcmp(argv[6], "boot") == 0) {
-        Njack = (Neff * 2 + 1);
-        myres = new resampling_boot(Neff * 2);
+        Njack = (Nboot + 1);
+        myres = new resampling_boot(Nboot);
     }
     else {
         Njack = 0;
@@ -440,7 +440,7 @@ int main(int argc, char** argv) {
 
         // print for frezzotti
         char name_f_jack[NAMESIZE];
-        mysprintf(name_f_jack, NAMESIZE, "%s/out/%s_jack%d.txt", option[3], name, Njack-1);
+        mysprintf(name_f_jack, NAMESIZE, "%s/out/%s_%s%d.txt", option[3], name, myres->option, Njack - 1);
         myres->write_jack_in_file(fit_M_PSpdmu[iq].P[0], name_f_jack);
 
         fit_info.corr_id = { 1, 0, head.ncorr + 1 + iq * head.ncorr, head.ncorr + 0 + iq * head.ncorr };

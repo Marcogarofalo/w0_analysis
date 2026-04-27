@@ -375,8 +375,8 @@ int main(int argc, char** argv) {
         myres = new resampling_jack(Neff);
     }
     else if (strcmp(argv[6], "boot") == 0) {
-        Njack = (Neff * 2 + 1);
-        myres = new resampling_boot(Neff * 2);
+        Njack = (Nboot + 1);
+        myres = new resampling_boot(Nboot);
     }
     else {
         Njack = 0;
@@ -706,7 +706,7 @@ int main(int argc, char** argv) {
     print_result_in_file(outfile, deriv, name, 0.0, fit_info.tmin, fit_info.tmax);
     write_jack(deriv, Njack, jack_file);    check_correlatro_counter(2);
 
-    mysprintf(name, NAMESIZE, "deriv/der_w0_m0_%s_%s_jack%d.dat", argv[3], f_str.c_str(), Njack-1);
+    mysprintf(name, NAMESIZE, "deriv/der_w0_m0_%s_%s_%s%d.dat", argv[3], f_str.c_str(), myres->option, Njack-1);
     printf("writing derivative in file %s\n", name);
     myres->write_jack_in_file(deriv, name);
 
@@ -848,7 +848,7 @@ int main(int argc, char** argv) {
         print_result_in_file(outfile, deriv, name, 0.0, fit_info.tmin, fit_info.tmax);
         write_jack(deriv, Njack, jack_file);    check_correlatro_counter(18);
 
-        mysprintf(name, NAMESIZE, "deriv/der_sqrtt0_m0_%s_%s_jack%d.dat", argv[3], f_str.c_str(), Njack-1);
+        mysprintf(name, NAMESIZE, "deriv/der_sqrtt0_m0_%s_%s_%s%d.dat", argv[3], f_str.c_str(), myres->option, Njack-1);
         printf("writing derivative in file %s\n", name);
         myres->write_jack_in_file(deriv, name);
     }

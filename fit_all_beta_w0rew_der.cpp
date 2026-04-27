@@ -696,9 +696,9 @@ int main(int argc, char** argv) {
     fit_info.band_range = { 0, 0.008145209846823482 };
     print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_charm_w0_5pt, der_charm_w0_5pt, 0, 0 /* set the other variables to the first of the n*/, 0.001, {});
 
-    std::string namej = std::string("deriv/P0_fit_mul_over_w0_dw_dmuc_a2_5pt") + "_jack"+std::to_string(Njack-1)+".dat";
+    std::string namej = std::string("deriv/P0_fit_mul_over_w0_dw_dmuc_a2_5pt") + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(der_charm_w0_5pt.P[0], namej.c_str());
-    namej = std::string("deriv/P1_fit_mul_over_w0_dw_dmuc_a2_5pt") + "_jack"+std::to_string(Njack-1)+".dat";
+    namej = std::string("deriv/P1_fit_mul_over_w0_dw_dmuc_a2_5pt") + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(der_charm_w0_5pt.P[1], namej.c_str());
 
     //////////////////////////////////////////////////////////////
@@ -712,9 +712,9 @@ int main(int argc, char** argv) {
     fit_info.band_range = { 0, 0.008145209846823482 };
     print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_charm_sqrtt0_5pt, der_charm_sqrtt0_5pt, 0, 0 /* set the other variables to the first of the n*/, 0.001, {});
 
-    namej = std::string("deriv/P0_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt") + "_jack"+std::to_string(Njack-1)+".dat";
+    namej = std::string("deriv/P0_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt") + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(der_charm_sqrtt0_5pt.P[0], namej.c_str());
-    namej = std::string("deriv/P1_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt") + "_jack"+std::to_string(Njack-1)+".dat";
+    namej = std::string("deriv/P1_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt") + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(der_charm_sqrtt0_5pt.P[1], namej.c_str());
 
 

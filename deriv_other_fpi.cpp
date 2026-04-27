@@ -256,7 +256,6 @@ int main(int argc, char** argv) {
         myres = new resampling_jack(Neff);
     }
     else if (strcmp(argv[6], "boot") == 0) {
-        Neff = 1000;
         Njack = Neff + 1;//(Neff * 2 + 1);
         myres = new resampling_boot(Neff);
     }
@@ -551,10 +550,10 @@ int main(int argc, char** argv) {
     if (label.compare("strange") == 0)
         label = "rewsOS";
 
-    std::string name_jack_fpi = "deriv/deriv_fpi_P5A0_" + std::string(argv[3]) + "_" + std::string(argv[8]) +  "_jack"+std::to_string(Njack-1)+".dat";;
+    std::string name_jack_fpi = "deriv/deriv_fpi_P5A0_" + std::string(argv[3]) + "_" + std::string(argv[8]) + "_" + myres->option + std::to_string(Njack - 1) + ".dat";;
     myres->write_jack_in_file(deriv, name_jack_fpi.c_str());
 
-    name_jack_fpi = "deriv/fpi_P5A0_" + std::string(argv[3]) + "_jack"+std::to_string(Njack-1)+".dat";
+    name_jack_fpi = "deriv/fpi_P5A0_" + std::string(argv[3]) + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
     double* Zf = myres->create_copy(fpi.P[0]);
     myres->mult(Zf, Z, fpi.P[0]);
     myres->write_jack_in_file(Zf, name_jack_fpi.c_str());

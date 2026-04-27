@@ -205,9 +205,8 @@ int main(int argc, char** argv) {
         myres = new resampling_jack(Neff);
     }
     else if (strcmp(argv[6], "boot") == 0) {
-        Neff = 1000;
-        Njack = Neff + 1;//(Neff * 2 + 1);
-        myres = new resampling_boot(Neff);
+        Njack = Nboot + 1;//(Neff * 2 + 1);
+        myres = new resampling_boot(Nboot);
     }
     else {
         Njack = 0;
@@ -486,11 +485,11 @@ int main(int argc, char** argv) {
     printf("Z_fpi: %.12g   %.12g\n", Z_fpi[Njack - 1], myres->comp_error(Z_fpi));
     printf("Z_fpi_mu: %.12g   %.12g\n", Z_fpi_mu[Njack - 1], myres->comp_error(Z_fpi_mu));
     printf("deriv: %.12g   %.12g\n", deriv[Njack - 1], myres->comp_error(deriv));
-    std::string name_jack_fpi = "deriv/deriv_val_fpi_P5A0_" + std::string(argv[3]) + "_jack"+std::to_string(Njack-1)+".dat";
+    std::string name_jack_fpi = "deriv/deriv_val_fpi_P5A0_" + std::string(argv[3]) +  "_" + myres->option +std::to_string(Njack-1)+".dat";
     myres->write_jack_in_file(deriv, name_jack_fpi.c_str());
 
 
-    name_jack_fpi = "deriv/fpi_P5A0_" + std::string(argv[3]) + "_jack"+std::to_string(Njack-1)+".dat";
+    name_jack_fpi = "deriv/fpi_P5A0_" + std::string(argv[3]) +  "_" + myres->option +std::to_string(Njack-1)+".dat";
     myres->write_jack_in_file(Z_fpi, name_jack_fpi.c_str());
 
     write_jack(deriv, Njack, jack_file);
@@ -542,7 +541,7 @@ int main(int argc, char** argv) {
     write_jack(deriv_WTI, Njack, jack_file);
     check_correlatro_counter(9);
 
-    name_jack_fpi = "deriv/deriv_val_fpi_WTI_" + std::string(argv[3]) + "_jack" + std::to_string(Njack-1) + ".dat";
+    name_jack_fpi = "deriv/deriv_val_fpi_WTI_" + std::string(argv[3]) +  "_" + myres->option  + std::to_string(Njack-1) + ".dat";
     myres->write_jack_in_file(deriv_WTI, name_jack_fpi.c_str());
 
 

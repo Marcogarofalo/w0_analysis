@@ -939,11 +939,11 @@ int main(int argc, char** argv) {
     for (int j = 0; j < Njack;j++) {
         dw0_dmc_lin_der[j] = get_linear_deriv_w0c(data, amuiso, previous_a, j);
     }
-    std::string filename = "deriv/dw0_dmc_lin_der" + ensemble + "_jack" + std::to_string(Njack - 1) + ".dat";
+    std::string filename = "deriv/dw0_dmc_lin_der" + ensemble +  "_" + myres->option  + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(dw0_dmc_lin_der, filename.c_str());
-    filename = "deriv/dw0_dms_lin_der" + ensemble + "_jack" + std::to_string(Njack - 1) + ".dat";
+    filename = "deriv/dw0_dms_lin_der" + ensemble +  "_" + myres->option  + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(data[id_deriv(iw0, 1, 1, 1)], filename.c_str());
-    filename = "deriv/dw0_dml_lin_der" + ensemble + "_jack" + std::to_string(Njack - 1) + ".dat";
+    filename = "deriv/dw0_dml_lin_der" + ensemble +  "_" + myres->option  + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(data[id_deriv(iw0, 0, 1, 1)], filename.c_str());
     //////////////////////////////////////////////////////////////
     // sistemone fpi
@@ -1130,9 +1130,9 @@ int main(int argc, char** argv) {
             myres->mean(diff_a), myres->comp_error(diff_a));
         printf("w0 (fm): %g +/- %g\n", myres->mean(w0_from_fpi), myres->comp_error(w0_from_fpi));
         char name_out[NAMESIZE];
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_fpi_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_fpi_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(a_fm, name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_w0_from_fpi_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_w0_from_fpi_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(w0_from_fpi, name_out);
 
         write_jack(miso[0], Njack, jack_file);     check_correlatro_counter(30);
@@ -1215,7 +1215,7 @@ int main(int argc, char** argv) {
             data_m_a[3][j] = miso[2][j];
         }
         double** cov_m_a = myres->comp_cov(4, data_m_a);
-        printf("covariance matrix for (in order) m^iso l,s,c and a, ens: %s\n", ensemble.c_str());
+        printf("covariance matrix for (in order) a, m^iso l,s,c  ens: %s\n", ensemble.c_str());
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
@@ -1325,9 +1325,9 @@ int main(int argc, char** argv) {
         printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
 
         char name_out[NAMESIZE];
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(a_from_w0, name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(fpi_from_w0, name_out);
 
         write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(35);
@@ -1500,9 +1500,9 @@ int main(int argc, char** argv) {
         printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0_h), myres->comp_error(fpi_from_w0_h));
 
         char name_out[NAMESIZE];
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_hybrid_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(a_from_w0_hybrid, name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_hybrid_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(fpi_from_w0_h, name_out);
 
         write_jack(miso_w0_h[0], Njack, jack_file);     check_correlatro_counter(48);
@@ -1515,11 +1515,11 @@ int main(int argc, char** argv) {
         write_jack(dm_w0_h[1], Njack, jack_file);     check_correlatro_counter(54);
         write_jack(dm_w0_h[2], Njack, jack_file);     check_correlatro_counter(55);
 
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_l_wp25_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_l_wp25_hybrid_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(dm_w0_h[0], name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_s_wp25_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_s_wp25_hybrid_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(dm_w0_h[1], name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_c_wp25_hybrid_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_dmu_c_wp25_hybrid_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(dm_w0_h[2], name_out);
 
 
@@ -1649,9 +1649,9 @@ int main(int argc, char** argv) {
         printf("fpi (fm): %g +/- %g\n", myres->mean(fpi_from_w0), myres->comp_error(fpi_from_w0));
 
         char name_out[NAMESIZE];
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_w0_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(a_from_w0, name_out);
-        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_jack%d.dat", files[36].c_str(), Njack - 1);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_fpi_from_w0_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
         myres->write_jack_in_file(fpi_from_w0, name_out);
 
         write_jack(miso_w0[0], Njack, jack_file);     check_correlatro_counter(58);

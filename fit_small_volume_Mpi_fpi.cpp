@@ -460,7 +460,7 @@ exit(1);
 
         file_out_name f_name_c_full(argv[3], namefit.c_str());
         // compute_fpi_at_mciso(jackall, fit_info, der_fpi_const_full, id_w0, f_name_c_full);
-        std::string namej = std::string("deriv/mul_w0_dw0_dmu_charm_small_volume_const_jack.txt") + "_jack"+std::to_string(Njack-1)+".dat";
+        std::string namej = std::string("deriv/mul_w0_dw0_dmu_charm_small_volume_const_jack.txt") +  "_" + myres->option +std::to_string(Njack-1)+".dat";
         myres->write_jack_in_file(der_fpi_const_full.P[0],  namej.c_str());
         ////////////////////////////////////////////////////////////////
         // strange
@@ -478,7 +478,7 @@ exit(1);
         fit_info.band_range = { 23, 33 };
         print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "L_a", der_w0_strange, der_w0_strange, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 1, {});
 
-        namej = std::string("deriv/mul_w0_dw0_dmu_strange_small_volume_const_jack.txt") + "_jack"+std::to_string(Njack-1)+".dat";
+        namej = std::string("deriv/mul_w0_dw0_dmu_strange_small_volume_const_jack.txt") +  "_" + myres->option +std::to_string(Njack-1)+".dat";
         myres->write_jack_in_file(der_w0_strange.P[0],  namej.c_str());
         fit_info.restore_default();
     }

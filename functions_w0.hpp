@@ -20,8 +20,8 @@ static constexpr double hbarc = 197.326963; // MeV*fm
 static constexpr double fpi_MeV = 130.5;
 static constexpr double fpi_MeV_err = 0.04;
 
-static constexpr double fpi_MeV_wp25_Cm5 = 131.26;
-static constexpr double fpi_MeV_err_wp25_Cm5 = 0.27;
+static constexpr double fpi_MeV_wp25_Cm5 = 131.30; //131.26;
+static constexpr double fpi_MeV_err_wp25_Cm5 = 0.34; //0.27;
 
 static constexpr double fpi_MeV_interpol = 132.00;
 static constexpr double fpi_MeV_err_interpol = 1e-20;
@@ -41,6 +41,7 @@ static constexpr double MK_MeV_err = 0.3;
 static constexpr double MDs_MeV = 1967.0;
 static constexpr double MDs_MeV_err = 0.4;
 
+static constexpr int Nboot = 1000;
 double**** bin_intoN_exp(double**** data, int ivar, int T, int Nconf_in, int Nb);
 double**** bin_intoN_exp1(double**** data, double**** data_noexp, int ivar, int ivar_noexp, int T, int Nconf_in, int Nb);
 void make_ratio_of_jacks(double**** final, int Njack, int i, int T, double**** num, int i1, double**** den, int i2);

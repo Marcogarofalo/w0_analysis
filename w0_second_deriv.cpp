@@ -314,8 +314,8 @@ int main(int argc, char** argv) {
         myres = new resampling_jack(Neff);
     }
     else if (strcmp(argv[6], "boot") == 0) {
-        Njack = (Neff * 2 + 1);
-        myres = new resampling_boot(Neff * 2);
+        Njack = (Nboot + 1);
+        myres = new resampling_boot(Nboot);
     }
     else {
         Njack = 0;

@@ -523,7 +523,7 @@ int main(int argc, char** argv) {
 
 
         write_jack(der_fpi_const_full.P[0], Njack, jack_file); check_correlatro_counter(17 + i);
-        std::string name_j = "deriv/" + base_name + "_" + der_name[i] + "_jack"+std::to_string(Njack-1)+".dat";
+        std::string name_j = "deriv/" + base_name + "_" + der_name[i] + "_" + myres->option +std::to_string(Njack-1)+".dat";
         myres->write_jack_in_file(der_fpi_const_full.P[0], name_j.c_str());
     }
 
