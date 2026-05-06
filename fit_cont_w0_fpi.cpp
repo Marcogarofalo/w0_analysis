@@ -31,6 +31,8 @@
 #include <string>
 #include <vector>
 #include <ranges>
+#include <algorithm>
+#include <iterator>
 
 // #include "do_analysis_charm.hpp"
 
@@ -295,6 +297,18 @@ double rhs_a2_N3_a4_noa4OS(int n, int Nvar, double* x, int Npar, double* P) {
 }
 
 
+template <double C>
+double rhs_a2_Husung(int n, int Nvar, double* x, int Npar, double* P) {
+    double r;
+    double a2 = x[0];
+    static constexpr double lam = 295 / hbarc;
+    static constexpr double lam2 = lam * lam;
+
+
+    r = P[0] + a2 * P[1] + a2 / std::pow(-std::log(a2 * lam2), C) * P[2];
+
+    return r;
+}
 
 template <double C>
 double rhs_a2_N3_Husung(int n, int Nvar, double* x, int Npar, double* P) {
@@ -366,10 +380,10 @@ int main(int argc, char** argv) {
     std::vector<std::string> files;
     // std::vector<std::string> beta_names;
 
-    files.emplace_back(std::string(argv[2])+"jack_scale_setting_system_B64");
-    files.emplace_back(std::string(argv[2])+"jack_scale_setting_system_C80");
-    files.emplace_back(std::string(argv[2])+"jack_scale_setting_system_D96");
-    files.emplace_back(std::string(argv[2])+"jack_scale_setting_system_E112");
+    files.emplace_back(std::string(argv[2]) + "jack_scale_setting_system_B64");
+    files.emplace_back(std::string(argv[2]) + "jack_scale_setting_system_C80");
+    files.emplace_back(std::string(argv[2]) + "jack_scale_setting_system_D96");
+    files.emplace_back(std::string(argv[2]) + "jack_scale_setting_system_E112");
 
     std::vector<std::vector<int>> myen(1, std::vector<int>(files.size()));
     for (int i = 0; i < myen[0].size(); i++) {
@@ -1318,6 +1332,80 @@ int main(int argc, char** argv) {
             free(tmp);
         }
     fclose(fout);
+
+    // auto it = std::find(coeffs.begin(), coeffs.end(), -5.0);
+    auto it = std::ranges::find(coeffs, -5.0);
+    printf("Finding -5.0 in coeffs: %s   %g\n", (it != coeffs.end()) ? "Found" : "Not Found", *it);
+    std::size_t id_Cm5;
+    if (it != coeffs.end()) {
+        id_Cm5 = std::distance(coeffs.begin(), it);
+    }
+    else {
+        printf("Error: -5.0 not found in coeffs\n");
+        exit(1);
+    }
+    printf("Index of -5.0 in coeffs: %zu\n", id_Cm5);
+    int id_sqrtt0_Cm5 = id_sqrtt0_from_fpi + 1 + id_Cm5;
+    printf("Index of  strtt0 wp25 -5.0 in coeffs: %zu\n", id_Cm5);
+
+
+    //////////////////////////////////////////////////////////////
+    // fits sqrtt0
+    //////////////////////////////////////////////////////////////
+    //fits
+    points = {
+        {{0,1,2,3}},
+        {{1,2,3}},
+        {{0,2,3}},
+        {{0,1,2,3}},
+        {{0,1,2,3}},
+        {{0,1,3}},
+        {{0,1,2}}
+    };
+    std::vector<std::string> fits_sqrtt0 = { "a2", "a2_noB", "a2_noC", "a2_a4", "a2_Husung0.42" , "a2_noD", "a2_noE" };
+    std::vector<double (*)(int, int, double*, int, double*)> funcArray_sqrtt0 = { rhs_a2,rhs_a2,rhs_a2, rhs_a2_a4 , rhs_a2_Husung<0.42>,rhs_a2,rhs_a2 };
+    std::vector<int> Npars_sqrtt0 = { 2,2,2, 3, 3, 2, 2 };
+
+    //obs to fit
+    id_obs = { id_sqrtt0_from_fpi ,id_sqrtt0_Cm5 , id_w0_lin_deriv };
+    obs = { "sqrtt0_FLAG", "sqrtt0_wp25_Cm5", "w0_lin_deriv_FLAG" };
+    id_a = { 33 , 95 + static_cast<int>(id_Cm5) * 8, 33 };
+
+    for (int i = 0; i < obs.size(); i++) {
+        for (auto [ifit, fit] : std::views::enumerate(fits_sqrtt0)) {
+
+            fit_type fit_info;
+
+            fit_info.corr_id = { id_obs[i] };
+            fit_info.Nxen = points[ifit];
+            fit_info.init_N_etot_form_Nxen();
+            fit_info.function = funcArray_sqrtt0[ifit];
+            fit_info.linear_fit = true;
+            fit_info.Npar = Npars_sqrtt0[ifit];
+            fit_info.Nvar = 1; // a2
+            fit_info.Njack = jackall.en[0].Njack;
+            fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+            int count = 0;
+            for (int n = 0; n < fit_info.N; n++) {
+                for (int e : fit_info.Nxen[n]) {
+                    for (int j = 0; j < Njack; j++) {
+                        fit_info.x[0][count][j] = pow(jackall.en[e].jack[id_a[i]][j], 2); // a^2 fm^2
+                    }
+                    count++;
+                }
+            }
+            std::string namefit = "fit_" + obs[i] + "_" + fit;
+            fit_result res_sqrtt0 = fit_all_data(argv, jackall, lhs_fun_N3, fit_info, namefit.c_str());
+            fit_info.band_range = { 0, 0.008145209846823482 };
+            print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", res_sqrtt0, res_sqrtt0, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
+            res_sqrtt0.clear();
+
+            fit_info.restore_default();
+
+
+        }
+    }
 
     printf("Njack: %d\n", Njack);
 }
