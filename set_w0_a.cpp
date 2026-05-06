@@ -1225,6 +1225,13 @@ int main(int argc, char** argv) {
             }
             printf("\n");
         }
+        printf("a = %g +/- %g\n", myres->mean(a_fm), myres->comp_error(a_fm));
+        printf("aml = %g +/- %g\n", myres->mean(miso[0]), myres->comp_error(miso[0]));
+        printf("ams = %g +/- %g\n", myres->mean(miso[1]), myres->comp_error(miso[1]));
+        printf("amc = %g +/- %g\n", myres->mean(miso[2]), myres->comp_error(miso[2]));
+        printf("Delta_aml = %g +/- %g\n", myres->mean(dm_fpi[0]), myres->comp_error(dm_fpi[0]));
+        printf("Delta_ams = %g +/- %g\n", myres->mean(dm_fpi[1]), myres->comp_error(dm_fpi[1]));
+        printf("Delta_amc = %g +/- %g\n", myres->mean(dm_fpi[2]), myres->comp_error(dm_fpi[2]));
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
