@@ -32,6 +32,7 @@ masses <- c(
 Nj <- 20
 cat("## wp25_C-5  Njack = ", Nj, "\n\n")
 df_old <- read.table(paste0("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_fpi.txt"), header = TRUE)
+df_old$Njack<-Nj
 start_indices <- seq(2, ncol(df_old), by = 2)
 new_df <- data.frame(df_old[, c(1, start_indices)])
 colnames(new_df) <- colnames(df)[c(1, start_indices)]
@@ -457,16 +458,20 @@ for (Nj in Njack) {
     tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
     print(kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$")))
     cat("BAIC average $f_\\pi=", ave_BAIC$m, "(", ave_BAIC$stat, ")(", ave_BAIC$syst, ") =", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>\n")
-
+    ############
+    df_filtered <- df[!grepl("noC|noB", df$fit), ]
+    ave_BAIC_f <- BAIC(v = df_filtered$res, err = df_filtered$err, chi2dof = df_filtered$chi2dof, dof = df_filtered$dof, npar = df_filtered$Npar, multiplicity = df_filtered$mult)
+    
+    cat("BAIC average 4b $f_\\pi=", ave_BAIC_f$m, "(", ave_BAIC_f$stat, ")(", ave_BAIC_f$syst, ") =", mean_print(ave_BAIC_f$m, ave_BAIC_f$dm), "\\,[\\text{MeV}]$<br>\n")
     
     ###
     dft <- rbind(dft, df)
 
-    # fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
-    #   to_print = TRUE,
-    #   # yrange = c(-1, 4),
-    #   legend_position = c(0.7, 0.98)
-    # )
+    fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+      to_print = TRUE,
+      # yrange = c(-1, 4),
+      legend_position = c(0.7, 0.98)
+    )
   }
   cat("<br>BAIC average all\n\n")
   df1 <- dft

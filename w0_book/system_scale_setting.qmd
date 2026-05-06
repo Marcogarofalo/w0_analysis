@@ -282,47 +282,95 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 [\\mbox{fm}]$",
 
 
 
-
-## sqrtt0
-
-
 ```{r,results='asis',echo=FALSE, warning=FALSE}
+library(stringr)
+dft <- NULL
 gg <- NULL
-basenames <- c(
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_sqrtt0_from_fpi_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_sqrtt0_wp25_C0.000000_cont_a2",
-  "/home/garofalo/analysis/flow/data/fit_all_beta/fit_sqrtt0_wp25_C-5.000000_cont_a2"
-)
-labels <- c(
-  "FLAG ",
-  "wp25",
-  "wp25+C-5"
-)
-
-
-for (j in seq_along(basenames)) {
-  print(basenames[j])
-  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
-  print(make_table_fit_result(fit))
-  gg <- plot_fit(basenames[j], "a2",
-    # noline = TRUE,
-    data_type = c(labels[j]),
-    gg = gg,
-    id_x = 1,
-    single_name_for_fit = labels[j],
-    width = 0.0001
+for (reg in c("fit_w0_lin_deriv_FLAG")) {
+  path <- "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
+  basenames <- c(
+    paste0(reg, "_a2"),
+    paste0(reg, "_a2_noB"),
+    paste0(reg, "_a2_noC"),
+    paste0(reg, "_a2_noD"),
+    paste0(reg, "_a2_noE"),
+    paste0(reg, "_a2_a4"),
+    paste0(reg, "_a2_Husung0.42")
   )
-}
-w0_wp25 <- 0.14292
-gg <- gg + geom_hline(yintercept = w0_wp25, linetype = "dashed")
-gg <- gg + geom_point(aes(x = 0, y = w0_wp25, color = "FLAG24", shape = "FLAG24", fill = "FLAG24"))
+  legend_name <- basenames
+  count <- length(basenames)
+  df <- data.frame(
+    "fit" = rep("", count),
+    "res" = rep(0, count),
+    "err" = rep(0, count),
+    "chi2dof" = rep(0, count),
+    "dof" = rep(0, count),
+    "Npar" = rep(0, count),
+    "Ndat" = rep(0, count),
+    "mult" = rep(0, count),
+    "k" = rep(0, count)
+  )
 
-fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0} [\\mbox{fm}]$",
+  
+  for (j in seq_along(basenames)) {
+    # print(basenames[j])
+    fit <- Rose::read_fit_P_file(paste0(path, basenames[j], "_fit_P.dat"))
+    print(make_table_fit_result(fit))
+    df[j, 1] <- basenames[j]
+    # M <- data.matrix(fit$C)
+    # for (i in c(1:dim(M)[1])) {
+    #   for (l in c(1:dim(M)[1])) {
+    #     M[i, l] <- as.numeric(fit$C[i, l])
+    #   }
+    # }
+    M <- matrix(as.numeric(as.matrix(fit$C)), nrow = nrow(fit$C))
+    e <- eigen(M)
+
+    lmin <- min(abs(e$values))
+    lmax <- max(abs(e$values))
+    k <- lmax / lmin
+    df[j, -1] <- c(fit$P[1, 2], fit$P[1, 3], fit$chi2dof, fit$dof, fit$npar, fit$ndata, 1, k)
+
+    gg <- plot_fit(paste0(path, basenames[j]), "a2",
+      # noline = TRUE,
+      data_type = reg,
+      gg = gg,
+      id_x = 1,
+      single_name_for_fit = legend_name[j],
+      # labelfit = "fit",
+      width = 0.0001,
+      nudge = 0,
+      noline = TRUE
+    )
+  }
+  cat("reg:", reg, "<br>\n")
+  #### BAIC
+  ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+  tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+  print(kable(tab, col.names = c("fit", "$w_{0}[\\text{fm}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$")))
+  cat("BAIC average $w_0=", ave_BAIC$m, "(", ave_BAIC$stat, ")(", ave_BAIC$syst, ") =", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{fm}]$<br>\n")
+  ############
+  df_filtered <- df[!grepl("Husung", df$fit), ]
+    ave_BAIC_f <- BAIC(v = df_filtered$res, err = df_filtered$err, chi2dof = df_filtered$chi2dof, dof = df_filtered$dof, npar = df_filtered$Npar, multiplicity = df_filtered$mult)
+    cat("BAIC average (no Husung) $f_\\pi=", ave_BAIC_f$m, "(", ave_BAIC_f$stat, ")(", ave_BAIC_f$syst, ") =", mean_print(ave_BAIC_f$m, ave_BAIC_f$dm), "\\,[\\text{MeV}]$<br>\n")
+  ############
+  df_filtered <- df[!grepl("Husung", df$fit), ]
+  df_filtered <- df_filtered[!grepl("a4", df_filtered$fit), ]
+    ave_BAIC_f <- BAIC(v = df_filtered$res, err = df_filtered$err, chi2dof = df_filtered$chi2dof, dof = df_filtered$dof, npar = df_filtered$Npar, multiplicity = df_filtered$mult)
+    cat("BAIC average (no Husung, no a4) $f_\\pi=", ave_BAIC_f$m, "(", ave_BAIC_f$stat, ")(", ave_BAIC_f$syst, ") =", mean_print(ave_BAIC_f$m, ave_BAIC_f$dm), "\\,[\\text{MeV}]$<br>\n")
+
+  ###
+  dft <- rbind(dft, df)
+}
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_{0} [\\mbox{fm}]$",
   to_print = TRUE,
   # yrange = c(-1, 4),
-  legend_position = c(0, 0.98)
+  legend_position = c(0.7, 0.98)
 )
+cat("BMW w_0=0.17284(42)1e-5 [fm]")
 ```
+
+
 
 ## fpi
 
