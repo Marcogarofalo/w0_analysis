@@ -1231,10 +1231,11 @@ int main(int argc, char** argv) {
             }
             // fit_info.linear_fit = false;
             fit_info.verbosity = 0;
-            // fit_info.covariancey = true;
-            // fit_info.compute_cov_fit(argv, jackall, lhs_fun);
+            fit_info.covariancey = true;
+            fit_info.compute_cov_fit(argv, jackall, lhs_fun_N3);
             // fit_info.make_covariance_block_diagonal_in_n();
-            // fit_info.compute_cov1_fit();
+            fit_info.make_covariance_block_diagonal_in_e();
+            fit_info.compute_cov1_fit();
 
             std::string namefit = "fit_fpi_C" + std::to_string(coeffs[ic]) + "_" + fit;
 
