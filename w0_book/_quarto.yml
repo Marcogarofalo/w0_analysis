@@ -27,6 +27,7 @@ book:
     - system_scale_setting.qmd
     - test_scheme_change.qmd
     - Njack_check.qmd
+    - w0.qmd
     - sqrtt0.qmd
     - fpi.qmd
     - quark_masses.qmd
