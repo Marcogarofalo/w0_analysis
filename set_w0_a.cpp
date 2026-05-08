@@ -260,7 +260,7 @@ double get_linear_deriv_w0c_with_pref(double** data, std::vector<double*>amuiso,
     double P0 = data[41][j];
     double P1 = data[42][j];
     // remove the prefactor in dw0/dmc(sea)
-    
+
     double a = previous_a[j];
     dw = P0 + P1 * a * a;
     return dw;
@@ -677,6 +677,8 @@ int main(int argc, char** argv) {
     std::vector<bool> correct_M = { true };
     std::vector<bool> correct_M_twist = { true };
     std::vector<std::vector<int>> id_average;
+
+    double* fpi_sim_big_L = myres->create_zero();
     if (strcmp(files[46].c_str(), "skip") != 0 &&
         strcmp(files[47].c_str(), "skip") != 0 &&
         strcmp(files[48].c_str(), "skip") != 0) {
@@ -684,11 +686,13 @@ int main(int argc, char** argv) {
         id_to_correct.push_back({ 44, 45 }); // 
         read_file_debug(data[44], files[46].c_str());// mpi 
         read_file_debug(data[45], files[47].c_str());// fpi
-        Ls.push_back(std::stoi(files[48]));
+        Ls.push_back(std::stoi(files[48]));  // L
         correct_M.push_back(true);
         correct_M_twist.push_back(true);
         id_average.push_back({ 0, 44 });
         id_average.push_back({ 3, 45 });
+
+        myres->copy(fpi_sim_big_L, data[45]);
     }
 
     read_file_debug(data[46], files[49].c_str());// fpi A0 tm
@@ -819,13 +823,30 @@ int main(int argc, char** argv) {
     read_file_debug(data[73], files[76].c_str());// dw0/dms_sea P0
     read_file_debug(data[74], files[77].c_str());// dw0/dmc_sea P1
 
-
+    double* fpi_sim = myres->create_copy(data[3]);
 
     //////////////////////////////////////////////////////////////
     // max twist correction
     //////////////////////////////////////////////////////////////
     printf("////////////// applying max twist correction\n");
 
+    std::vector<std::vector<double>> cl(id_correct_max_twist.size(), std::vector<double>(Njack));
+    for (int i = 0; i < id_correct_max_twist.size(); i++) {
+        int idM;
+        int idf;
+
+        idM = id_correct_max_twist[i][0];
+        idf = id_correct_max_twist[i][1];
+
+        for (int j = 0; j < Njack;j++) {
+            double mr = ZA[j] * mpcac_over_mu[j];
+            cl[i][j] = sqrt(1 + mr * mr);
+            double* Mpi = &data[idM][j];
+            double* fpi = &data[idf][j];
+            // if (correct_M_twist[i]) *Mpi = *Mpi / sqrt(cl);
+            // *fpi = *fpi * cl;
+        }
+    }
     for (int i = 0; i < id_correct_max_twist.size(); i++) {
         int idM;
         int idf;
@@ -836,12 +857,10 @@ int main(int argc, char** argv) {
         printf("Mpi before max twist correction id=%d: %.12g  %.12g\n", idM, data[idM][Njack - 1], myres->comp_error(data[idM]));
         printf("fpi before max twist correction id=%d: %.12g  %.12g\n", idf, data[idf][Njack - 1], myres->comp_error(data[idf]));
         for (int j = 0; j < Njack;j++) {
-            double mr = ZA[j] * mpcac_over_mu[j];
-            double cl = sqrt(1 + mr * mr);
             double* Mpi = &data[idM][j];
             double* fpi = &data[idf][j];
-            if (correct_M_twist[i]) *Mpi = *Mpi / sqrt(cl);
-            *fpi = *fpi * cl;
+            if (correct_M_twist[i]) *Mpi = *Mpi / sqrt(cl[i][j]);
+            *fpi = *fpi * cl[i][j];
         }
         printf("Mpi after max twist correction id=%d: %.12g  %.12g\n", idM, data[idM][Njack - 1], myres->comp_error(data[idM]));
         printf("fpi after max twist correction id=%d: %.12g  %.12g\n", idf, data[idf][Njack - 1], myres->comp_error(data[idf]));
@@ -859,9 +878,15 @@ int main(int argc, char** argv) {
         data[id_deriv_sqrtt0(0, 0, 0)][j] += delta_sqrtt0;
     }
 
+    double* w0_max_twist = myres->create_copy(data[iw0]);
+    double* fpi_max_twist = myres->create_copy(data[3]);
+    double* fpi_big_L_max_twist = myres->create_copy(data[45]);
+
     //////////////////////////////////////////////////////////////
     // FVE
     //////////////////////////////////////////////////////////////
+
+    std::vector<std::vector<delta_fve_NNLO_CDH>> d(id_to_correct.size(), std::vector<delta_fve_NNLO_CDH>(Njack));
     printf("////////////// applying FVE correction\n");
     for (int i = 0; i < id_to_correct.size(); i++) {
         int idM;
@@ -874,21 +899,36 @@ int main(int argc, char** argv) {
             double* Mpi = &data[idM][j];
             double* fpi = &data[idf][j];
             double xi = (*Mpi) * (*Mpi) / ((4 * M_PI * *fpi) * (4 * M_PI * *fpi));
-            double delta_FVE = FVE_GL_Mpi(Ls[i], xi, (*fpi));
+            // double delta_FVE = FVE_GL_Mpi(Ls[i], xi, (*fpi));
             // *Mpi /= (1 - 0.25 * delta_FVE);
             // *fpi /= (1 + delta_FVE);
 
-            delta_fve_NNLO_CDH  d = Delta_pi_NNLO_CDH(Ls[i], xi, (*fpi));
+            d[i][j] = Delta_pi_NNLO_CDH(Ls[i], xi, (*fpi));
             // if (j == Njack - 1) printf("delta FVE M (L=%d) = %g   %g\n", Ls[i], -0.25 * delta_FVE, d.dM);
             // if (j == Njack - 1) printf("delta FVE f (L=%d) = %g   %g\n", Ls[i], delta_FVE, d.df);
-            if (correct_M[i])*Mpi /= (1 + d.dM);
-            *fpi /= (1 + d.df);
+
+        }
+        // printf("Mpi after FVE correction id[%d] L=%d: %.12g  %.12g\n", idM, Ls[i], data[idM][Njack - 1], myres->comp_error(data[idM]));
+        // printf("fpi after FVE correction id[%d] L=%d: %.12g  %.12g\n", idf, Ls[i], data[idf][Njack - 1], myres->comp_error(data[idf]));
+    }
+    for (int i = 0; i < id_to_correct.size(); i++) {
+        int idM;
+        int idf;
+
+        idM = id_to_correct[i][0];
+        idf = id_to_correct[i][1];
+
+        for (int j = 0; j < Njack;j++) {
+            double* Mpi = &data[idM][j];
+            double* fpi = &data[idf][j];
+
+            if (correct_M[i])*Mpi /= (1 + d[i][j].dM);
+            *fpi /= (1 + d[i][j].df);
 
         }
         printf("Mpi after FVE correction id[%d] L=%d: %.12g  %.12g\n", idM, Ls[i], data[idM][Njack - 1], myres->comp_error(data[idM]));
         printf("fpi after FVE correction id[%d] L=%d: %.12g  %.12g\n", idf, Ls[i], data[idf][Njack - 1], myres->comp_error(data[idf]));
     }
-
 
     // if (strcmp(files[46].c_str(), "skip") != 0 && strcmp(files[47].c_str(), "skip") != 0) {
     //     printf("averaging volumes:\n");
@@ -932,6 +972,9 @@ int main(int argc, char** argv) {
     myres->div(Rpi, Rpi, data[3]);
     printf("Rpi after averaging volumes: %.12g  %.12g\n", Rpi[Njack - 1], myres->comp_error(Rpi));
 
+    double* w0_Linf_twist = myres->create_copy(data[iw0]);
+    double* fpi_Linf_twist = myres->create_copy(data[3]);
+
     //////////////////////////////////////////////////////////////
     // print dw0/dmc lin der
     //////////////////////////////////////////////////////////////
@@ -939,11 +982,11 @@ int main(int argc, char** argv) {
     for (int j = 0; j < Njack;j++) {
         dw0_dmc_lin_der[j] = get_linear_deriv_w0c(data, amuiso, previous_a, j);
     }
-    std::string filename = "deriv/dw0_dmc_lin_der" + ensemble +  "_" + myres->option  + std::to_string(Njack - 1) + ".dat";
+    std::string filename = "deriv/dw0_dmc_lin_der" + ensemble + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(dw0_dmc_lin_der, filename.c_str());
-    filename = "deriv/dw0_dms_lin_der" + ensemble +  "_" + myres->option  + std::to_string(Njack - 1) + ".dat";
+    filename = "deriv/dw0_dms_lin_der" + ensemble + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(data[id_deriv(iw0, 1, 1, 1)], filename.c_str());
-    filename = "deriv/dw0_dml_lin_der" + ensemble +  "_" + myres->option  + std::to_string(Njack - 1) + ".dat";
+    filename = "deriv/dw0_dml_lin_der" + ensemble + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
     myres->write_jack_in_file(data[id_deriv(iw0, 0, 1, 1)], filename.c_str());
     //////////////////////////////////////////////////////////////
     // sistemone fpi
@@ -960,7 +1003,7 @@ int main(int argc, char** argv) {
         }
         for (int im = 0; im < 3; im++) {
             if (iM == 4 && im == 2) {
-                double *dM = (double*)malloc(sizeof(double) * Njack);
+                double* dM = (double*)malloc(sizeof(double) * Njack);
                 for (int j = 0; j < Njack;j++)
                     dM[j] = get_linear_deriv_w0c(data, amuiso, previous_a, j);
                 printf(" dsea%d = %-8.3g (%-8.3g)", im, dM[Njack - 1], myres->comp_error(dM));
@@ -1002,6 +1045,11 @@ int main(int argc, char** argv) {
     double* w0_from_fpi_ensemble = myres->create_copy(data[iw0]);
     double* w0_from_fpi_hybrid = myres->create_copy(data[iw0]);
     double* sqrtt0_from_fpi = myres->create_copy(data[id_deriv_sqrtt0(0, 0, 0)]);
+    double** w0_a_split = malloc_2<double>(7, Njack);
+    double** w0_split = malloc_2<double>(7, Njack);
+    double* w0_a_lin_der = myres->create_copy(data[iw0]);
+    double* w0_sim = myres->create_copy(data[iw0]);
+
     {
         for (int j = 0; j < Njack;j++) {
 
@@ -1183,6 +1231,13 @@ int main(int argc, char** argv) {
                 w0_from_fpi_hybrid[j] *= a_fm[j];
             }
         }
+
+        myres->copy(w0_a_split[0], data[id_deriv(4, 0, 0, 0)]);
+        myres->sub(w0_a_split[1], w0_a_split[1], w0_a_split[1]);// set to zero
+        myres->sub(w0_a_split[2], w0_a_split[2], w0_a_split[2]);// set to zero
+        myres->sub(w0_a_split[3], w0_a_split[3], w0_a_split[3]);// set to zero
+        for (int ii = 0;ii < 4;ii++)
+            myres->mult(w0_split[ii], w0_a_split[ii], a_fm);
         // linear deriv mc
         for (int j = 0; j < Njack;j++) {
             for (int im = 0; im < 3; im++) {
@@ -1199,7 +1254,11 @@ int main(int argc, char** argv) {
 
                 w0_lin_deriv[j] += dm * dw;
                 sqrtt0_from_fpi[j] += dm * dt;
+                w0_a_split[1 + im + val_sea * 3][j] = dm * dw;
+                w0_split[1 + im + val_sea * 3][j] = w0_a_split[1 + im + val_sea * 3][j] * a_fm[j];
             }
+            w0_sim[j] = data[iw0][j] * data[id_deriv(3, 0, 0, 0)][j] / (fpi_MeV / hbarc);
+            w0_a_lin_der[j] = w0_lin_deriv[j];
             w0_lin_deriv[j] *= a_fm[j];
             sqrtt0_from_fpi[j] *= a_fm[j];
         }
@@ -1232,6 +1291,16 @@ int main(int argc, char** argv) {
         printf("Delta_aml = %g +/- %g\n", myres->mean(dm_fpi[0]), myres->comp_error(dm_fpi[0]));
         printf("Delta_ams = %g +/- %g\n", myres->mean(dm_fpi[1]), myres->comp_error(dm_fpi[1]));
         printf("Delta_amc = %g +/- %g\n", myres->mean(dm_fpi[2]), myres->comp_error(dm_fpi[2]));
+
+        printf("w0_a (fm): %+.3g  (%.3g) =", myres->mean(w0_a_lin_der), myres->comp_error(w0_a_lin_der));
+        for (int ii = 0; ii < 7; ii++) {
+            printf("%+.3g  (%.3g) ", myres->mean(w0_a_split[ii]), myres->comp_error(w0_a_split[ii]));
+        }printf("\n");
+        printf("w0 (fm): %+.3g  (%.3g) =", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
+        for (int ii = 0; ii < 7; ii++) {
+            printf("%+.3g  (%.3g) ", myres->mean(w0_split[ii]), myres->comp_error(w0_split[ii]));
+        }printf("\n");
+        printf("w0_sim (fm): %+.3g  (%.3g)\n", myres->mean(w0_sim), myres->comp_error(w0_sim));
     }
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3000,6 +3069,15 @@ int main(int argc, char** argv) {
 
     }
 
+    write_jack(fpi_sim_big_L, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L);
 
+
+    write_jack(w0_max_twist, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 1);
+    write_jack(fpi_max_twist, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 2);
+    write_jack(fpi_big_L_max_twist, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 3);
+
+
+    write_jack(w0_Linf_twist, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 4);
+    write_jack(fpi_Linf_twist, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 5);
     return 0;
 }
