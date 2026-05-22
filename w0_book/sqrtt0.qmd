@@ -64,7 +64,7 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0} [\\mbox{fm}]$",
 ```
 
 
-```{r,results='asis',echo=FALSE, warning=FALSE}
+```{r,results='asis',echo=FALSE, warning=FALSE, dev='tikz'}
 library(stringr)
 dft <- NULL
 gg <- NULL
@@ -130,15 +130,15 @@ for (reg in c("fit_sqrtt0_FLAG", "fit_sqrtt0_wp25_Cm5")) {
   cat("reg:", reg, "<br>\n")
   #### BAIC
   ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
-  tab <- data.frame("fit" = basenames, "$f_{\\pi} [\\mbox{MeV}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
-  print(kable(tab, col.names = c("fit", "$f_{\\pi}[\\text{MeV}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$")))
+  tab <- data.frame("fit" = basenames, "$\\sqrt{t_0} [\\mbox{fm}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+  print(kable(tab, col.names = c("fit", "$\\sqrt{t_0} [\\mbox{fm}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$")))
   cat("BAIC average $f_\\pi=", ave_BAIC$m, "(", ave_BAIC$stat, ")(", ave_BAIC$syst, ") =", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>\n")
 
 
   ###
   dft <- rbind(dft, df)
 }
-fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$f_{\\pi} [\\mbox{MeV}]$",
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0} [\\mbox{fm}]$",
   to_print = TRUE,
   # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)

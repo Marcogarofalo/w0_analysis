@@ -668,7 +668,26 @@ int main(int argc, char** argv) {
     fit_info.band_range = { 0, 0.008145209846823482 };
     print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_charm_w0, der_charm_w0, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
 
-    /////
+
+    /// sqrtt0
+
+    fit_info.corr_id = { id_dsqrtt0_dmu, id_amuliso, id_sqrtt0 };
+
+    namefit = "der_sqrtt0_charm_a2";
+
+    fit_result der_charm_sqrtt0 = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
+    fit_info.band_range = { 0, 0.008145209846823482 };
+    print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", der_charm_sqrtt0, der_charm_sqrtt0, 0, 0 /* set the other variables to the first of the n*/, 0.001, {});
+
+    std::string namej_sqrtt0 = std::string("deriv/P0_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2") + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
+    myres->write_jack_in_file(der_charm_sqrtt0.P[0], namej_sqrtt0.c_str());
+    namej_sqrtt0 = std::string("deriv/P1_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2") + "_" + myres->option + std::to_string(Njack - 1) + ".dat";
+    myres->write_jack_in_file(der_charm_sqrtt0.P[1], namej_sqrtt0.c_str());
+
+
+    ///////////////// 5pt
+
+
     fit_info.Nxen = std::vector<std::vector<int>>(1);
     for (int n = 0; n < 1; n++) {
         fit_info.Nxen[n].resize(5);
