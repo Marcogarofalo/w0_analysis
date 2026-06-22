@@ -139,3 +139,4 @@ add_target_with_libs(average_smallV_phys_point_fpi_A0P5 average_smallV_phys_poin
 add_target_with_libs(derivative_corr derivative_corr.cpp)
 
 add_target_with_libs(check_MK_fpi_RK check_MK_fpi_RK.cpp)
+add_target_with_libs(jacks_B96_C112_w0 jacks_B96_C112_w0.cpp)

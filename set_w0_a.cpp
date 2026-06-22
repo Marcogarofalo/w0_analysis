@@ -446,7 +446,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // read the jacks
     //////////////////////////////////////////////////////////////
-    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2 + 2 + (7 + 4 + 2);
+    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2 + 2 + (7 + 4 + 2)+ 2;
     printf("%d\n", file_to_read);
     error(files.size() - 2 != file_to_read, 1, "main", "No input files found in  file %s we need %d lines but we have %d", argv[4], file_to_read, files.size() - 2);
     double** data = malloc_2<double>(file_to_read, Njack);
@@ -825,6 +825,22 @@ int main(int argc, char** argv) {
 
     double* fpi_sim = myres->create_copy(data[3]);
 
+
+    // B96 w0 and t0
+    bool bigLw0 = files.size() > 79 && strcmp(files[78].c_str(), "skip") != 0 && strcmp(files[79].c_str(), "skip") != 0;
+    if (bigLw0) {
+        read_file_debug(data[75], files[78].c_str());// w0 tm B96 
+        read_file_debug(data[76], files[79].c_str());// fpi OS B96
+    }
+    else {
+        for (int j = 0; j < Njack;j++) {
+            data[75][j] = 0;
+            data[76][j] = 0;
+        }
+    }
+    double* w0_L = myres->create_copy(data[75]);
+    double* sqrt0_L = myres->create_copy(data[76]);
+
     //////////////////////////////////////////////////////////////
     // max twist correction
     //////////////////////////////////////////////////////////////
@@ -876,8 +892,13 @@ int main(int argc, char** argv) {
         double dsqrtt0_dm0 = data[70][j] + 0.5 * (data[71][j] + data[72][j]);
         double delta_sqrtt0 = dm0 * dsqrtt0_dm0;
         data[id_deriv_sqrtt0(0, 0, 0)][j] += delta_sqrtt0;
+        if (bigLw0) {
+            data[75][j] += delta;
+            data[76][j] += delta_sqrtt0;
+        }
     }
 
+    
     double* w0_max_twist = myres->create_copy(data[iw0]);
     double* fpi_max_twist = myres->create_copy(data[3]);
     double* fpi_big_L_max_twist = myres->create_copy(data[45]);
@@ -972,6 +993,11 @@ int main(int argc, char** argv) {
     myres->div(Rpi, Rpi, data[3]);
     printf("Rpi after averaging volumes: %.12g  %.12g\n", Rpi[Njack - 1], myres->comp_error(Rpi));
 
+    if (bigLw0){
+        weighted_average(data[iw0], data[75]);
+        weighted_average(data[id_deriv_sqrtt0(0,0,0)], data[76]);
+    }
+
     double* w0_Linf_twist = myres->create_copy(data[iw0]);
     double* fpi_Linf_twist = myres->create_copy(data[3]);
 
@@ -1040,6 +1066,9 @@ int main(int argc, char** argv) {
     double*** Matj = malloc_3<double>(3, 3, Njack);
     double* y = (double*)malloc(sizeof(double) * 3);
     double** yj = malloc_2<double>(3, Njack);
+    double** Risoj = malloc_2<double>(3, Njack);
+    double** Rsimj = malloc_2<double>(3, Njack);
+    double** Ra = malloc_2<double>(3, Njack);
     double** miso = malloc_2<double>(3, Njack);
     double** dm_fpi = malloc_2<double>(3, Njack);
     double* w0_from_fpi_ensemble = myres->create_copy(data[iw0]);
@@ -2391,12 +2420,17 @@ int main(int argc, char** argv) {
                     }
                     // if (im!=2) 
                     Mat[iM][im] += dM * w0 + M * dw;
+                    Matj[iM][im][j] = Mat[iM][im];
                 }
-                y[iM] -= M * w0;
+                Risoj[iM][j] = y[iM];
+                Rsimj[iM][j] = M * w0;
+                y[iM] -= Rsimj[iM][j];
+                Ra[iM][j] = 0.0;
 
             }
             // add the lattice artefact RDs
-            y[2] += coeff * previous_a[j] * previous_a[j];
+            Ra[2][j] = coeff * previous_a[j] * previous_a[j];
+            y[2] += Ra[2][j];
 
             double* P = LU_decomposition_solver(3, Mat, y);
             miso_w0[0][j] = (amusim[0][j] + P[0]);
@@ -2408,6 +2442,28 @@ int main(int argc, char** argv) {
 
             free(P);
         }
+        if (coeff == -5) {
+            printf("Matrix for m^iso solution (jackknife %d):\n", Njack - 1);
+            for (int ii = 0; ii < 3; ii++) {
+                for (int jj = 0; jj < 3; jj++) {
+                    printf("%g  %g  ", myres->mean(Matj[ii][jj]), myres->comp_error(Matj[ii][jj]));
+                }
+                printf("\n");
+            }
+            printf("Riso:\n");
+            for (int ii = 0; ii < 3; ii++) {
+                printf("%g  %g  \n", myres->mean(Risoj[ii]), myres->comp_error(Risoj[ii]));
+            }
+            printf("Rsim:\n");
+            for (int ii = 0; ii < 3; ii++) {
+                printf("%g  %g  \n", myres->mean(Rsimj[ii]), myres->comp_error(Rsimj[ii]));
+            }
+            printf("solution:\n");
+            for (int ii = 0; ii < 3; ii++) {
+                printf("%g  %g  \n", myres->mean(dm_w0[ii]), myres->comp_error(dm_w0[ii]));
+            }
+        }
+
         printf("Results for m^iso (MeV):\n");
         for (int i = 0; i < 3; i++) {
             double mean = myres->mean(miso_w0[i]);
@@ -3079,5 +3135,9 @@ int main(int argc, char** argv) {
 
     write_jack(w0_Linf_twist, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 4);
     write_jack(fpi_Linf_twist, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 5);
+
+    write_jack(w0_L, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 6);
+    write_jack(sqrt0_L, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 7);
+    
     return 0;
 }

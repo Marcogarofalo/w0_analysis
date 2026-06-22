@@ -239,6 +239,13 @@ double lhs_w0_sim(int n, int e, int j, data_all gjack, struct fit_type fit_info)
     double a = afpi / (fpi_MeV / hbarc);
     return w0_a * a;
 }
+double lhs_w0_sim1(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
+    double w0_a = (n == 0) ? gjack.en[e].jack[fit_info.corr_id[0]][j]: gjack.en[e].jack[fit_info.corr_id[3]][j] ; // d(w0/a)/d(a*mu)
+    double afpi = (n == 0) ? gjack.en[e].jack[fit_info.corr_id[1]][j] : gjack.en[e].jack[fit_info.corr_id[2]][j];
+
+    double a = afpi / (fpi_MeV / hbarc);
+    return w0_a * a;
+}
 
 
 double lhs_fun_N3(int n, int e, int j, data_all gjack, struct fit_type fit_info) {
@@ -1526,5 +1533,46 @@ int main(int argc, char** argv) {
         fit_info.restore_default();
 
     }
+
+
+    // done with B96 and C112
+    //////////////////////////////////////////////////////////////
+    // w0 sim
+    //////////////////////////////////////////////////////////////
+    {
+        int id_fpi = 3;
+        int id_w0 = 4;
+        fit_type fit_info;
+
+        fit_info.corr_id = { id_w0, id_fpi , id_fpi_sim_big_L, id_fpi_sim_big_L + 6}; // w0, fpi
+        fit_info.Nxen = { {0,1,2,3}, {0,1} };
+        fit_info.init_N_etot_form_Nxen();
+        fit_info.function = rhs_a2;
+        fit_info.linear_fit = true;
+        fit_info.Npar = 2;
+        fit_info.Nvar = 1; // a2
+        fit_info.Njack = jackall.en[0].Njack;
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+        int count = 0;
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
+                    double fpi = (n == 0) ? jackall.en[e].jack[id_fpi][j] : jackall.en[e].jack[id_fpi_sim_big_L][j];
+                    fit_info.x[0][count][j] = pow(fpi / (fpi_MeV / hbarc), 2); // a^2 fm^2
+                }
+                count++;
+            }
+        }
+        std::string namefit = "fit_w0_sim_L_a2";
+        fit_result res_sqrtt0 = fit_all_data(argv, jackall, lhs_w0_sim1, fit_info, namefit.c_str());
+        fit_info.band_range = { 0, 0.008145209846823482 };
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", res_sqrtt0, res_sqrtt0, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
+        res_sqrtt0.clear();
+
+        fit_info.restore_default();
+
+    }
+    
     printf("Njack: %d\n", Njack);
 }
