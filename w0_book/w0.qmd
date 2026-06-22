@@ -32,7 +32,7 @@ masses <- c(
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- NULL
 basenames <- c(
-  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_w0_sim_a2",
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_w0_sim_L_a2",
   # "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_w0_max_twist_a2",
   "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_w0_Linf_a2",
   "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_w0_lin_deriv_FLAG_a2"
