@@ -535,7 +535,7 @@ onlinemeas_D96.dat m0  -0.3761252         0.0000039  24
 onlinemeas_D96.dat a     0.056850         0.000090   25
 
 onlinemeas_D96.dat m0iso   -0.3761252    0.0000039    26
-onlinemeas_D96.dat m0sim   -0.3761157    1e-20        26
+onlinemeas_D96.dat m0sim   -0.376080875554 1e-20        26
 
 onlinemeas_D96.dat  M_{PS}   28 84 1
 onlinemeas_D96.dat  mpcac    17 95 1
@@ -1059,3 +1059,7 @@ E112_OS_l0_l0_A0P5.dat  M_{PS}  33 98 1
 
 
 E112_l_s1.bin  M_{PS}  40 98 1
+
+onlinemeas_D128.dat  M_{PS}   28 84 1
+onlinemeas_D128.dat  mpcac    17 95 1
+onlinemeas_D128.dat  f_{PS}   28 84 1
