@@ -92,3 +92,4 @@ w0_book/_book/*
 w0_book/plots/*.pdf
 w0_book/plots/*.tex
 .positai
+*.pdf
