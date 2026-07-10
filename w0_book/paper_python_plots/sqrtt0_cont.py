@@ -51,7 +51,7 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
              id_x=1, noline=False, labelfit="fit", width=0.02, size=1,
              id_color=None, id_shape=None, single_name_for_fit=None,
              nolabel_for_fit=False, nudge=0, alpha_line=1, alpha_ribbon=0.5,
-             stroke=1, filter_data=None, ii=0):
+             stroke=1, filter_data=None, ii =0):
     """
     Translates the R plot_fit logic into Matplotlib.
     Instead of passing a 'gg' object, we pass a Matplotlib Axis object ('ax').
@@ -153,7 +153,6 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
     #marker_map = ["o","^","^"]
 
     for combo in unique_combos:
-        print(combo)
         mask = [c == combo[0] and s == combo[1] for c, s in zip(color_type, shape_type)]
         if any(mask):
             ax.errorbar(
@@ -161,14 +160,11 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
                 # fmt=marker_map[combo],
                 marker = marker_choices[ii],
                 linestyle='none', 
-                elinewidth=size,
-                capsize=width*1000, 
+                elinewidth=size, capsize=width*1000, 
                 # markersize=size*5,
                 # markeredgewidth=stroke,
-                # label=f"$f_\\pi^{{\\rm {combo[0]}}}$"
-                label=f"{combo[0]}"
+                label=data_type
             )
-    
 def read_fit_file(file_path):
     # Read space-separated data (equivalent to read.table with fill=True)
     # Generate 40 columns (0 to 39 in Python's 0-based indexing)
@@ -239,10 +235,13 @@ def calculate_baic_average(v, err, chi2dof, dof, npar, multiplicity=1):
 C = -5
 path = "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
 basenames = [
-    f"fit_w0_sim_L_a2",
-    #f"fit_w0_Linf_a2",
-    #f"fit_w0_lin_deriv_FLAG_a2"
-    f"fit_w0_full_a2"
+    f"fit_sqrtt0_FLAG_a2",
+    f"fit_sqrtt0_FLAG_a2_noB",
+    f"fit_sqrtt0_FLAG_a2_noC",
+    f"fit_sqrtt0_FLAG_a2_noD",
+    f"fit_sqrtt0_FLAG_a2_noE",
+    f"fit_sqrtt0_FLAG_a2_a4",
+    f"fit_sqrtt0_FLAG_a2_Husung0.42"
 ]
 
 count = len(basenames)
@@ -262,34 +261,33 @@ df = pd.DataFrame({
 legend_name = [re.sub(r"fit_fpi_|\.000000", "", name) for name in basenames]
 # legend_name = [f"\\verb|{name}|" for name in legend_name]
 
-labels = [["sim","sim"], ["$m_0$ and $L$ corrected"], ["full corrected"],["aaa"]]
-labels = [["sim","sim"],  ["full corrected"],["aaa"]]
+labels = ["FLAG"]
 
 # Initialize the Matplotlib figure canvas
 # Defaulting layout variables width/height if missing in original snippet scope
 width, height = 800, 600 
-fig, ax = plt.subplots(figsize=(width / 100, height / 100))
-# fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(9,6))
-ax.set_xlim(0, 0.007)
+#fig, ax = plt.subplots(figsize=(width / 100, height / 100))
+fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(9,6))
+
 Nboot=2000
 flat_boot = [] 
 # Iterate and append layers directly onto the initialized axes
 for j, basename in enumerate(basenames):
     plot_fit(
-        ax=ax,
+        ax=ax[1],
         basename=os.path.join(path, basename),
         var="a2",
-        data_type=labels[j],
+        data_type=labels[0],
         id_x=1,
         single_name_for_fit="",
         width=0.004,
         size=0.8,
         nudge=0,
-        noline=True,
+        noline=False,
         noribbon=True,
         alpha_line = 0.5,
         stroke=0.1,
-        ii=j
+        ii=0
     )
     # Assuming 'path', 'basenames', and 'j' are defined in your loop:
     file_path = os.path.join(path, f"{basenames[j]}_fit_P.dat")
@@ -319,52 +317,185 @@ for j, basename in enumerate(basenames):
 
 # Reference benchmark flag lines
 # fpi_FLAG = 0.17236
-# ax.axhline(y=fpi_FLAG, color='black', linestyle='--', label='WP25')
-# ax.scatter([0], [fpi_FLAG], color='red', marker='x', label='WP95')
+# ax[1].axhline(y=fpi_FLAG, color='black', linestyle='--', label='wp25')
+# ax[1].scatter([0], [fpi_FLAG], color='red', marker='x', label='wp25')
 
 # Typography and Axis setup
 title = ""
-xlabel = r"$(af_\pi/f_\pi^{\rm FLAG})^2$ [fm$^2$]"
-ylabel = r"$w_{0}f_\pi$"
+xlabel = r"$a^2$ [fm$^2$]"
+ylabel = r"$\sqrt{t_{0}}$ [fm]"
 
 legend_position = (0.7, 0.98)
 
 if title != "":
-    ax.set_title(title)
+    ax[1].set_title(title)
 if xlabel != "":
-    ax.set_xlabel(xlabel)
+    ax[1].set_xlabel(xlabel)
 if ylabel != "":
-    ax.set_ylabel(ylabel)
+    ax[0].set_ylabel(ylabel)
 
 # Customizing the Classic Matplotlib border presentation (Replicates theme_matplotlib)
-ax.patch.set_facecolor('white')
-for spine in ax.spines.values():
+ax[1].patch.set_facecolor('white')
+for spine in ax[1].spines.values():
     spine.set_color('black')
     spine.set_linewidth(1)
-    
-# ax.tick_params(colors='black', direction='out')
-# ax.yaxis.get_label().set_visible(False)
-# ax.tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
+# ax[1].tick_params(colors='black', direction='out')
+ax[1].yaxis.get_label().set_visible(False)
+ax[1].tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
 # Clean duplicate handles generated during the iterative subplot loops
-handles, plot_labels = ax.get_legend_handles_labels()
+handles, plot_labels = ax[1].get_legend_handles_labels()
 by_label = dict(zip(plot_labels, handles))
-ax.legend(by_label.values(), by_label.keys(), loc="lower left",
+ax[1].legend(by_label.values(), by_label.keys(), loc="upper left",
             #  bbox_to_anchor=legend_position
              )
-# ax.errorbar([0.],[BAIC_ave],[BAIC_err],fmt="x",color="black",label=f"BAIC average")
-# ax.errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
-
-#ax.xaxis.set_minor_locator(ticker.AutoMinorLocator())
-# ax.grid(True, which='minor', axis='x')
-# ax.tick_params(axis='x',which='minor',size=0)
-
+print("BAIC ",[BAIC_ave],"  ",[BAIC_err] )
+ax[1].errorbar([0.],[BAIC_ave],[BAIC_err],fmt="x",color="black",label=f"BAIC average")
+ax[1].errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
+#ax[1].set_ylim(0.167, 0.176)
+# histogram
+# Nota per Marco: in flat_boot c'è sostanzialmente un array che contiene un ricampionamento bootstrap
+# dei limiti al continuo. flat_weig sono i pesi normalizzati con la somma dei pesi (e li moltiplico
+# per 100 per ottenere la percentuale). Ogni modello ha il suo peso che è lo stesso per ogni bootstrap.
+# Nota importante: flat_boot ha dimensione (numero di modelli)*(numero di samples) ma è un array 1D. Lo stesso
+# vale per flat_weights, dove ripeti (numero di samples) volte lo stesso weight per ogni modello.
+ax[0].hist(flat_boot, bins=20, weights=np.array(flat_weig)*100/Nboot,orientation="horizontal",histtype='step', linewidth=1.5,color="black")
+print(np.array(flat_weig).sum()/Nboot )
+ax[0].set_xlim(ax[0].get_xlim())
+# BAIC_ave e BAIC_err si capisce cosa sono e te li devi calcolare a parte
+ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-BAIC_err,BAIC_ave-BAIC_err],
+                            [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color="red",alpha=0.1)
+ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
+                            [BAIC_ave+stat_err,BAIC_ave+stat_err],color="red",alpha=0.1)
+ax[0].set_xlabel(r"%")
+ax[0].xaxis.set_minor_locator(ticker.AutoMinorLocator())
+ax[0].grid(True, which='minor', axis='x')
+ax[0].tick_params(axis='x',which='minor',size=0)
 
 plt.subplots_adjust(left=0.12, right=0.95, top=0.92, bottom=0.12, wspace=0)
 
 # Save configuration
 # Matplotlib saves vector figures cleanly via .pdf or .svg. 
 # If your final step compiles in LaTeX via pgf/tikz, use .pgf extension format target instead.
-fpi3reg = "w0_corr"
+
+
+######################################################## now the WP25 scheme
+df = pd.DataFrame({
+    "fit": [""] * count,
+    "res": [0.0] * count,
+    "err": [0.0] * count,
+    "chi2dof": [0.0] * count,
+    "dof": [0] * count,
+    "Npar": [0] * count,
+    "Ndat": [0] * count,
+    "mult": [0.0] * count
+    })
+
+basenames = [
+    f"fit_sqrtt0_wp25_Cm5_a2",
+    f"fit_sqrtt0_wp25_Cm5_a2_noB",
+    f"fit_sqrtt0_wp25_Cm5_a2_noC",
+    f"fit_sqrtt0_wp25_Cm5_a2_noD",
+    f"fit_sqrtt0_wp25_Cm5_a2_noE",
+    f"fit_sqrtt0_wp25_Cm5_a2_a4",
+    f"fit_sqrtt0_wp25_Cm5_a2_Husung0.42"
+]
+flat_boot = [] 
+
+# Iterate and append layers directly onto the initialized axes
+for j, basename in enumerate(basenames):
+    plot_fit(
+        ax=ax[1],
+        basename=os.path.join(path, basename),
+        var="a2",
+        data_type="WP25",
+        id_x=1,
+        single_name_for_fit="",
+        width=0.004,
+        size=0.8,
+        nudge=0,
+        noline=False,
+        noribbon=True,
+        alpha_line = 0.5,
+        stroke=0.1,
+        ii=1
+    )
+    # Assuming 'path', 'basenames', and 'j' are defined in your loop:
+    file_path = os.path.join(path, f"{basenames[j]}_fit_P.dat")
+
+    # Call the converted python function
+    fit = read_fit_file(file_path)
+    # Initialize row j with a list of values
+    # Note: The list must have the exact same number of elements as there are columns (9 columns)
+    df.iloc[j] = [basenames[j], fit['P'].iloc[0,1], fit['P'].iloc[0,2], fit['chi2dof'], fit['dof'], fit['npar'], fit['ndata'], 1]
+    bt=np.random.normal(fit['P'].iloc[0,1], fit['P'].iloc[0,2], Nboot)
+    flat_boot.extend(bt)
+    
+ave_BAIC = calculate_baic_average(
+    v=df['res'].to_numpy(),
+    err=df['err'].to_numpy(),
+    chi2dof=df['chi2dof'].to_numpy(),
+    dof=df['dof'].to_numpy(),
+    npar=df['Npar'].to_numpy(),
+    multiplicity=df['mult'].to_numpy()
+)
+BAIC_ave = ave_BAIC['m']
+BAIC_err = ave_BAIC['dm']
+stat_err = ave_BAIC['stat']
+flat_weig =[]
+for j, basename in enumerate(basenames):
+    flat_weig.extend([ave_BAIC['AIC'][j]]*Nboot)
+
+# Reference benchmark flag lines
+# fpi_FLAG = 0.17236
+# ax[1].axhline(y=fpi_FLAG, color='black', linestyle='--', label='wp25')
+# ax[1].scatter([0], [fpi_FLAG], color='red', marker='x', label='wp25')
+
+
+# Customizing the Classic Matplotlib border presentation (Replicates theme_matplotlib)
+ax[1].patch.set_facecolor('white')
+for spine in ax[1].spines.values():
+    spine.set_color('black')
+    spine.set_linewidth(1)
+# ax[1].tick_params(colors='black', direction='out')
+ax[1].yaxis.get_label().set_visible(False)
+ax[1].tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
+# Clean duplicate handles generated during the iterative subplot loops
+handles, plot_labels = ax[1].get_legend_handles_labels()
+by_label = dict(zip(plot_labels, handles))
+ax[1].legend(by_label.values(), by_label.keys(), loc="upper left",
+            #  bbox_to_anchor=legend_position
+             )
+print("BAIC ",[BAIC_ave],"  ",[BAIC_err] )
+ax[1].errorbar([0.],[BAIC_ave],[BAIC_err],fmt="x",color="black",label=f"BAIC average")
+ax[1].errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
+#ax[1].set_ylim(0.167, 0.176)
+# histogram
+# Nota per Marco: in flat_boot c'è sostanzialmente un array che contiene un ricampionamento bootstrap
+# dei limiti al continuo. flat_weig sono i pesi normalizzati con la somma dei pesi (e li moltiplico
+# per 100 per ottenere la percentuale). Ogni modello ha il suo peso che è lo stesso per ogni bootstrap.
+# Nota importante: flat_boot ha dimensione (numero di modelli)*(numero di samples) ma è un array 1D. Lo stesso
+# vale per flat_weights, dove ripeti (numero di samples) volte lo stesso weight per ogni modello.
+ax[0].hist(flat_boot, bins=20, weights=np.array(flat_weig)*100/Nboot,orientation="horizontal",histtype='step', linewidth=1.5,color="black")
+print(np.array(flat_weig).sum()/Nboot )
+ax[0].set_xlim(ax[0].get_xlim())
+# BAIC_ave e BAIC_err si capisce cosa sono e te li devi calcolare a parte
+ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-BAIC_err,BAIC_ave-BAIC_err],
+                            [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color="red",alpha=0.1)
+ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
+                            [BAIC_ave+stat_err,BAIC_ave+stat_err],color="red",alpha=0.1)
+ax[0].set_xlabel(r"%")
+ax[0].xaxis.set_minor_locator(ticker.AutoMinorLocator())
+ax[0].grid(True, which='minor', axis='x')
+ax[0].tick_params(axis='x',which='minor',size=0)
+
+plt.subplots_adjust(left=0.12, right=0.95, top=0.92, bottom=0.12, wspace=0)
+
+# Save configuration
+# Matplotlib saves vector figures cleanly via .pdf or .svg. 
+# If your final step compiles in LaTeX via pgf/tikz, use .pgf extension format target instead.
+
+
+fpi3reg = "sqrtt0cont"
 # plt.tight_layout()
 plt.savefig(f"{fpi3reg}.pdf", format="pdf")
 plt.close()

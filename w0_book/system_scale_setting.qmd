@@ -163,6 +163,43 @@ f_\pi= f_\pi^{sim}+ (a\vec{\delta \mu} +a^3C\hat{e_{\mu_c}})\cdot\frac{d f_\pi}{
 $$
 
 
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- myggplot(fill = FALSE)
+gg <- ggplot() +
+  theme_bw()
+
+# df1 <- read.table(paste0("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_wp25_deriv_mc_a2_laC", 0, ".txt"), header = TRUE)
+# gg <- gg + geom_point(aes(
+#   x = df1$a.fm. * df1$a.fm.,
+#   y = df1$delta_amuc / (df1$amul),
+#   color = "wp25"
+# ))
+
+
+for (ic in c(0, -5, -10)) {
+  df_m <- read.table(paste0("/home/garofalo/analysis/flow/data_20//fit_all_beta/data_from_wp25_lin_deriv_mc_la_MDs_C", ic, ".txt"), header = TRUE)
+  gg <- gg + geom_point(aes(
+    x = !!(df_m$a.fm. * df_m$a.fm.),
+    y = !!(df_m$delta_amuc / (df$amul)),
+    color = !!paste0("MDs+a2*C=", ic)
+  ))
+}
+
+
+df_m <- read.table(paste0("/home/garofalo/analysis/flow/data_20/fit_all_beta/data_from_fpi.txt"), header = TRUE)
+gg <- gg + geom_point(aes(
+ x = !!(df_m$a.fm. * df_m$a.fm.),
+   y = !!(df_m$delta_amuc / (df$amul)),
+   color = "from fpi"
+ ))
+
+fig <- myplotly(gg, "", "$a^2$", "$\\delta\\mu_c /\\mu_\\ell$",
+  xrange = c(0, 0.008),
+  #yrange = c(-0.0002, 0.0006),
+  to_print = TRUE
+)
+```
+
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 gg <- myggplot(fill = FALSE)
@@ -197,6 +234,7 @@ gg <- ggplot() +
 # ), width=0.00005)
 
 ######
+df1 <- read.table(paste0("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_wp25_deriv_mc_a2_laC", 0, ".txt"), header = TRUE)
 gg <- gg + geom_point(aes(
   x = df1$a.fm. * df1$a.fm.,
   y = df1$delta_amuc / (df1$amul),
@@ -212,7 +250,7 @@ for (ic in c(-1, -2,-3,-4, -5, -10)) {
   df_m <- read.table(paste0("/home/garofalo/analysis/flow/data/fit_all_beta/data_from_wp25_deriv_mc_a2_laC", ic, ".txt"), header = TRUE)
   gg <- gg + geom_point(aes(
     x = !!(df_m$a.fm. * df_m$a.fm.),
-    y = !!(df_m$delta_amuc / (df1$amul)),
+    y = !!(df_m$delta_amuc / (df$amul)),
     color = !!paste0("MDs+a2*C=", ic)
   ))
 }

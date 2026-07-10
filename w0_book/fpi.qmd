@@ -123,7 +123,7 @@ for (Nj in Njack) {
     df_filtered <- df[!grepl("noC|noB", df$fit), ]
     ave_BAIC_f <- BAIC(v = df_filtered$res, err = df_filtered$err, chi2dof = df_filtered$chi2dof, dof = df_filtered$dof, npar = df_filtered$Npar, multiplicity = df_filtered$mult)
     
-    cat("BAIC average 4b $f_\\pi=", ave_BAIC_f$m, "(", ave_BAIC_f$stat, ")(", ave_BAIC_f$syst, ") =", mean_print(ave_BAIC_f$m, ave_BAIC_f$dm), "\\,[\\text{MeV}]$<br>\n")
+    cat("BAIC average (always 4b) $f_\\pi=", ave_BAIC_f$m, "(", ave_BAIC_f$stat, ")(", ave_BAIC_f$syst, ") =", mean_print(ave_BAIC_f$m, ave_BAIC_f$dm), "\\,[\\text{MeV}]$<br>\n")
     
     ###
     dft <- rbind(dft, df)

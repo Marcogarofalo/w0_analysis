@@ -45,7 +45,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import rc
-
+from matplotlib.ticker import FormatStrFormatter
 plt.rcParams.update({
     "text.usetex": False,         # Zero crash su Windows
     "mathtext.fontset": "cm",     # Usa il motore matematico Computer Modern
@@ -91,13 +91,24 @@ plt.rcParams.update({
 # Read your dataset
 df = pd.read_csv("fpi.txt", sep=r"\s+")
 
-fig, axes = plt.subplots(1, 2, figsize=(11, 5), sharey=False)
 ensembles = df['en'].unique()
+fig, axes = plt.subplots(1, len(ensembles), figsize=(12, 6), sharey=False)
 
 # Define explicit color palettes for distinct volumes per ensemble
 color_maps = {
     'B': {64: '#e66101', 96: '#5e3c99'},
-    'C': {80: '#d7191c', 112: '#2c7bb6'}
+    'C': {80: '#d7191c', 112: '#2c7bb6'},
+    'D': {96: '#fdae61', 128: '#abd9e9'} # Example color palette extension
+}
+marker_maps = {
+    'B': {64: 'o', 96: 's'},
+    'C': {80: 'o', 112: 's'},
+    'D': {96: 'o', 128: 's'} # Example color palette extension
+}
+markerL_maps = {
+    'B': {64: '^', 96:  'x'},
+    'C': {80: '^', 112: 'x'},
+    'D': {96: '^', 128: 'x'} # Example color palette extension
 }
 
 for ax, en in zip(axes, ensembles):
@@ -107,16 +118,23 @@ for ax, en in zip(axes, ensembles):
     for _, row in sub.iterrows():
         L_size = int(row['L'])
         point_color = color_maps[en][L_size]
+        marker_style = marker_maps[en][L_size]
+        markerL_style = markerL_maps[en][L_size]
         x_finite = [0.9, 1.1]
         x_infinite = [1.9, 2.1]
         # Plot finite-volume point (Circle)
         ax.errorbar(x_finite[i], row['value'], yerr=row['error'], 
-                    fmt='o', color=point_color, ms=8, capsize=5, 
+                    fmt=marker_style,
+                    color=point_color,
+                    ms=8, capsize=5, 
                     label=f"L = {L_size}")
         
         # Plot its corresponding infinite-volume point (Square)
         ax.errorbar(x_infinite[i], row['Linf_value'], yerr=row['Linf_error'], 
-                    fmt='s', color=point_color, ms=8, capsize=5)
+                    fmt=markerL_style,
+                    color=point_color,
+                    ms=8, capsize=5
+                    )
         
         # Draw explicit linking trajectory line
         ax.plot([x_finite[i], x_infinite[i]], [row['value'], row['Linf_value']], 
@@ -125,10 +143,11 @@ for ax, en in zip(axes, ensembles):
     # Style configuration
     ax.set_title(f"Ensemble {en}", fontsize=13, fontweight='bold')
     ax.set_xticks([1.0, 2.0])
-    ax.set_xticklabels(['Finite $L$', r'Extrapolated Limit ($L_{\infty}$)'], fontsize=11)
+    ax.set_xticklabels(['Finite $L$', r'Extrapolated to $L_{\infty}$'], fontsize=11)
     ax.set_xlim(0.6, 2.4)
+    # ax.yaxis.set_major_formatter(FormatStrFormatter('%.4f'))  # Format Y-axis to 4 decimal places
     ax.grid(True, linestyle=':', alpha=0.5)
-    ax.legend(title="Lattice Volume", loc='best')
+    ax.legend(title="Lattice Volume", loc='lower right')
 
 axes[0].set_ylabel(r"$af_{\pi}^{\rm WTI}$", fontsize=12)
 plt.tight_layout()
