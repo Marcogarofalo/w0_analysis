@@ -452,10 +452,13 @@ int main(int argc, char** argv) {
     double dmu = head_rew.mus[0] - head_rew.oranges[0];
     printf("dmu: %.12g mu1 =  %g   mu2 = %g\n", dmu, head_rew.mus[0], head_rew.oranges[0]);
     double* deriv_M = myres->create_zero();
+    double* norm_deriv_M = myres->create_zero();
     for (int j = 0; j < Njack;j++) {
         deriv_M[j] = (M_PS[j] - M_PS_mu[j]) / dmu;
+        norm_deriv_M[j] = deriv_M[j] * amuiso[0][j] / M_PS[j];
     }
     printf("deriv M: %.12g   %.12g\n", deriv_M[Njack - 1], myres->comp_error(deriv_M));
+    printf("norm deriv M: %.12g   %.12g\n", norm_deriv_M[Njack - 1], myres->comp_error(norm_deriv_M));
 
     //////////////// me  and fpi
 

@@ -140,3 +140,5 @@ add_target_with_libs(derivative_corr derivative_corr.cpp)
 
 add_target_with_libs(check_MK_fpi_RK check_MK_fpi_RK.cpp)
 add_target_with_libs(jacks_B96_C112_w0 jacks_B96_C112_w0.cpp)
+add_target_with_libs(w0_only w0_only.cpp)
+add_target_with_libs(pion_only pion_only.cpp)
