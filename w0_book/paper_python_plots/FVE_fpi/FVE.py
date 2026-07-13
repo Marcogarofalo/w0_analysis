@@ -96,9 +96,12 @@ fig, axes = plt.subplots(1, len(ensembles), figsize=(12, 6), sharey=False)
 
 # Define explicit color palettes for distinct volumes per ensemble
 color_maps = {
-    'B': {64: '#e66101', 96: '#5e3c99'},
+    # 'B': {64: '#e66101', 96: '#5e3c99'},
+    # 'C': {80: '#d7191c', 112: '#2c7bb6'},
+    # 'D': {96: '#fdae61', 128: '#abd9e9'} # Example color palette extension
+    'B': {64: '#d7191c', 96: '#2c7bb6'},
     'C': {80: '#d7191c', 112: '#2c7bb6'},
-    'D': {96: '#fdae61', 128: '#abd9e9'} # Example color palette extension
+    'D': {96: '#d7191c', 128: '#2c7bb6'} # Example color palette extension
 }
 marker_maps = {
     'B': {64: 'o', 96: 's'},
