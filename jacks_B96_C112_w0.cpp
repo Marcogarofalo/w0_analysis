@@ -69,7 +69,7 @@ int main() {
     name =std::string("deriv/f_PS_D128.dat_jack") + std::to_string(Nj)  + std::string(".dat");
     myres->write_jack_in_file(fPSD128,  name.c_str());
     
-
+    delete myres;
 
   }
 }
