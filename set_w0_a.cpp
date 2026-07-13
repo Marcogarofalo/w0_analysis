@@ -33,7 +33,7 @@
 #include <string>
 #include <vector>
 #include <filesystem>
-
+#include <regex>
 enum enum_ensembles {
     B72_64,
     B72_96,
@@ -561,8 +561,10 @@ int main(int argc, char** argv) {
     read_file_debug(data[0 + 5 * 5], files[0 + 5 * 5].c_str());// dMpi / dmus(sea)
     read_file_debug(data[1 + 5 * 5], files[1 + 5 * 5].c_str());// dMK2  / dmus(sea)
     read_file_debug(data[2 + 5 * 5], files[2 + 5 * 5].c_str());// dMDs / dmus(sea)
-    read_file_debug(data[3 + 5 * 5], files[3 + 5 * 5].c_str());// ddpi / dmus(sea)
+    read_file_debug(data[3 + 5 * 5], files[3 + 5 * 5].c_str());// dfpi / dmus(sea)
     read_file_debug(data[4 + 5 * 5], files[4 + 5 * 5].c_str());// dw0 / dmus(sea)
+
+    
     for (int j = 0; j < Njack;j++) {
         double mul = amuiso[0][j];
         double f = data[3][j];
@@ -571,16 +573,45 @@ int main(int argc, char** argv) {
         *dR = (*dR) * (f) / mul;
         dR = &data[4 + 5 * 5][j]; // w0
         *dR = (*dR) * (w0) / mul;
-        for (int i = 0; i < 3; i++) {
-            // first we remove the prefacor
-            double* dR = &data[i + 5 * 5][j];
-            double M = data[i][j];
-            if (j == Njack - 1 && i == 2)    printf(" %g     %g   %g  %g \n", *dR, f, M, mul);
-            double df = data[3 + 5 * 5][j];
-            *dR = (*dR) * (M / f) / mul;
-            if (j == Njack - 1 && i == 2)    printf(" %g    %g \n", *dR, df);
-            (*dR) = ((*dR) + M * df / (f * f)) * f;
-            if (j == Njack - 1 && i == 2)    printf(" %g     \n", *dR);
+    }
+    for (int i = 0; i < 3; i++) {
+        std::vector<std::string> splitted_f = split(files[ i + 5 * 5],'/');
+        // for (auto s : splitted_f){          std::cout<< s << "\n";        }
+        // 1. Get the last element safely
+        const std::string& last_elem = splitted_f.back(); 
+
+        // 2. Define the regex pattern (.* matches any sequence of characters)
+        std::regex pattern("^mul_over_R.*_dR.*_dms\\.dat$");
+        std::regex patternM("^mul_over_M.*_dM.*_dms\\.dat$");
+        // 3. Perform the conditional check
+        if (std::regex_match(last_elem, pattern)) {
+            printf("file %s contains R\n", last_elem.c_str());
+            for (int j = 0; j < Njack;j++) {
+                double mul = amuiso[0][j];
+                double f = data[3][j];
+                // first we remove the prefacor
+                double* dR = &data[i + 5 * 5][j];
+                double M = data[i][j];
+                // if (j == Njack - 1 && i == 2)    printf(" %g     %g   %g  %g \n", *dR, f, M, mul);
+                double df = data[3 + 5 * 5][j];
+                *dR = (*dR) * (M / f) / mul;
+                // if (j == Njack - 1 && i == 2)    printf(" %g    %g \n", *dR, df);
+                (*dR) = ((*dR) + M * df / (f * f)) * f;
+                // if (j == Njack - 1 && i == 2)    printf(" %g     \n", *dR);
+            }
+        }
+        else if (std::regex_match(last_elem, patternM)) {
+            printf("file %s contains M\n", last_elem.c_str());
+            for (int j = 0; j < Njack;j++) {
+                double mul = amuiso[0][j];
+                double f = data[3][j];
+                // first we remove the prefacor
+                double* dR = &data[i + 5 * 5][j];
+                double M = data[i][j];
+                // if (j == Njack - 1 && i == 2)    printf(" %g     %g   %g  %g \n", *dR, f, M, mul);
+                double df = data[3 + 5 * 5][j];
+                *dR = (*dR) * (M ) / mul;
+            }
         }
     }
     // sea deriv mc
@@ -1050,7 +1081,7 @@ int main(int argc, char** argv) {
 
     double *previous_pull_w0= myres->create_zero();
     double *previous_pull_sqrtt0= myres->create_zero();
-    std::string filepath ="deriv/pull_w0.dat";
+    std::string filepath =std::string("deriv/pull_w0_jack") + std::to_string(Njack) +".dat";
     if (std::filesystem::exists(filepath)){
         myres->read_jack_from_file(previous_pull_w0, filepath.c_str());
     }
@@ -1058,7 +1089,7 @@ int main(int argc, char** argv) {
        free(previous_pull_w0);
        previous_pull_w0 = myres->create_fake_exact(0.0,1e-16,-1); 
     }
-    filepath ="deriv/pull_sqrtt0.dat";
+    filepath =std::string("deriv/pull_sqrtt0_jack") + std::to_string(Njack)  +".dat";
     if (std::filesystem::exists(filepath)){
         myres->read_jack_from_file(previous_pull_sqrtt0, filepath.c_str());
     }
