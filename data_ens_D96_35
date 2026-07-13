@@ -27,13 +27,13 @@ deriv/zero_35.dat
 ../../data_l_35/D96/derivatives/sea/ml/D96_dMDs_dml.dat
 ../../data_l_35/D96/derivatives/sea/ml/D96_dfPi_dml.dat
 deriv/der_rewlOS_flow_D96.dat_jack35.dat
-# ms valence derivatives 
+# ms sea derivatives 
 ../../data_l_35/D96/derivatives/sea/ms/mul_over_RPi_dRPi_dms.dat
 ../../data_l_35/D96/derivatives/sea/ms/mul_over_RK_dRK_dms.dat
 ../../data_l_35/D96/derivatives/sea/ms/mul_over_RDs_dRDs_dms.dat
 ../../data_l_35/D96/derivatives/sea/ms/mul_over_fPi_dfPi_dms.dat
 deriv/mul_w0_dw0_dmu_strange_small_volume_const_jack35.dat
-# ms valence derivatives 
+# mc sea derivatives 
 ../../data_l_35/D96/derivatives/sea/mc/mul_over_RPi_dRPi_dmc.dat
 ../../data_l_35/D96/derivatives/sea/mc/mul_over_RK_dRK_dmc.dat
 ../../data_l_35/D96/derivatives/sea/mc/mul_over_RDs_dRDs_dmc.dat
@@ -90,3 +90,6 @@ deriv/der_sqrtt0_m0_flow_D96.dat_P5_mu1.6490e-01.bin_jack35.dat
 deriv/der_sqrtt0_m0_flow_D96.dat_P5_mu5.4000e-04.bin_jack35.dat
 deriv/P0_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack35.dat
 deriv/P1_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack35.dat
+#
+deriv/w0_flow_D128.dat_jack35.dat
+deriv/sqrtt0_flow_D128.dat_jack35.dat

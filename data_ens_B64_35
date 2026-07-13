@@ -93,3 +93,6 @@ deriv/der_sqrtt0_m0_flow_B64_LMA.dat_P5_mu2.3770e-01.bin_jack35.dat
 deriv/der_sqrtt0_m0_flow_B64_LMA.dat_P5_mu7.2000e-04.bin_jack35.dat  
 deriv/P0_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack35.dat
 deriv/P1_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack35.dat
+####
+deriv/w0_flow_B96.dat_jack35.dat
+deriv/sqrtt0_flow_B96.dat_jack35.dat
