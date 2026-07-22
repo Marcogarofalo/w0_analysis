@@ -32,7 +32,7 @@ masses <- c(
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
 library(stringr)
-Njack <- c(35)
+Njack <- c(20)
 dfpi <- data.frame("fpi" = numeric(), "dfpi" = numeric(), "Njack" = numeric())
 
 for (Nj in Njack) {
