@@ -296,6 +296,30 @@ double comp_error_pool(double* j1, double* j2) {
     return fabs(j1[Nj - 1] - j2[Nj - 1]) * erf(fabs(P) / sqrt(2.0));
 }
 
+// we need the reference to a pointer to change is status
+void check_pull_factor(double *&pull, std::string filename){
+    std::string filepath = filename;
+    double *previous_pull;
+    if (std::filesystem::exists(filepath)){
+        previous_pull = myres->create_zero();
+        myres->read_jack_from_file(previous_pull, filename.c_str());
+    }
+    else{
+       previous_pull = myres->create_fake_exact(0.0,1e-16,-1); 
+    }
+    printf("comparing pull values current = %g  previous= %g\n", myres->comp_error(pull), myres->comp_error(previous_pull));
+    if (myres->comp_error(pull) < myres->comp_error(previous_pull)) {
+       printf("using pull factor from existing file %s \n", filename.c_str());
+       free(pull);
+       pull = previous_pull;
+    }
+    else {
+        printf("using current pull factor and updating %s \n", filename.c_str());
+        myres->write_jack_in_file(pull, filename.c_str());
+        free(previous_pull);
+    }
+}
+
 double* weighted_average_plus_pool(double* M0, double* M1) {
     double dM0 = myres->comp_error(M0);
     double dM1 = myres->comp_error(M1);
@@ -1079,45 +1103,14 @@ int main(int argc, char** argv) {
         pull_sqrtt0 = myres->create_fake_exact(0.0,1e-16,-1);
     }
 
+    
     double *previous_pull_w0= myres->create_zero();
     double *previous_pull_sqrtt0= myres->create_zero();
-    std::string filepath =std::string("deriv/pull_w0_jack") + std::to_string(Njack) +".dat";
-    if (std::filesystem::exists(filepath)){
-        myres->read_jack_from_file(previous_pull_w0, filepath.c_str());
-    }
-    else{
-       free(previous_pull_w0);
-       previous_pull_w0 = myres->create_fake_exact(0.0,1e-16,-1); 
-    }
-    filepath =std::string("deriv/pull_sqrtt0_jack") + std::to_string(Njack)  +".dat";
-    if (std::filesystem::exists(filepath)){
-        myres->read_jack_from_file(previous_pull_sqrtt0, filepath.c_str());
-    }
-    else{
-       free(previous_pull_sqrtt0);
-       previous_pull_sqrtt0 = myres->create_fake_exact(0.0,1e-16,-1); 
-    }
-
-    printf("comparing pull values  %g   %g\n", myres->comp_error(pull_w0), myres->comp_error(previous_pull_w0));
-    if (myres->comp_error(pull_w0) < myres->comp_error(previous_pull_w0)) {
-       printf("pull_w0.dat updated with new value\n");
-       free(pull_w0);
-       pull_w0 = previous_pull_w0;
-    }
-    else {
-        printf("pull_w0.dat stay the same\n");
-        myres->write_jack_in_file(pull_w0, "deriv/pull_w0.dat");
-    }
-    if (myres->comp_error(pull_sqrtt0) < myres->comp_error(previous_pull_sqrtt0)) {
-       printf("pull_sqrtt0.dat updated with new value\n");
-       free(pull_sqrtt0);
-       pull_sqrtt0 = previous_pull_sqrtt0;
-    }
-    else {
-        printf("pull_sqrtt0.dat stay the same\n");
-        myres->write_jack_in_file(pull_sqrtt0, "deriv/pull_sqrtt0.dat");
-    }
-
+    std::string filename_pull =std::string("deriv/pull_w0_jack") + std::to_string(Njack) +".dat";
+    check_pull_factor(pull_w0, filename_pull);
+    filename_pull =std::string("deriv/pull_sqrtt0_jack") + std::to_string(Njack) +".dat";
+    check_pull_factor(pull_sqrtt0, filename_pull);
+    
     myres->add(data[iw0], data[iw0], pull_w0);
     myres->add(data[id_deriv_sqrtt0(0, 0, 0)], data[id_deriv_sqrtt0(0, 0, 0)], pull_sqrtt0);
     
@@ -1409,7 +1402,9 @@ int main(int argc, char** argv) {
                 w0_lin_deriv[j] += dm * dw;
                 sqrtt0_from_fpi[j] += dm * dt;
                 w0_a_split[1 + im + val_sea * 3][j] = dm * dw;
+                w0_a_split[1 + im + 0 * 3][j] = 0.0;
                 w0_split[1 + im + val_sea * 3][j] = w0_a_split[1 + im + val_sea * 3][j] * a_fm[j];
+                w0_split[1 + im + 0 * 3][j] = 0.0;
             }
             w0_sim[j] = data[iw0][j] * data[id_deriv(3, 0, 0, 0)][j] / (fpi_MeV / hbarc);
             w0_a_lin_der[j] = w0_lin_deriv[j];
@@ -1428,13 +1423,23 @@ int main(int argc, char** argv) {
             data_m_a[3][j] = miso[2][j];
         }
         double** cov_m_a = myres->comp_cov(4, data_m_a);
-        printf("covariance matrix for (in order) a, m^iso l,s,c  ens: %s\n", ensemble.c_str());
+        printf("correlation matrix for (in order) a, m^iso l,s,c  ens: %s\n", ensemble.c_str());
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
                 printf("%-22.12g", corr);
                 // if (std::fabs(corr) > 0.4)
                 // printf("%-22.12g", cov_m_a[i][j]);
+            }
+            printf("\n");
+        }
+        printf("covariance matrix for (in order) a, m^iso l,s,c  ens: %s\n", ensemble.c_str());
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                // double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
+                // printf("%-22.12g", corr);
+                // if (std::fabs(corr) > 0.4)
+                printf("%-22.12g", cov_m_a[i][j]);
             }
             printf("\n");
         }
