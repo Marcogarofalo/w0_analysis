@@ -1560,7 +1560,7 @@ int main(int argc, char** argv) {
         fit_type fit_info;
 
         fit_info.corr_id = { id_w0_small_L, id_fpi_small_L , id_fpi_sim_big_L, id_w0_big_L}; // w0, fpi
-        fit_info.Nxen = { {0,1,2,3}, {0,2} };
+        fit_info.Nxen = { {0,1,2,3}, {0,1,2} };
         fit_info.init_N_etot_form_Nxen();
         fit_info.function = rhs_a2;
         fit_info.linear_fit = true;
