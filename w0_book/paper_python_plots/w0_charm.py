@@ -6,6 +6,17 @@ from matplotlib import rc
 import numpy as np
 import matplotlib.ticker as ticker
 
+import matplotlib.container as mcontainer
+from matplotlib.legend_handler import HandlerErrorbar
+ 
+handler_map = {
+    mcontainer.ErrorbarContainer: HandlerErrorbar(yerr_size=.7)
+}
+def legend(ax, *args, **kwargs):
+    kwargs.setdefault("handler_map", handler_map)
+    return ax.legend(*args, **kwargs)
+
+# Configurazione corretta per usare i font interni di LaTeX ovunque
 plt.rcParams.update({
     "text.usetex": False,         # Zero crash su Windows
     "mathtext.fontset": "cm",     # Usa il motore matematico Computer Modern
@@ -25,20 +36,26 @@ plt.rcParams.update({
     
     "xtick.labelsize": 14,    # Dimensione dei numeri sull'asse X
     "ytick.labelsize": 14,    # Dimensione dei numeri sull'asse Y
-
-    # --- Configurazione TICK MINORS ---
-    "xtick.minor.visible": True,  # Attiva i tick minori sull'asse X
-    "ytick.minor.visible": True,  # Attiva i tick minori sull'asse Y
-
-    # --- Configurazione TICK INTERNI ---
-    "xtick.direction": "in",  # Forzza i tick dell'asse X verso l'interno
-    "ytick.direction": "in",  # Forza i tick dell'asse Y verso l'interno        
     
     "legend.fontsize": 14,    # Dimensione del testo dentro la legenda
     "figure.titlesize": 18,   # Dimensione del titolo della figura intera (suptitle)
 
+    "legend.markerscale": 1.,       # Ingrandisce i simboli solo dentro la legenda (moltiplicatore)
+    "legend.labelspacing": 1.1,      # Aumenta lo spazio verticale tra le righe (default 0.5)
+    "legend.borderpad": .8,
+    "legend.handletextpad": 1.,
+
+
     "errorbar.capsize":5,
     "lines.markeredgewidth":2.0, 
+    "lines.markersize": 9.0, 
+    # --- Configurazione TICK MINORS ---
+    "xtick.minor.visible": True,  # Attiva i tick minori sull'asse X
+    "ytick.minor.visible": True,  # Attiva i tick minori sull'asse Y
+    # --- Configurazione TICK INTERNI ---
+    "xtick.direction": "in",  # Forzza i tick dell'asse X verso l'interno
+    "ytick.direction": "in",  # Forza i tick dell'asse Y verso l'interno        
+ 
     # --- Configurazione GRIGLIA AUTOMATICA (Major Ticks) ---
     "axes.grid": True,                   # Attiva la griglia di default su tutti i grafici
     "axes.grid.which": "major",          # Applica solo ai ticks principali (major)
@@ -47,6 +64,22 @@ plt.rcParams.update({
     "grid.linewidth": 0.5,               # Spessore della linea (width 0.5)
     "grid.alpha": 0.7,                   # Opzionale: trasparenza per non appesantire il grafico (da 0 a 1)
 })
+
+blue = "#4363d8"
+orange = "#f58231"
+yellow = "#ffe119"
+maroon = "#800000"
+navy = "#000075"
+lavender = "#dcbeff"
+red = "#e6194B"
+green= "#2CA02C"
+colors = [orange,blue,maroon,navy,yellow,lavender]
+colors_dis = {"tm":red,"OS":blue}
+symbol_dis = {"tm":"^","OS":"v"}
+########################################################################################
+########################################################################################
+
+
 def plot_fit(ax, basename, var, data_type=None, noribbon=False,
              id_x=1, noline=False, labelfit="fit", width=0.02, size=1,
              id_color=None, id_shape=None, single_name_for_fit=None,
@@ -160,10 +193,10 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
                 capsize=width*1000, 
                 label=f"B64"
             )
-    ax.errorbar(x_data[3], y_data[3], yerr=y_err[3], marker = marker_choices[4], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B32")
+    ax.errorbar(x_data[3]+0.5e-4, y_data[3], yerr=y_err[3], marker = marker_choices[4], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B32")
     ax.errorbar(x_data[4], y_data[4], yerr=y_err[4], marker = marker_choices[3], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B24")
     ax.errorbar(x_data[1], y_data[1], yerr=y_err[1],marker = marker_choices[1],linestyle='none', elinewidth=size,capsize=width*1000, label=f"C80")
-    ax.errorbar(x_data[5], y_data[5], yerr=y_err[5], marker = marker_choices[5], linestyle='none', elinewidth=size, capsize=width*1000, label=f"C48")
+    ax.errorbar(x_data[5]+0.5e-4, y_data[5], yerr=y_err[5], marker = marker_choices[5], linestyle='none', elinewidth=size, capsize=width*1000, label=f"C48")
     ax.errorbar(x_data[2], y_data[2], yerr=y_err[2],marker = marker_choices[2],linestyle='none', elinewidth=size,capsize=width*1000, label=f"D96")
     ax.errorbar(x_data[6], y_data[6], yerr=y_err[6], marker = marker_choices[6], linestyle='none', elinewidth=size, capsize=width*1000, label=f"E112")
     
@@ -280,7 +313,7 @@ labels = [["sim","sim"], ["$m_0$ and L corrected"], ["full corrected"]]
 # Initialize the Matplotlib figure canvas
 # Defaulting layout variables width/height if missing in original snippet scope
 width, height = 900, 600 
-fig, ax = plt.subplots(figsize=(width / 100, height / 100))
+fig, ax = plt.subplots(figsize=(12,6))
 # fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(9,6))
 
 Nboot=2000
@@ -300,6 +333,7 @@ for j, basename in enumerate(basenames):
         noline=True,
         noribbon=False,
         alpha_line = 0.5,
+        alpha_ribbon=0.2,
         stroke=0.1,
         ii=j
     )
@@ -360,9 +394,13 @@ for spine in ax.spines.values():
 # Clean duplicate handles generated during the iterative subplot loops
 handles, plot_labels = ax.get_legend_handles_labels()
 by_label = dict(zip(plot_labels, handles))
-ax.legend(by_label.values(), by_label.keys(), loc="lower left",
+# ax.legend(by_label.values(), by_label.keys(), loc="lower left",
+#             #  bbox_to_anchor=legend_position
+#              )
+legend(ax,by_label.values(), by_label.keys(), loc="lower left",
             #  bbox_to_anchor=legend_position
              )
+
 # ax.errorbar([0.],[BAIC_ave],[BAIC_err],fmt="x",color="black",label=f"BAIC average")
 # ax.errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
 

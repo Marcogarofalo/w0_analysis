@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 import numpy as np
 import matplotlib.ticker as ticker
-
+scale=1e+10
 plt.rcParams.update({
     "text.usetex": False,         # Zero crash su Windows
     "mathtext.fontset": "cm",     # Usa il motore matematico Computer Modern
@@ -132,10 +132,10 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
             lbl = str(mycol[idx])
             
             if not noribbon:
-                ax.fill_between(x_vals, ymin, ymax, alpha=alpha_ribbon, label=lbl)
+                ax.fill_between(x_vals, ymin*scale, ymax*scale, alpha=alpha_ribbon, label=lbl, color="red")
             if not noline:
                 # ax.plot(x_vals, y_vals, alpha=alpha_line, label=lbl, color="gray", linewidth=0.5)
-                ax.plot(x_vals, y_vals,color="black",alpha=0.2,linewidth=0.5)
+                ax.plot(x_vals, y_vals*scale,color="red",alpha=0.2,linewidth=0.5)
 
     # 2. Plot Points & Errorbars from main text data frame
     # Collect data arrays
@@ -152,22 +152,39 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
     marker_map = {combo: marker_choices[i % len(marker_choices)] for i, combo in enumerate(unique_combos)}
     #marker_map = ["o","^","^"]
 
-    for combo in unique_combos:
-        print(combo)
-        mask = [c == combo[0] and s == combo[1] for c, s in zip(color_type, shape_type)]
-        if any(mask):
-            ax.errorbar(
-                x_data[mask], y_data[mask], yerr=y_err[mask],
-                # fmt=marker_map[combo],
-                marker = marker_choices[ii],
-                linestyle='none', 
+    ax.errorbar(
+                x_data, y_data*scale, yerr=y_err*scale,
+                marker = marker_choices[0],
+                linestyle='none',
+                color="black" ,
                 elinewidth=size,
                 capsize=width*1000, 
-                # markersize=size*5,
-                # markeredgewidth=stroke,
-                # label=f"$f_\\pi^{{\\rm {combo[0]}}}$"
-                label=f"{combo[0]}"
+                label=f"$f_\pi$-scheme results"
             )
+    # ax.errorbar(x_data[3], y_data[3], yerr=y_err[3], marker = marker_choices[4], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B32")
+    # ax.errorbar(x_data[4], y_data[4], yerr=y_err[4], marker = marker_choices[3], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B24")
+    # ax.errorbar(x_data[1], y_data[1], yerr=y_err[1],marker = marker_choices[1],linestyle='none', elinewidth=size,capsize=width*1000, label=f"C80")
+    # ax.errorbar(x_data[5], y_data[5], yerr=y_err[5], marker = marker_choices[5], linestyle='none', elinewidth=size, capsize=width*1000, label=f"C48")
+    # ax.errorbar(x_data[2], y_data[2], yerr=y_err[2],marker = marker_choices[2],linestyle='none', elinewidth=size,capsize=width*1000, label=f"D96")
+    # ax.errorbar(x_data[6], y_data[6], yerr=y_err[6], marker = marker_choices[6], linestyle='none', elinewidth=size, capsize=width*1000, label=f"E112")
+    
+    # for combo in unique_combos:
+    #     print(combo)
+    #     mask = [c == combo[0] and s == combo[1] for c, s in zip(color_type, shape_type)]
+    #     if any(mask):
+    #         ax.errorbar(
+    #             x_data[mask], y_data[mask], yerr=y_err[mask],
+    #             # fmt=marker_map[combo],
+    #             marker = marker_choices[ii],
+    #             linestyle='none', 
+    #             id_color = 1,
+    #             elinewidth=size,
+    #             capsize=width*1000, 
+    #             # markersize=size*5,
+    #             # markeredgewidth=stroke,
+    #             # label=f"$f_\\pi^{{\\rm {combo[0]}}}$"
+    #             label=f"{combo[0]}"
+    #         )
     
 def read_fit_file(file_path):
     # Read space-separated data (equivalent to read.table with fill=True)
@@ -237,12 +254,9 @@ def calculate_baic_average(v, err, chi2dof, dof, npar, multiplicity=1):
 # --- Main Script Execution ---
 
 C = -5
-path = "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
+path = "/home/garofalo/analysis/gm2_analysis/build/interpolation_fpi"
 basenames = [
-    f"fit_w0_sim_L_a2",
-    #f"fit_w0_Linf_a2",
-    #f"fit_w0_lin_deriv_FLAG_a2"
-    f"fit_w0_full_a2"
+    f"fit_fpi_obs_5"
 ]
 
 count = len(basenames)
@@ -262,15 +276,14 @@ df = pd.DataFrame({
 legend_name = [re.sub(r"fit_fpi_|\.000000", "", name) for name in basenames]
 # legend_name = [f"\\verb|{name}|" for name in legend_name]
 
-labels = [["sim","sim"], ["$m_0$ and $L$ corrected"], ["full corrected"],["aaa"]]
-labels = [["sim","sim"],  ["full corrected"],["aaa"]]
+labels = [["sim","sim"], ["$m_0$ and L corrected"], ["full corrected"]]
 
 # Initialize the Matplotlib figure canvas
 # Defaulting layout variables width/height if missing in original snippet scope
-width, height = 800, 600 
-fig, ax = plt.subplots(figsize=(16,9))
+width, height = 900, 600 
+fig, ax = plt.subplots(figsize=(width / 100, height / 100))
 # fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(9,6))
-ax.set_xlim(0, 0.007)
+
 Nboot=2000
 flat_boot = [] 
 # Iterate and append layers directly onto the initialized axes
@@ -278,17 +291,18 @@ for j, basename in enumerate(basenames):
     plot_fit(
         ax=ax,
         basename=os.path.join(path, basename),
-        var="a2",
+        var="fpi",
         data_type=labels[j],
         id_x=1,
         single_name_for_fit="",
         width=0.004,
-        size=0.8,
+        size=0.9,
         nudge=0,
-        noline=True,
-        noribbon=True,
+        noline=False,
+        noribbon=False,
         alpha_line = 0.5,
-        stroke=0.1,
+        alpha_ribbon=0.2,
+        stroke=0.2,
         ii=j
     )
     # Assuming 'path', 'basenames', and 'j' are defined in your loop:
@@ -302,20 +316,20 @@ for j, basename in enumerate(basenames):
     bt=np.random.normal(fit['P'].iloc[0,1], fit['P'].iloc[0,2], Nboot)
     flat_boot.extend(bt)
     
-ave_BAIC = calculate_baic_average(
-    v=df['res'].to_numpy(),
-    err=df['err'].to_numpy(),
-    chi2dof=df['chi2dof'].to_numpy(),
-    dof=df['dof'].to_numpy(),
-    npar=df['Npar'].to_numpy(),
-    multiplicity=df['mult'].to_numpy()
-)
-BAIC_ave = ave_BAIC['m']
-BAIC_err = ave_BAIC['dm']
-stat_err = ave_BAIC['stat']
-flat_weig =[]
-for j, basename in enumerate(basenames):
-    flat_weig.extend([ave_BAIC['AIC'][j]]*Nboot)
+# ave_BAIC = calculate_baic_average(
+#     v=df['res'].to_numpy(),
+#     err=df['err'].to_numpy(),
+#     chi2dof=df['chi2dof'].to_numpy(),
+#     dof=df['dof'].to_numpy(),
+#     npar=df['Npar'].to_numpy(),
+#     multiplicity=df['mult'].to_numpy()
+# )
+# BAIC_ave = ave_BAIC['m']
+# BAIC_err = ave_BAIC['dm']
+# stat_err = ave_BAIC['stat']
+# flat_weig =[]
+# for j, basename in enumerate(basenames):
+#     flat_weig.extend([ave_BAIC['AIC'][j]]*Nboot)
 
 # Reference benchmark flag lines
 # fpi_FLAG = 0.17236
@@ -324,8 +338,8 @@ for j, basename in enumerate(basenames):
 
 # Typography and Axis setup
 title = ""
-xlabel = r"$(af_\pi/f_\pi^{\rm FLAG})^2$ [fm$^2$]"
-ylabel = r"$w_{0}f_\pi$"
+xlabel = r"$f_\pi$ [MeV]"
+ylabel = r"$a_\mu^{\rm HVP} (c)\times 10^{10}$"
 
 legend_position = (0.7, 0.98)
 
@@ -348,9 +362,6 @@ for spine in ax.spines.values():
 # Clean duplicate handles generated during the iterative subplot loops
 handles, plot_labels = ax.get_legend_handles_labels()
 by_label = dict(zip(plot_labels, handles))
-ax.legend(by_label.values(), by_label.keys(), loc="lower left",
-            #  bbox_to_anchor=legend_position
-             )
 # ax.errorbar([0.],[BAIC_ave],[BAIC_err],fmt="x",color="black",label=f"BAIC average")
 # ax.errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
 
@@ -358,13 +369,24 @@ ax.legend(by_label.values(), by_label.keys(), loc="lower left",
 # ax.grid(True, which='minor', axis='x')
 # ax.tick_params(axis='x',which='minor',size=0)
 
+fpi_wp25=131.09  
+val=1.42617149993e-09  
+err=2.20037920503e-11
+ax.errorbar(fpi_wp25, val*scale, yerr=err*scale, marker = "s", linestyle='none', color="red", 
+            # elinewidth=0.8,
+            # capsize=width*1000,
+            label=f"WP25result")
+ax.set_xlim(130, 131.5)
 
 plt.subplots_adjust(left=0.12, right=0.95, top=0.92, bottom=0.12, wspace=0)
 
+ax.legend(by_label.values(), by_label.keys(), loc="lower left",
+            #  bbox_to_anchor=legend_position
+             )
 # Save configuration
 # Matplotlib saves vector figures cleanly via .pdf or .svg. 
 # If your final step compiles in LaTeX via pgf/tikz, use .pgf extension format target instead.
-fpi3reg = "w0_corr"
+fpi3reg = "amu_c_interpolation"
 # plt.tight_layout()
 plt.savefig(f"{fpi3reg}.pdf", format="pdf")
 plt.close()

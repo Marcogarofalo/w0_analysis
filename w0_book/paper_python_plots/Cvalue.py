@@ -51,7 +51,7 @@ plt.rcParams.update({
 # plt.style.use("seaborn-v0_8-whitegrid")  # or 'ggplot' depending on preference
 # fig, ax = plt.subplots(figsize=(8, 6))
 width, height = 800, 600 
-fig, ax = plt.subplots(figsize=(width / 100, height / 100))
+fig, ax = plt.subplots(figsize=(16,9))
 
 # -------------------------------------------------------------------------
 # Loop 1: ic in (0, -5)

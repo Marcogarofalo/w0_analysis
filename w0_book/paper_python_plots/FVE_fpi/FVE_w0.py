@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # 1. Read the data file (handling whitespace separation safely)
-df = pd.read_csv("w0.txt", sep=r"\s+")
+df = pd.read_csv("w0_20.txt", sep=r"\s+")
 
 # 2. Get unique ensembles to determine the layout
 ensembles = df["en"].unique()
@@ -10,9 +10,9 @@ num_plots = len(ensembles)
 
 # 3. Create a side-by-side subplot layout
 fig, axes = plt.subplots(
-    1, num_plots, figsize=(6 * num_plots, 5), sharex=False, squeeze=False
+    1, num_plots, figsize=(12 5), sharex=False, squeeze=False
 )
-a_fm = [0.079696, 0.056879]
+a_fm = [0.079696, 0.068004, 0.056879]
 # 4. Loop through each ensemble and plot its data
 for idx, en_name in enumerate(ensembles):
     ax = axes[0, idx]

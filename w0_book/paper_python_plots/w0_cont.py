@@ -6,6 +6,17 @@ from matplotlib import rc
 import numpy as np
 import matplotlib.ticker as ticker
 
+import matplotlib.container as mcontainer
+from matplotlib.legend_handler import HandlerErrorbar
+ 
+handler_map = {
+    mcontainer.ErrorbarContainer: HandlerErrorbar(yerr_size=.7)
+}
+def legend(ax, *args, **kwargs):
+    kwargs.setdefault("handler_map", handler_map)
+    return ax.legend(*args, **kwargs)
+
+# Configurazione corretta per usare i font interni di LaTeX ovunque
 plt.rcParams.update({
     "text.usetex": False,         # Zero crash su Windows
     "mathtext.fontset": "cm",     # Usa il motore matematico Computer Modern
@@ -25,20 +36,26 @@ plt.rcParams.update({
     
     "xtick.labelsize": 14,    # Dimensione dei numeri sull'asse X
     "ytick.labelsize": 14,    # Dimensione dei numeri sull'asse Y
-
-    # --- Configurazione TICK MINORS ---
-    "xtick.minor.visible": True,  # Attiva i tick minori sull'asse X
-    "ytick.minor.visible": True,  # Attiva i tick minori sull'asse Y
-
-    # --- Configurazione TICK INTERNI ---
-    "xtick.direction": "in",  # Forzza i tick dell'asse X verso l'interno
-    "ytick.direction": "in",  # Forza i tick dell'asse Y verso l'interno        
     
     "legend.fontsize": 14,    # Dimensione del testo dentro la legenda
     "figure.titlesize": 18,   # Dimensione del titolo della figura intera (suptitle)
 
+    "legend.markerscale": 1.,       # Ingrandisce i simboli solo dentro la legenda (moltiplicatore)
+    "legend.labelspacing": 1.1,      # Aumenta lo spazio verticale tra le righe (default 0.5)
+    "legend.borderpad": .8,
+    "legend.handletextpad": 1.,
+
+
     "errorbar.capsize":5,
     "lines.markeredgewidth":2.0, 
+    "lines.markersize": 9.0, 
+    # --- Configurazione TICK MINORS ---
+    "xtick.minor.visible": True,  # Attiva i tick minori sull'asse X
+    "ytick.minor.visible": True,  # Attiva i tick minori sull'asse Y
+    # --- Configurazione TICK INTERNI ---
+    "xtick.direction": "in",  # Forzza i tick dell'asse X verso l'interno
+    "ytick.direction": "in",  # Forza i tick dell'asse Y verso l'interno        
+ 
     # --- Configurazione GRIGLIA AUTOMATICA (Major Ticks) ---
     "axes.grid": True,                   # Attiva la griglia di default su tutti i grafici
     "axes.grid.which": "major",          # Applica solo ai ticks principali (major)
@@ -47,6 +64,21 @@ plt.rcParams.update({
     "grid.linewidth": 0.5,               # Spessore della linea (width 0.5)
     "grid.alpha": 0.7,                   # Opzionale: trasparenza per non appesantire il grafico (da 0 a 1)
 })
+
+blue = "#4363d8"
+orange = "#f58231"
+yellow = "#ffe119"
+maroon = "#800000"
+navy = "#000075"
+lavender = "#dcbeff"
+red = "#e6194B"
+green= "#2CA02C"
+colors = [orange,blue,maroon,navy,yellow,lavender]
+colors_dis = {"tm":red,"OS":blue}
+symbol_dis = {"tm":"^","OS":"v"}
+########################################################################################
+########################################################################################
+
 def plot_fit(ax, basename, var, data_type=None, noribbon=False,
              id_x=1, noline=False, labelfit="fit", width=0.02, size=1,
              id_color=None, id_shape=None, single_name_for_fit=None,
@@ -135,7 +167,8 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
                 ax.fill_between(x_vals, ymin, ymax, alpha=alpha_ribbon, label=lbl)
             if not noline:
                 # ax.plot(x_vals, y_vals, alpha=alpha_line, label=lbl, color="gray", linewidth=0.5)
-                ax.plot(x_vals, y_vals,color="black",alpha=0.2,linewidth=0.5)
+                # ax.plot(x_vals, y_vals,color="black",alpha=0.2,linewidth=0.5)
+                ax.plot(x_vals, y_vals,color=green, alpha=0.5,linestyle="dashed",linewidth=0.4)
 
     # 2. Plot Points & Errorbars from main text data frame
     # Collect data arrays
@@ -147,8 +180,8 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
     unique_combos = sorted(list(set(zip(color_type, shape_type))))
     
     # Marker map variant safely addressing varied markers
-    marker_choices = ['o', 's', '^', 'D', 'v', '<', '>', 'p', '*']
-    marker_choices = ['o', 'v', '^', 'D', 's', '<', '>', 'p', '*']
+    # marker_choices = ['o', 's', '^', 'D', 'v', '<', '>', 'p', '*']
+    marker_choices = ['d', 'v', '^', 'D', 's', '<', '>', 'p', '*']
     marker_map = {combo: marker_choices[i % len(marker_choices)] for i, combo in enumerate(unique_combos)}
     #marker_map = ["o","^","^"]
 
@@ -158,6 +191,7 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
             ax.errorbar(
                 x_data[mask], y_data[mask], yerr=y_err[mask],
                 fmt=marker_map[combo],
+                color=green,
                 elinewidth=size, capsize=width*1000, 
                 # markersize=size*5,
                 # markeredgewidth=stroke,
@@ -265,7 +299,7 @@ labels = [["WTI", "tm", "OS"]]
 # Defaulting layout variables width/height if missing in original snippet scope
 width, height = 800, 600 
 #fig, ax = plt.subplots(figsize=(width / 100, height / 100))
-fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(9,6))
+fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(12,6))
 
 Nboot=2000
 flat_boot = [] 
@@ -342,9 +376,13 @@ ax[1].tick_params(axis='y', which='both', left=False, right=False, labelleft=Fal
 # Clean duplicate handles generated during the iterative subplot loops
 handles, plot_labels = ax[1].get_legend_handles_labels()
 by_label = dict(zip(plot_labels, handles))
-ax[1].legend(by_label.values(), by_label.keys(), loc="upper left",
+# ax[1].legend(by_label.values(), by_label.keys(), loc="upper left",
+#             #  bbox_to_anchor=legend_position
+#              )
+legend(ax[1],by_label.values(), by_label.keys(), loc="upper left",
             #  bbox_to_anchor=legend_position
              )
+
 ax[1].errorbar([0.],[BAIC_ave],[BAIC_err],fmt="x",color="black",label=f"BAIC average")
 ax[1].errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
 ax[1].set_ylim(0.167, 0.176)
@@ -359,9 +397,10 @@ print(np.array(flat_weig).sum()/Nboot )
 ax[0].set_xlim(ax[0].get_xlim())
 # BAIC_ave e BAIC_err si capisce cosa sono e te li devi calcolare a parte
 ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-BAIC_err,BAIC_ave-BAIC_err],
-                            [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color="red",alpha=0.1)
+                            [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color=lavender,alpha=0.2)
 ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
-                            [BAIC_ave+stat_err,BAIC_ave+stat_err],color="red",alpha=0.1)
+                            [BAIC_ave+stat_err,BAIC_ave+stat_err],color=lavender,alpha=0.2)
+
 ax[0].set_xlabel(r"%")
 ax[0].xaxis.set_minor_locator(ticker.AutoMinorLocator())
 ax[0].grid(True, which='minor', axis='x')

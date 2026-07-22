@@ -89,7 +89,7 @@ plt.rcParams.update({
 })
 
 # Read your dataset
-df = pd.read_csv("fpi.txt", sep=r"\s+")
+df = pd.read_csv("fpi_20.txt", sep=r"\s+")
 
 ensembles = df['en'].unique()
 fig, axes = plt.subplots(1, len(ensembles), figsize=(12, 6), sharey=False)
