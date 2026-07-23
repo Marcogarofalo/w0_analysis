@@ -1443,6 +1443,26 @@ int main(int argc, char** argv) {
             }
             printf("\n");
         }
+        printf("a [fm]         : %g\n",myres->mean(a_fm));
+        printf("error on a [fm]: %g\n",myres->comp_error(a_fm));
+        printf("a*mu_l         : %g\n",myres->mean(miso[0]));
+        printf("error on a*mu_l: %g\n",myres->comp_error(miso[0]));
+        printf("a*mu_s         : %g\n",myres->mean(miso[1]));   
+        printf("error on a*mu_s: %g\n",myres->comp_error(miso[1]));
+        printf("a*mu_c         : %g\n",myres->mean(miso[2]));
+        printf("error on a*mu_c: %g\n",myres->comp_error(miso[2]));
+        printf("#\n#\n#\n#\n#\n#\n#\n");
+        for (int i = 0; i < 4; i++) {
+            printf("C_%dj : ",i);
+            for (int j = 0; j < 4; j++) {
+                // double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
+                // printf("%-22.12g", corr);
+                // if (std::fabs(corr) > 0.4)
+                printf("%-22.12g", cov_m_a[i][j]);
+            }
+            printf("\n");
+        }
+
         printf("a = %g +/- %g\n", myres->mean(a_fm), myres->comp_error(a_fm));
         printf("aml = %g +/- %g\n", myres->mean(miso[0]), myres->comp_error(miso[0]));
         printf("ams = %g +/- %g\n", myres->mean(miso[1]), myres->comp_error(miso[1]));
@@ -2523,6 +2543,7 @@ int main(int argc, char** argv) {
             y[2] = MDs_MeV * w0_MeV;
             static constexpr int iw0 = 4;
             double w0 = data[id_deriv(iw0, 0, 0, 0)][j];
+            double a2_sim = std::pow(w0_fm / w0, 2);
 
             for (int iM = 0; iM < 3; iM++) {
 
@@ -2551,6 +2572,9 @@ int main(int argc, char** argv) {
                     // if (im!=2) 
                     Mat[iM][im] += dM * w0 + M * dw;
                     Matj[iM][im][j] = Mat[iM][im];
+                    //a2 coeff in RDs
+                    if (iM == 2)
+                        Mat[iM][im] += coeff * a2_sim * 2.0 * dw / w0;
                 }
                 Risoj[iM][j] = y[iM];
                 Rsimj[iM][j] = M * w0;
@@ -2559,7 +2583,8 @@ int main(int argc, char** argv) {
 
             }
             // add the lattice artefact RDs
-            Ra[2][j] = coeff * previous_a[j] * previous_a[j];
+            // Ra[2][j] = coeff * previous_a[j] * previous_a[j];
+            Ra[2][j] = coeff * a2_sim;
             y[2] += Ra[2][j];
 
             double* P = LU_decomposition_solver(3, Mat, y);
