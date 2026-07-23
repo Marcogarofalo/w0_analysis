@@ -185,17 +185,10 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
     marker_map = {combo: marker_choices[i % len(marker_choices)] for i, combo in enumerate(unique_combos)}
     #marker_map = ["o","^","^"]
 
-    ax.errorbar(
-                x_data[0], y_data[0], yerr=y_err[0],
-                marker = marker_choices[0],
-                linestyle='none', 
-                elinewidth=size,
-                capsize=width*1000, 
-                label=f"B64"
-            )
+    # ax.errorbar( x_data[0], y_data[0], yerr=y_err[0], marker = marker_choices[0], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B64")
     ax.errorbar(x_data[3]+0.5e-4, y_data[3], yerr=y_err[3], marker = marker_choices[4], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B32")
     ax.errorbar(x_data[4], y_data[4], yerr=y_err[4], marker = marker_choices[3], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B24")
-    ax.errorbar(x_data[1], y_data[1], yerr=y_err[1],marker = marker_choices[1],linestyle='none', elinewidth=size,capsize=width*1000, label=f"C80")
+    # ax.errorbar(x_data[1], y_data[1], yerr=y_err[1],marker = marker_choices[1],linestyle='none', elinewidth=size,capsize=width*1000, label=f"C80")
     ax.errorbar(x_data[5]+0.5e-4, y_data[5], yerr=y_err[5], marker = marker_choices[5], linestyle='none', elinewidth=size, capsize=width*1000, label=f"C48")
     ax.errorbar(x_data[2], y_data[2], yerr=y_err[2],marker = marker_choices[2],linestyle='none', elinewidth=size,capsize=width*1000, label=f"D96")
     ax.errorbar(x_data[6], y_data[6], yerr=y_err[6], marker = marker_choices[6], linestyle='none', elinewidth=size, capsize=width*1000, label=f"E112")
