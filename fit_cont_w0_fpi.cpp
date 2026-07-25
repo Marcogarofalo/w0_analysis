@@ -1396,9 +1396,9 @@ int main(int argc, char** argv) {
     std::vector<int> Npars_sqrtt0 = { 2,2,2, 3, 3, 2, 2 };
 
     //obs to fit
-    id_obs = { id_sqrtt0_from_fpi ,id_sqrtt0_Cm5 , id_w0_lin_deriv };
-    obs = { "sqrtt0_FLAG", "sqrtt0_wp25_Cm5", "w0_lin_deriv_FLAG" };
-    id_a = { 33 , 95 + static_cast<int>(id_Cm5) * 8, 33 };
+    id_obs = { id_sqrtt0_from_fpi ,id_sqrtt0_Cm5 , id_w0_lin_deriv , id_fpiwp25_sol+6};
+    obs = { "sqrtt0_FLAG", "sqrtt0_wp25_Cm5", "w0_lin_deriv_FLAG", "sqrtt0_fpiwp25" };
+    id_a = { 33 , 95 + static_cast<int>(id_Cm5) * 8, 33 ,id_fpiwp25_sol+3};
 
     for (int i = 0; i < obs.size(); i++) {
         for (auto [ifit, fit] : std::views::enumerate(fits_sqrtt0)) {

@@ -662,6 +662,11 @@ int main(int argc, char** argv) {
             (*dR) = ((*dR) + M * df / (f * f)) * f;
         }
     }
+    double *tmp_c= data[id_deriv(3,1,2,1)];
+    printf("%d  %d\n",id_deriv(3,1,2,1),3 + 5 * 6 );
+    myres->change_mean_and_error(tmp_c,myres->mean(tmp_c),myres->mean(tmp_c)  );
+    printf("enlargin error dfpi/dmc\n");
+    printf("%g   %g\n",myres->mean(tmp_c),myres->mean(tmp_c) );
 
     // decorrelate jacks
     // for (int iM = 0; iM < 5;iM++) {
@@ -3299,6 +3304,303 @@ int main(int argc, char** argv) {
 
     write_jack(pull_w0, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 10);
     write_jack(pull_sqrtt0, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 11);
+    
+
+    //////////////////////////////////////////////////////////////
+    // fpiwp25
+    //////////////////////////////////////////////////////////////
+    double *fpi_wp25j = myres->create_fake_exact(fpi_wp25,fpi_wp25_err,-1);
+    {
+        for (int j = 0; j < Njack;j++) {
+
+            y[0] = Mpi_MeV / fpi_wp25j[j];
+            y[1] = MK_MeV / fpi_wp25j[j];
+            y[2] = MDs_MeV / fpi_wp25j[j];
+            int ifpi = 3;
+            double f = data[id_deriv(ifpi, 0, 0, 0)][j];
+
+            for (int iM = 0; iM < 2; iM++) {
+
+                double M = data[id_deriv(iM, 0, 0, 0)][j];
+
+                for (int im = 0; im < 3; im++) {
+                    Mat[iM][im] = 0.0;
+                    // valence
+                    double dM = data[id_deriv(iM, 1, im, 0)][j];
+                    double df = data[id_deriv(ifpi, 1, im, 0)][j];
+                    Mat[iM][im] += 2 * M * dM / (f * f) - 2 * M * M * df / (f * f * f);
+                    // sea
+                    dM = data[id_deriv(iM, 1, im, 1)][j];
+                    df = data[id_deriv(ifpi, 1, im, 1)][j];
+                    Mat[iM][im] += 2 * M * dM / (f * f) - 2 * M * M * df / (f * f * f);
+                    Matj[iM][im][j] = Mat[iM][im];
+                }
+                y[iM] *= y[iM];
+                // if (j==Njack-1) printf(" %.12g   %g   %g   %g\n ",y[iM], M / f, f, M);
+                y[iM] -= (M / f) * (M / f);
+                yj[iM][j] = y[iM];
+
+            }
+            for (int iM = 2; iM < 3; iM++) {
+
+                double M = data[id_deriv(iM, 0, 0, 0)][j];
+
+                for (int im = 0; im < 3; im++) {
+                    Mat[iM][im] = 0.0;
+                    // valence
+                    double dM = data[id_deriv(iM, 1, im, 0)][j];
+                    double df = data[id_deriv(ifpi, 1, im, 0)][j];
+                    Mat[iM][im] += dM / f - M * df / (f * f);
+                    // sea
+                    dM = data[id_deriv(iM, 1, im, 1)][j];
+                    df = data[id_deriv(ifpi, 1, im, 1)][j];
+                    Mat[iM][im] += dM / f - M * df / (f * f);
+                    Matj[iM][im][j] = Mat[iM][im];
+
+                }
+                // if (j == Njack - 1) printf(" %.12g   %g   %g   %g\n ", y[iM], M / f, f, M);
+                y[iM] -= M / f;
+                yj[iM][j] = y[iM];
+
+            }
+            double* P = LU_decomposition_solver(3, Mat, y);
+            miso[0][j] = (amusim[0][j] + P[0]);
+            miso[1][j] = (amusim[1][j] + P[1]);
+            miso[2][j] = (amusim[2][j] + P[2]);
+            for (int im = 0; im < 3; im++) {
+                dm_fpi[im][j] = P[im];
+            }
+            if (j == Njack - 1) {
+                printf("Matrix for m^iso solution (jackknife %d):\n", j);
+                for (int ii = 0; ii < 3; ii++) {
+                    for (int jj = 0; jj < 3; jj++) {
+                        printf("%g (%g) ", Matj[ii][jj][Njack - 1], myres->comp_error(Matj[ii][jj]));
+                    }
+                    printf("\n");
+                }
+                printf("RHS:\n");
+                for (int ii = 0; ii < 3; ii++) {
+                    printf("%g (%g)\n", yj[ii][Njack - 1], myres->comp_error(yj[ii]));
+                }
+                printf("solution:\n");
+                for (int ii = 0; ii < 3; ii++) {
+                    printf("%g\n", P[ii]);
+                }
+            }
+            free(P);
+        }
+        printf("Results for m^iso (MeV):\n");
+        for (int i = 0; i < 3; i++) {
+            double mean = myres->mean(miso[i]);
+            double err = myres->comp_error(miso[i]);
+            printf("m^iso_%d = %-12g +/- %-12g   starting from %-12g +/- %-12g\n", i, mean, err, myres->mean(amuiso[i]), myres->comp_error(amuiso[i]));
+        }
+        printf("sim values:\n");
+        for (int i = 0; i < 3; i++) {
+            printf("m^sim_%d = %g \n", i, myres->mean(amusim[i]));
+        }
+
+        // decorrelate miso
+        // for (int i = 0; i < 3; i++) {
+        //     double mean = myres->mean(miso[i]);
+        //     double err = myres->comp_error(miso[i]);
+        //     free(miso[i]);
+        //     miso[i] = myres->create_fake(mean, err, -1);
+        // }
+
+
+        double* a_fm = myres->create_copy(data[4]);
+        double* w0_from_fpi = myres->create_copy(data[4]);
+        for (int j = 0; j < Njack;j++) {
+            int ifpi = 3;
+            double af = data[id_deriv(ifpi, 0, 0, 0)][j];
+            int iw0 = 4;
+            double w_a = data[id_deriv(iw0, 0, 0, 0)][j];
+            for (int im = 0; im < 3; im++) {
+                for (int val_sea = 0; val_sea < 2; val_sea++) {
+                    double df = data[id_deriv(ifpi, 1, im, val_sea)][j];
+                    double dm = (miso[im][j] - amusim[im][j]);
+                    af += dm * df;
+                    double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                    // if (val_sea != 1 && im != 2)
+                    w_a += dm * dw;
+
+                }
+            }
+
+            a_fm[j] = af / (fpi_wp25j[j] / hbarc);
+            w0_from_fpi[j] = w_a * a_fm[j];
+        }
+        double* diff_a = myres->create_copy(a_fm);
+        myres->sub(diff_a, a_fm, previous_a);
+        printf("lattice spacing (fm): %g +/- %g   vs previous value %g +/- %g  diff %g +/- %g  \n", myres->mean(a_fm), myres->comp_error(a_fm),
+            myres->mean(previous_a), myres->comp_error(previous_a),
+            myres->mean(diff_a), myres->comp_error(diff_a));
+        printf("w0 (fm): %g +/- %g\n", myres->mean(w0_from_fpi), myres->comp_error(w0_from_fpi));
+        char name_out[NAMESIZE];
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_a_from_fpi_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
+        myres->write_jack_in_file(a_fm, name_out);
+        mysprintf(name_out, NAMESIZE, "scale_setting/%s_w0_from_fpi_%s%d.dat", files[36].c_str(), myres->option, Njack - 1);
+        myres->write_jack_in_file(w0_from_fpi, name_out);
+
+        write_jack(miso[0], Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol);
+        write_jack(miso[1], Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+1);
+        write_jack(miso[2], Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+2);
+        write_jack(a_fm, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+3);
+        write_jack(w0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+4);
+
+        // w0 from fpi with strange and charm deriv ensemble
+        for (int j = 0; j < Njack;j++) {
+            double dw = data[id_deriv(iw0, 1, 0, 1)][j];
+            double dm = (miso[0][j] - amusim[0][j]);
+            w0_from_fpi_ensemble[j] += dm * dw;
+            dw = data[39][j];
+            dm = (miso[1][j] - amusim[1][j]);
+            w0_from_fpi_ensemble[j] += dm * dw;
+            dw = data[40][j];
+            dm = (miso[2][j] - amusim[2][j]);
+            w0_from_fpi_ensemble[j] += dm * dw;
+
+            w0_from_fpi_ensemble[j] *= a_fm[j];
+        }
+        // hybrid approach
+        for (int j = 0; j < Njack;j++) {
+            double dw = data[id_deriv(iw0, 1, 0, 1)][j];
+            double dm = (miso[0][j] - amusim[0][j]);
+            w0_from_fpi_hybrid[j] += dm * dw;
+
+            if (ensemble.compare("C80") == 0 || ensemble.compare("B64") == 0) {
+                if (j == Njack - 1) printf("HYBRID APPROACH: USINGE SMALL VOLUME DERIV\n");
+                dw = data[id_deriv(iw0, 1, 1, 1)][j]; // small volume deriv strange
+                dm = (miso[1][j] - amusim[1][j]);
+                w0_from_fpi_hybrid[j] += dm * dw;
+                dw = data[id_deriv(iw0, 1, 2, 1)][j]; // small volume deriv charm
+                dm = (miso[2][j] - amusim[2][j]);
+                w0_from_fpi_hybrid[j] += dm * dw;
+
+                w0_from_fpi_hybrid[j] *= a_fm[j];
+            }
+            else { // add the ensemble deriv
+                dw = data[39][j];
+                dm = (miso[1][j] - amusim[1][j]);
+                w0_from_fpi_hybrid[j] += dm * dw;
+                dw = data[40][j];
+                dm = (miso[2][j] - amusim[2][j]);
+                w0_from_fpi_hybrid[j] += dm * dw;
+
+                w0_from_fpi_hybrid[j] *= a_fm[j];
+            }
+        }
+
+        myres->copy(w0_a_split[0], data[id_deriv(4, 0, 0, 0)]);
+        myres->sub(w0_a_split[1], w0_a_split[1], w0_a_split[1]);// set to zero
+        myres->sub(w0_a_split[2], w0_a_split[2], w0_a_split[2]);// set to zero
+        myres->sub(w0_a_split[3], w0_a_split[3], w0_a_split[3]);// set to zero
+        for (int ii = 0;ii < 4;ii++)
+            myres->mult(w0_split[ii], w0_a_split[ii], a_fm);
+
+            // linear deriv mc
+        for (int j = 0; j < Njack;j++) {
+            w0_lin_deriv[j]= data[4][j];
+            sqrtt0_from_fpi[j]=data[id_deriv_sqrtt0(0, 0, 0)][j];
+            for (int im = 0; im < 3; im++) {
+                int val_sea = 1;
+                double dm = (miso[im][j] - amusim[im][j]);
+                double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
+                double dt = data[id_deriv_sqrtt0(1, im, val_sea)][j];
+                if (im == 2 && val_sea == 1) {
+                    if (j == Njack - 1) printf("replacing dw0/dmc = %g\n", dw);
+                    dw = get_linear_deriv_w0c(data, amuiso, previous_a, j);
+                    dt = get_linear_deriv_sqrtt0c(data, amuiso, previous_a, j);
+                    if (j == Njack - 1) printf("with      dw0/dmc = %g\n", dw);
+                }
+
+                w0_lin_deriv[j] += dm * dw;
+                sqrtt0_from_fpi[j] += dm * dt;
+                w0_a_split[1 + im + val_sea * 3][j] = dm * dw;
+                w0_a_split[1 + im + 0 * 3][j] = 0.0;
+                w0_split[1 + im + val_sea * 3][j] = w0_a_split[1 + im + val_sea * 3][j] * a_fm[j];
+                w0_split[1 + im + 0 * 3][j] = 0.0;
+            }
+            w0_sim[j] = data[iw0][j] * data[id_deriv(3, 0, 0, 0)][j] / (fpi_MeV / hbarc);
+            w0_a_lin_der[j] = w0_lin_deriv[j];
+            w0_lin_deriv[j] *= a_fm[j];
+            sqrtt0_from_fpi[j] *= a_fm[j];
+        }
+
+        write_jack(w0_lin_deriv, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+5);
+        write_jack(sqrtt0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+6);
+
+        // printf("w0 from fpi (ensemble deriv): %g +/- %g\n", myres->mean(w0_from_fpi_ensemble), myres->comp_error(w0_from_fpi_ensemble));
+        // printf("w0 from fpi (hybrid): %g +/- %g\n", myres->mean(w0_from_fpi_hybrid), myres->comp_error(w0_from_fpi_hybrid));
+        printf("w0 from fpi (linear deriv): %g +/- %g\n", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
+        printf("sqrt(t0) from fpi (linear deriv): %g +/- %g\n", myres->mean(sqrtt0_from_fpi), myres->comp_error(sqrtt0_from_fpi));
+        double** data_m_a = malloc_2<double>(4, Njack);
+        for (int j = 0; j < Njack;j++) {
+            data_m_a[0][j] = a_fm[j];
+            data_m_a[1][j] = miso[0][j];
+            data_m_a[2][j] = miso[1][j];
+            data_m_a[3][j] = miso[2][j];
+        }
+        double** cov_m_a = myres->comp_cov(4, data_m_a);
+        printf("correlation matrix for (in order) a, m^iso l,s,c  ens: %s\n", ensemble.c_str());
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
+                printf("%-22.12g", corr);
+                // if (std::fabs(corr) > 0.4)
+                // printf("%-22.12g", cov_m_a[i][j]);
+            }
+            printf("\n");
+        }
+        printf("covariance matrix for (in order) a, m^iso l,s,c  ens: %s\n", ensemble.c_str());
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                // double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
+                // printf("%-22.12g", corr);
+                // if (std::fabs(corr) > 0.4)
+                printf("%-22.12g", cov_m_a[i][j]);
+            }
+            printf("\n");
+        }
+        printf("a [fm]         : %g\n",myres->mean(a_fm));
+        printf("error on a [fm]: %g\n",myres->comp_error(a_fm));
+        printf("a*mu_l         : %g\n",myres->mean(miso[0]));
+        printf("error on a*mu_l: %g\n",myres->comp_error(miso[0]));
+        printf("a*mu_s         : %g\n",myres->mean(miso[1]));   
+        printf("error on a*mu_s: %g\n",myres->comp_error(miso[1]));
+        printf("a*mu_c         : %g\n",myres->mean(miso[2]));
+        printf("error on a*mu_c: %g\n",myres->comp_error(miso[2]));
+        printf("#\n#\n#\n#\n#\n#\n#\n");
+        for (int i = 0; i < 4; i++) {
+            printf("C_%dj : ",i);
+            for (int j = 0; j < 4; j++) {
+                // double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
+                // printf("%-22.12g", corr);
+                // if (std::fabs(corr) > 0.4)
+                printf("%-22.12g", cov_m_a[i][j]);
+            }
+            printf("\n");
+        }
+
+        printf("a = %g +/- %g\n", myres->mean(a_fm), myres->comp_error(a_fm));
+        printf("aml = %g +/- %g\n", myres->mean(miso[0]), myres->comp_error(miso[0]));
+        printf("ams = %g +/- %g\n", myres->mean(miso[1]), myres->comp_error(miso[1]));
+        printf("amc = %g +/- %g\n", myres->mean(miso[2]), myres->comp_error(miso[2]));
+        printf("Delta_aml = %g +/- %g\n", myres->mean(dm_fpi[0]), myres->comp_error(dm_fpi[0]));
+        printf("Delta_ams = %g +/- %g\n", myres->mean(dm_fpi[1]), myres->comp_error(dm_fpi[1]));
+        printf("Delta_amc = %g +/- %g\n", myres->mean(dm_fpi[2]), myres->comp_error(dm_fpi[2]));
+
+        printf("w0_a (fm): %+.6g  (%.3g) =", myres->mean(w0_a_lin_der), myres->comp_error(w0_a_lin_der));
+        for (int ii = 0; ii < 7; ii++) {
+            printf("%+.6g  (%.3g) ", myres->mean(w0_a_split[ii]), myres->comp_error(w0_a_split[ii]));
+        }printf("\n");
+        printf("w0 (fm): %+.6g  (%.3g) =", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
+        for (int ii = 0; ii < 7; ii++) {
+            printf("%+.6g  (%.3g) ", myres->mean(w0_split[ii]), myres->comp_error(w0_split[ii]));
+        }printf("\n");
+        printf("w0_sim (fm): %+.6g  (%.3g)\n", myres->mean(w0_sim), myres->comp_error(w0_sim));
+    }
 
     return 0;
 }

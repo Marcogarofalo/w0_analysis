@@ -16,10 +16,15 @@ static constexpr int id_miso_fpi_interpol = id_sqrtt0_fpi_wp25_Cm5 + 4;
 static constexpr int id_a_fpi_interpol = id_miso_fpi_interpol + 3;
 static constexpr int id_w0_fpi_interpol = id_a_fpi_interpol + 1;
 static constexpr int id_fpi_sim_big_L = id_w0_fpi_interpol + 5;
+static constexpr int id_fpiwp25_sol = id_fpi_sim_big_L + 12;
 
 static constexpr double hbarc = 197.326963; // MeV*fm
 static constexpr double fpi_MeV = 130.5;
 static constexpr double fpi_MeV_err = 0.04;
+
+static constexpr double fpi_wp25 = 131.02;
+static constexpr double fpi_wp25_err = 0.26;
+
 
 static constexpr double fpi_MeV_wp25_Cm5 = 131.30; //131.26;
 static constexpr double fpi_MeV_err_wp25_Cm5 = 0.34; //0.27;
