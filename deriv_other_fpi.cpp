@@ -651,8 +651,8 @@ int main(int argc, char** argv) {
     fit_info.ave_P = { dmu };
 
 
-    fit_info.corr_id = { 0 ,2 }
-    ;
+    fit_info.corr_id = { 0 ,2 };
+    
     struct fit_result plateau_fpi = fit_fun_to_fun_of_corr(
         option, kinematic_2pt, (char*)"P5P5", conf_jack, namefile_plateaux,
         outfile, lhs_plateau_fpi_P5A0, "pateau_deriv_fpi_P5A0", fit_info,
