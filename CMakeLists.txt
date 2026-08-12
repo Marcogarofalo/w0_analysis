@@ -142,3 +142,6 @@ add_target_with_libs(check_MK_fpi_RK check_MK_fpi_RK.cpp)
 add_target_with_libs(jacks_B96_C112_w0 jacks_B96_C112_w0.cpp)
 add_target_with_libs(w0_only w0_only.cpp)
 add_target_with_libs(pion_only pion_only.cpp)
+
+add_target_with_libs(fit_smallV_to_Linf_fix_mass_fpi_A0P5 fit_smallV_to_Linf_fix_mass_fpi_A0P5.cpp)
+add_target_with_libs(fit_smallV_chiral_after_Linf_fpi_A0P5 fit_smallV_chiral_after_Linf_fpi_A0P5.cpp)

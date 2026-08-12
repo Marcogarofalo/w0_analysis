@@ -153,10 +153,9 @@ double rhs_1overamu(int n, int Nvar, double* x, int Npar, double* P) {
     double r = P[0] / amu;
     return r;
 }
-double rhs_xi(int n, int Nvar, double* x, int Npar, double* P) {
-    double xi = x[0];
-    // xi *= xi;
-    double r = P[0] + P[1] * xi;
+double rhs_expmML(int n, int Nvar, double* x, int Npar, double* P) {
+    double expmML = x[0];
+    double r = P[0] + P[1] * expmML;
     return r;
 }
 double rhs_xi_xi2(int n, int Nvar, double* x, int Npar, double* P) {
@@ -350,9 +349,16 @@ int main(int argc, char** argv) {
     // std::vector<std::string> beta_names;
     std::vector<std::vector<int>> myen(1, std::vector<int>());
 
+    bool OS = false;
     while (std::getline(file, line)) {
         if (!line.empty() && line[0] != '#') // skip empty lines and comments
         {
+            printf("reading line: %s\n", line.c_str());
+            if (line == "tm"){
+                OS = true;
+                printf("We are analysing the OS data so we need to read Mps from the tm files\n");
+                continue;
+            }
             std::vector<std::string> word = split(line, ' ');
 
             if (word.size() == 2) {
@@ -379,6 +385,15 @@ int main(int argc, char** argv) {
                 error(1, 1, "main", "Invalid line in input file: %s", line.c_str());
             }
         }
+    }
+
+   std::vector<int> myen_OStm = myen[0];
+    if (OS){
+         error(myen[0].size()%2!=0, 1, "main", "The number of files should be even (we need the tm to read the mass), but got %zu", myen[0].size());
+
+        myen_OStm = myen[0];
+        myen[0] = std::vector<int> (myen[0].size()/2);
+        for (int i=0; i<myen[0].size(); i++) myen[0][i] = i;
     }
 
     // mysprintf(namefile, NAMESIZE, "%s/%s_onlinemeas_B64.dat_reweight_charm_0.1_OS_B64.dat", argv[2], argv[1]);
@@ -417,7 +432,7 @@ int main(int argc, char** argv) {
     std::string base_name = input_file.substr(input_file.find_last_of("/\\") + 1);
     base_name = base_name.substr(0, base_name.find_last_of("."));
 
-    mysprintf(namefile, NAMESIZE, "%s/%s", argv[2], base_name.c_str());
+    mysprintf(namefile, NAMESIZE, "%s/%s.%s", argv[2], base_name.c_str(),  argv[1]);
     FILE* jack_file = open_file(namefile, "w+");
     printf("writing in file %s\n", namefile);
     // write_header_g2(jack_file, head);
@@ -479,26 +494,26 @@ int main(int argc, char** argv) {
     for (int j = 0; j < Njack; j++) {
         zeros[j] = 0;
     }
-    for (int i = 0; i < 10; i++) {
-        write_jack(zeros, Njack, jack_file); check_correlatro_counter(i);
+    for (int i = 0; i < 23; i++) {
+        write_jack(jackall.en[0].jack[i], Njack, jack_file); check_correlatro_counter(i);
     }
-    write_jack(jackall.en[0].jack[10], Njack, jack_file); check_correlatro_counter(10); //amuiso
-    write_jack(jackall.en[0].jack[11], Njack, jack_file); check_correlatro_counter(11);
-    write_jack(jackall.en[0].jack[12], Njack, jack_file); check_correlatro_counter(12);
+    // write_jack(jackall.en[0].jack[10], Njack, jack_file); check_correlatro_counter(10); //amuiso
+    // write_jack(jackall.en[0].jack[11], Njack, jack_file); check_correlatro_counter(11);
+    // write_jack(jackall.en[0].jack[12], Njack, jack_file); check_correlatro_counter(12);
 
-    write_jack(jackall.en[0].jack[13], Njack, jack_file); check_correlatro_counter(13); //amusim
-    write_jack(jackall.en[0].jack[14], Njack, jack_file); check_correlatro_counter(14);
-    write_jack(jackall.en[0].jack[15], Njack, jack_file); check_correlatro_counter(15);
+    // write_jack(jackall.en[0].jack[13], Njack, jack_file); check_correlatro_counter(13); //amusim
+    // write_jack(jackall.en[0].jack[14], Njack, jack_file); check_correlatro_counter(14);
+    // write_jack(jackall.en[0].jack[15], Njack, jack_file); check_correlatro_counter(15);
 
-    write_jack(jackall.en[0].jack[16], Njack, jack_file); check_correlatro_counter(16); //  a_fm
+    // write_jack(jackall.en[0].jack[16], Njack, jack_file); check_correlatro_counter(16); //  a_fm
     
     fit_type fit_info;
 
     // linear fit of the smallest masses
     fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
     for (int n = 0; n < myen.size(); n++) {
-        fit_info.Nxen[n].resize(myen[n].size()-1);
-        for (int e = 0; e < myen[n].size()-1; e++) {
+        fit_info.Nxen[n].resize(myen[n].size());
+        for (int e = 0; e < myen[n].size(); e++) {
             fit_info.Nxen[n][e] = myen[n][e];
         }
     }
@@ -506,13 +521,13 @@ int main(int argc, char** argv) {
     fit_info.Nvar = 1;
     fit_info.Njack = jackall.en[0].Njack;
 
+    int e_M = (OS==0) ? 0 : + myen[0].size();  
     fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
     int count = 0;
     for (int n = 0; n < fit_info.N; n++) {
         for (int e : fit_info.Nxen[n]) {
             for (int j = 0; j < Njack; j++) {
-                // fit_info.x[0][count][j] = jackall.en[e].jack[id_aMpi][j] / jackall.en[e].jack[id_afpi_WTI][j]; // Mpi/fpi
-                fit_info.x[0][count][j] = jackall.en[e].jack[id_mu][j] ;
+                fit_info.x[0][count][j] = exp(-jackall.en[e+e_M].jack[0][j] *jackall.en[e].header.L); // Mpi
             }
             count++;
         }
@@ -531,74 +546,24 @@ int main(int argc, char** argv) {
         // fit_info.corr_id = {id_dw0_dmu, id_m0iso, id_a_fm};
         fit_info.corr_id = { id_der[i], id_muliso };
 
-        fit_info.function = rhs_xi;
+        fit_info.function = rhs_expmML;
         fit_info.linear_fit = true;
         fit_info.Npar = 2;
 
 
-        std::string namefit = base_name + "_" + der_name[i] + "_xi";
+        std::string namefit = base_name + "_" + der_name[i] + "_expmML_fix_mass_fpi";
 
         fit_result der_fpi_const_full = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, dx, {});
+        fit_info.band_range = { 0.0, 0.082 };
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "expmML", der_fpi_const_full, der_fpi_const_full, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, dx, {});
 
 
-        // a function that compute rhs_xi at the physical point and write it in a jackknife file
-        for (int j = 0; j < Njack; j++) {
-            for (int p = 0; p < fit_info.Npar; p++)                tif[p] = der_fpi_const_full.P[p][j];
-            fpi_phys_point[j] = fit_info.function(0, fit_info.Nvar, x_phys_point.data(), fit_info.Npar, tif);
-        }
-        write_jack(fpi_phys_point, Njack, jack_file); check_correlatro_counter(17 + i);
+        std::vector<double> expmML = {0.0};
+        add_point_to_fitted_datafile(argv, jackall, fit_info, namefit.c_str(), expmML, myres->mean(der_fpi_const_full.P[0]), myres->comp_error(der_fpi_const_full.P[0]), "expmML",0); 
+        
+        write_jack(der_fpi_const_full.P[0], Njack, jack_file); check_correlatro_counter(23 + i);
     }
 
-    free_3(fit_info.Nvar, fit_info.entot, fit_info.x);
-
-    fit_info.Nxen = std::vector<std::vector<int>>(myen.size());
-    for (int n = 0; n < myen.size(); n++) {
-        fit_info.Nxen[n].resize(myen[n].size());
-        for (int e = 0; e < myen[n].size(); e++) {
-            fit_info.Nxen[n][e] = myen[n][e];
-        }
-    }
-    fit_info.init_N_etot_form_Nxen();
-    fit_info.Nvar = 1;
-    fit_info.Njack = jackall.en[0].Njack;
-
-    fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
-    count = 0;
-    for (int n = 0; n < fit_info.N; n++) {
-        for (int e : fit_info.Nxen[n]) {
-            for (int j = 0; j < Njack; j++) {
-                // fit_info.x[0][count][j] = jackall.en[e].jack[id_aMpi][j] / jackall.en[e].jack[id_afpi_WTI][j]; // Mpi/fpi
-                fit_info.x[0][count][j] = jackall.en[e].jack[id_mu][j] ;
-            }
-            count++;
-        }
-    }
-
-    for (int i = 0; i < der_name.size(); i++) {
-        //////////////////////////////////////////////////////////////
-        // a+b*mu*mu2
-        //////////////////////////////////////////////////////////////
-        fit_info.corr_id = { id_der[i] ,id_muliso };
-        fit_info.linear_fit = true;
-        fit_info.function = rhs_xi_xi2;
-        fit_info.Npar = 3;
-
-
-
-        std::string namefit = base_name + "_" + der_name[i] + "_xi_xi2";
-
-        fit_result der_fpi_const_full_poly = fit_all_data(argv, jackall, lhs_fun, fit_info, namefit.c_str());
-        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "amu", der_fpi_const_full_poly, der_fpi_const_full_poly, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, dx, {});
-
-        for (int j = 0; j < Njack; j++) {
-            for (int p = 0; p < fit_info.Npar; p++)                tif[p] = der_fpi_const_full_poly.P[p][j];
-            fpi_phys_point[j] = fit_info.function(0, fit_info.Nvar, x_phys_point.data(), fit_info.Npar, tif);
-        }
-        write_jack(fpi_phys_point, Njack, jack_file); check_correlatro_counter(17 + der_name.size() + i);
-
-        add_point_to_fitted_datafile(argv, jackall, fit_info, namefit.c_str(), x_phys_point, myres->mean(fpi_phys_point), myres->comp_error(fpi_phys_point),"amu", 0); 
-    }
     free(fpi_phys_point);
     fit_info.restore_default();
     free(tif);
