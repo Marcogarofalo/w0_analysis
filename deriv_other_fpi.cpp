@@ -626,11 +626,20 @@ int main(int argc, char** argv) {
     printf("mul_over_fpi_deriv: %.12g   %.12g\n", mul_over_fpi_deriv[Njack - 1], myres->comp_error(mul_over_fpi_deriv));
     double* mul_over_fpi_deriv_WTI = myres->create_copy(deriv_WTI);
     for (int j = 0; j < Njack;j++) {
-        mul_over_fpi_deriv_WTI[j] = (amuiso[0][j] / fpi.P[0][j]) * deriv_WTI[j];
+        mul_over_fpi_deriv_WTI[j] = (amuiso[0][j] / f_PS.P[0][j]) * deriv_WTI[j];
     }
     printf("mul_over_fpi_deriv_WTI: %.12g   %.12g\n", mul_over_fpi_deriv_WTI[Njack - 1], myres->comp_error(mul_over_fpi_deriv_WTI));
     write_jack(mul_over_fpi_deriv, Njack, jack_file); check_correlatro_counter(17);
     write_jack(mul_over_fpi_deriv_WTI, Njack, jack_file); check_correlatro_counter(18);
+
+    name_jack_fpi = "deriv/mul_over_fpiA0P5_dfA0P5_dmu_" + std::string(argv[3]) + "_" + std::string(argv[8]) + "_" + myres->option + std::to_string(Njack - 1) + ".dat";;
+    myres->write_jack_in_file(mul_over_fpi_deriv, name_jack_fpi.c_str());
+
+    print_result_in_file(outfile, mul_over_fpi_deriv, "mul_over_fpiA0P5_dfA0P5_dmu", 0.0, 0, 0);
+
+
+    name_jack_fpi = "deriv/mul_over_fpiWTI_dfWTI_dmu_" + std::string(argv[3]) + "_" + std::string(argv[8]) + "_" + myres->option + std::to_string(Njack - 1) + ".dat";;
+    myres->write_jack_in_file(mul_over_fpi_deriv_WTI, name_jack_fpi.c_str());
 
     fit_info.Nvar = 1;
     fit_info.Npar = 1;
