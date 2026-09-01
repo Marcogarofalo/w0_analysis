@@ -32,71 +32,70 @@ df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, numbe
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 
 fig <- myplotly(gg, "", "$t/a$", "A0P5", to_print = TRUE)
-
 ```
 
 ```{r, results='asis', echo=FALSE}
 df <- NULL
-li<-c("l0")
-for (l in li){
-for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu", "f_{PS}", "f_{PS}_mu", "M_{PS}_A0")){
-mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B64_tm_",l,"_",l,"_A0P5.dat_output"))
-all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename=paste0(obs,"_",l))
-}}
+li <- c("l0")
+for (l in li) {
+  for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu", "f_{PS}", "f_{PS}_mu", "M_{PS}_A0")) {
+    mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B64_tm_", l, "_", l, "_A0P5.dat_output"))
+    all_obs <- Rose::get_all_corr(mt)
+    df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename = paste0(obs, "_", l))
+  }
+}
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 
 fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
-
 ```
 
 ### OS
 
 ```{r, results='asis', echo=FALSE}
 df <- NULL
-li<-c("l0")
-for (l in li){
-for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu",  "M_{PS}_A0")){
-mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B64_OS_",l,"_",l,"_A0P5.dat_output"))
-all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename=paste0(obs,"_",l))
-}}
+li <- c("l0")
+for (l in li) {
+  for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu", "M_{PS}_A0")) {
+    mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B64_OS_", l, "_", l, "_A0P5.dat_output"))
+    all_obs <- Rose::get_all_corr(mt)
+    df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename = paste0(obs, "_", l))
+  }
+}
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 
 fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
-
 ```
 
 ## B24
 
 ```{r, results='asis', echo=FALSE}
 df <- NULL
-li<-c("l0","l1","l2")
-for (l in li){
-for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu", "f_{PS}")){
-mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B24_tm_",l,"_",l,"_A0P5.dat_reweight_charm_OS_B24.dat_output"))
-all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename=paste0(obs,"_",l))
-}}
+li <- c("l0", "l1", "l2")
+for (l in li) {
+  for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu", "f_{PS}")) {
+    mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B24_tm_", l, "_", l, "_A0P5.dat_reweight_charm_OS_B24.dat_output"))
+    all_obs <- Rose::get_all_corr(mt)
+    df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename = paste0(obs, "_", l))
+  }
+}
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 
 fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
-
 ```
 
 ```{r, results='asis', echo=FALSE}
 df <- NULL
-li<-c("l0","l1","l2")
-for (l in li){
-for (obs in c("pateau_deriv_fpi_P5A0")){
-mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B24_tm_",l,"_",l,"_A0P5.dat_reweight_charm_OS_B24.dat_output"))
-all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename=paste0(obs,"_",l))
-}}
+li <- c("l0", "l1", "l2")
+for (l in li) {
+  for (obs in c("pateau_deriv_fpi_P5A0")) {
+    mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B24_tm_", l, "_", l, "_A0P5.dat_reweight_charm_OS_B24.dat_output"))
+    all_obs <- Rose::get_all_corr(mt)
+    df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename = paste0(obs, "_", l))
+  }
+}
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 
 fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
-
 ```
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
@@ -104,12 +103,14 @@ gg <- NULL
 basenames <- c(
   "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_B24_fpi_A0P5_deriv_fpi_A0P5_xi_xi2",
   "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_B24_OS_fpi_A0P5_deriv_fpi_A0P5_xi_xi2",
-  "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_B24_fpi_A0P5_deriv_fpi_WTI_xi_xi2"
+  "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_B24_fpi_A0P5_deriv_fpi_WTI_xi_xi2",
+  "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/fit_smallV_B24_fpi_A0P5_deriv_fpi_WTI_xi"
 )
 labels <- c(
   "fpi_A0P5 ",
   "fpi_A0P5_OS ",
-  "fpi_WTI "
+  "fpi_WTI ",
+  "fpi_WTI_lin "
 )
 
 
@@ -134,7 +135,7 @@ for (j in seq_along(basenames)) {
 
 fig <- myplotly(gg, "", "$\\mu_\\ell$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
   to_print = TRUE,
-  # yrange = c(-1, 4), 
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
@@ -143,17 +144,17 @@ fig <- myplotly(gg, "", "$\\mu_\\ell$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
 
 ```{r, results='asis',echo=FALSE}
 df <- NULL
-li<-c("l0","l1","l2")
-for (l in li){
-for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu", "f_{PS}","pateau_deriv_fpi_P5A0")){
-mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B32_tm_",l,"_",l,"_A0P5.dat_reweight_charm_OS_B32.dat_output"))
-all_obs <- Rose::get_all_corr(mt)
-df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename=paste0(obs,"_",l))
-}}
+li <- c("l0", "l1", "l2")
+for (l in li) {
+  for (obs in c("M_{PS}", "M_{PS}_mu", "fpi_P5A0", "fpi_P5A0_mu", "f_{PS}", "pateau_deriv_fpi_P5A0")) {
+    mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0//out/B32_tm_", l, "_", l, "_A0P5.dat_reweight_charm_OS_B32.dat_output"))
+    all_obs <- Rose::get_all_corr(mt)
+    df <- add_corr_to_df(obs, all_obs, mt, df, print_res = FALSE, reshape = T, rename = paste0(obs, "_", l))
+  }
+}
 gg <- plot_df_corr_ggplot(df, width = 0.05)
 
 fig <- myplotly(gg, "", "$t/a$", "$m_{eff}(t)$", to_print = TRUE)
-
 ```
 
 
@@ -193,7 +194,7 @@ for (j in seq_along(basenames)) {
 
 fig <- myplotly(gg, "", "$M_\\pi/f_\\pi$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
   to_print = TRUE,
-  # yrange = c(-1, 4), 
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
@@ -235,7 +236,7 @@ for (j in seq_along(basenames)) {
 
 fig <- myplotly(gg, "", "$M_\\pi/f_\\pi$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
   to_print = TRUE,
-  # yrange = c(-1, 4), 
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
@@ -248,7 +249,7 @@ basenames <- c(
   "/home/garofalo/analysis/flow/data_fpi_A0/fit_smallV_phys_point/average_mul_over_fpi_df_dmuc_smallV_OS_fpi_A0P5_deriv_fpi_A0P5_const"
 )
 labels <- c(
-  "fpi_A0P5 "
+  "fpi_A0P5"
 )
 
 
@@ -258,7 +259,7 @@ for (j in seq_along(basenames)) {
   # print(make_table_fit_result(fit))
   gg <- plot_fit(basenames[j], "L",
     # noline = TRUE,
-    # data_type = ,
+    data_type = c("tm", "OS"),
     gg = gg,
     id_x = 1,
     single_name_for_fit = labels[j],
@@ -267,9 +268,285 @@ for (j in seq_along(basenames)) {
   )
 }
 
-fig <- myplotly(gg, "", "$L$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
+fig <- myplotly(gg, "", "$L/a$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
   to_print = TRUE,
-  # yrange = c(-1, 4), 
+  # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
 )
 ```
+
+
+## ML extrapolation
+
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+basenames <- c(
+  "/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_expmML_l0_fpi_A0P5_deriv_fpi_A0P5_expmML_fix_mass_fpi",
+  "/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_expmML_l1_fpi_A0P5_deriv_fpi_A0P5_expmML_fix_mass_fpi",
+  "/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_expmML_l2_fpi_A0P5_deriv_fpi_A0P5_expmML_fix_mass_fpi"
+)
+labels <- c(
+  "dfpi_A0P5_tm_l0",
+  "dfpi_A0P5_tm_l1",
+  "dfpi_A0P5_tm_l2"
+)
+
+
+for (j in seq_along(basenames)) {
+  # print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  # print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "expmML",
+    # noline = TRUE,
+    data_type = labels[j],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    nudge = j * 0.00001
+  )
+}
+
+fig <- myplotly(gg, "", "$\\exp(-ML)$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+## tm
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+basenames <- c(
+  "/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_deriv_fpi_A0P5_amu_N3",
+  "/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_deriv_fpi_A0P5_amu_N2",
+  "/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_deriv_fpi_A0P5_amu_amu2_N3"
+)
+labels <- c(
+  "amu_N3",
+  "amu_N2",
+  "amu_amu2_N3"
+)
+
+
+for (j in seq_along(basenames)) {
+  # print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  # print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "amu",
+    # noline = TRUE,
+    data_type = labels[j],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    nudge = j * 0.00001
+  )
+}
+
+gg <- plot_fit("/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_deriv_fpi_A0P5_ave", "ave",
+  # noline = TRUE,
+  data_type = "ave",
+  gg = gg,
+  id_x = 1,
+  single_name_for_fit = "ave",
+  width = 0.0001,
+  nudge = j * 0.00001
+)
+
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/D96_tm_l0_l0_A0P5.dat_reweight_charm_OS_D96.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "D96"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0004934, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/D96_tm_l0_l0_A0P5.dat_reweight_charm_OS_D96.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "D96"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0004934, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/E112_tm_l0_l0_A0P5.dat_reweight_charm_OS_E112_LMA.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "E112"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0004306, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/C80_tm_l0_l0_A0P5.dat_reweight_charm_0.1_OS_C80_LMA.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "C80"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0005864, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/B64_tm_l0_l0_A0P5.dat_reweight_charm_0.1_OS_B64_LMA.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "B64"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0005864, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+
+#######################################
+gg <- plot_fit("/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_phys_point/fit_smallV_C48_fpi_A0P5_deriv_fpi_A0P5_xi_xi2", "amu",
+  # noline = TRUE,
+  data_type = "C48",
+  gg = gg,
+  id_x = 1,
+  single_name_for_fit = "C48",
+  width = 0.0001,
+  nudge = j * 0.00001
+)
+#######################
+fig <- myplotly(gg, "", "$a\\mu_\\ell$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+
+
+## OS
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+basenames <- c(
+  "/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_OS_deriv_fpi_A0P5_amu_N3",
+  "/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_OS_deriv_fpi_A0P5_amu_N2",
+  "/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_OS_deriv_fpi_A0P5_amu_amu2_N3"
+)
+labels <- c(
+  "amu_N3",
+  "amu_N2",
+  "amu_amu2_N3"
+)
+
+
+for (j in seq_along(basenames)) {
+  # print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  # print(make_table_fit_result(fit))
+  gg <- plot_fit(basenames[j], "amu",
+    # noline = TRUE,
+    data_type = labels[j],
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    nudge = j * 0.00001
+  )
+}
+
+gg <- plot_fit("/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_expmML/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_OS_deriv_fpi_A0P5_ave", "ave",
+  # noline = TRUE,
+  data_type = "ave",
+  gg = gg,
+  id_x = 1,
+  single_name_for_fit = "ave",
+  width = 0.0001,
+  nudge = j * 0.00001
+)
+
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/D96_OS_l0_l0_A0P5.dat_reweight_charm_OS_D96.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "D96"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0004934, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/D96_OS_l0_l0_A0P5.dat_reweight_charm_OS_D96.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "D96"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0004934, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/E112_OS_l0_l0_A0P5.dat_reweight_charm_OS_E112_LMA.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "E112"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0004306, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/C80_OS_l0_l0_A0P5.dat_reweight_charm_0.1_OS_C80_LMA.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "C80"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0005864, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+##########################
+mt <- read_df(paste0("/home/garofalo/analysis/flow/data_fpi_A0_20/out/B64_OS_l0_l0_A0P5.dat_reweight_charm_0.1_OS_B64_LMA.dat_output"))
+all_obs <- Rose::get_all_corr(mt)
+fit <- Rose::get_full_res("mul_over_fpiA0P5_dfA0P5_dmu", all_obs = all_obs, mt = mt)
+lab <- "B64"
+gg <- gg + geom_pointrange(aes(
+  x = 0.0005864, y = !!fit[1, 1],
+  ymin = !!(fit[1, 1] - fit[1, 2]),
+  ymax = !!(fit[1, 1] + fit[1, 2]),
+  color = !!lab, shape = !!lab, fill = !!lab
+))
+
+#######################################
+gg <- plot_fit("/home/garofalo/analysis/flow/data_fpi_A0_20/fit_smallV_phys_point/fit_smallV_C48_OS_fpi_A0P5_deriv_fpi_A0P5_xi_xi2", "amu",
+  # noline = TRUE,
+  data_type = "C48",
+  gg = gg,
+  id_x = 1,
+  single_name_for_fit = "C48",
+  width = 0.0001,
+  nudge = j * 0.00001
+)
+#######################
+fig <- myplotly(gg, "", "$a\\mu_\\ell$", "$\\mu_\\ell/ f_{\\pi}df_\\pi/d\\mu_c$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+

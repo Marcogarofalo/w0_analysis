@@ -42,7 +42,7 @@ for (reg in c("fit_w0_lin_deriv_FLAG")) {
     paste0(reg, "_a2_noD"),
     paste0(reg, "_a2_noE"),
     paste0(reg, "_a2_a4"),
-    paste0(reg, "_a2_Husung0.42")
+    paste0(reg, "_a2_Husung0.21")
   )
   legend_name <- basenames
   count <- length(basenames)
@@ -62,7 +62,7 @@ for (reg in c("fit_w0_lin_deriv_FLAG")) {
   for (j in seq_along(basenames)) {
     # print(basenames[j])
     fit <- Rose::read_fit_P_file(paste0(path, basenames[j], "_fit_P.dat"))
-    # print(make_table_fit_result(fit))
+    print(make_table_fit_result(fit))
     df[j, 1] <- basenames[j]
     # M <- data.matrix(fit$C)
     # for (i in c(1:dim(M)[1])) {

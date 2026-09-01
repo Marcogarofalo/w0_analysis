@@ -22,7 +22,47 @@ myplotly(ggplot())
 ```
 
 
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_sqrtt0_w0_sim_a2",
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_sqrtt0_over_w0_FLAG_a2"
+)
+labels <- c(
+  "sim",
+  # "max-twist",
+  # "infinite volume",
+  "all-misstuning"
+)
+my_noribbon=c(TRUE,TRUE,FALSE)
 
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c(labels[j]),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    size = 0.1,
+    # noribbon = my_noribbon[j],
+    # noline =my_noribbon[j]
+  )
+}
+# w0_wp25 <- 0.17236
+# gg <- gg + geom_hline(yintercept = w0_wp25, linetype = "dashed")
+# gg <- gg + geom_point(aes(x = 0, y = w0_wp25, color = "wp25", shape = "wp25", fill = "wp25"))
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 f_\\pi$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
 
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
@@ -67,8 +107,8 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0} [\\mbox{fm}]$",
 ```{r,results='asis',echo=FALSE, warning=FALSE, dev='tikz'}
 library(stringr)
 dft <- NULL
-gg <- NULL
-for (reg in c("fit_sqrtt0_FLAG", "fit_sqrtt0_wp25_Cm5")) {
+gg <- ggplot()
+for (reg in c("fit_sqrtt0_FLAG")) {#"fit_sqrtt0_fpiwp25"
   path <- "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
   basenames <- c(
     paste0(reg, "_a2"),
@@ -76,8 +116,184 @@ for (reg in c("fit_sqrtt0_FLAG", "fit_sqrtt0_wp25_Cm5")) {
     paste0(reg, "_a2_noC"),
     paste0(reg, "_a2_noD"),
     paste0(reg, "_a2_noE"),
-    paste0(reg, "_a2_a4"),
-    paste0(reg, "_a2_Husung0.42")
+    paste0(reg, "_a2_a4")
+    # paste0(reg, "_a2_Husung0.42")
+  )
+  if (reg =="fit_sqrtt0_FLAG" ){
+    print("ahuasdaskjdakjs")
+    basenames<-basenames[-length(basenames)]
+  }
+  legend_name <- basenames
+  count <- length(basenames)
+  df <- data.frame(
+    "fit" = rep("", count),
+    "res" = rep(0, count),
+    "err" = rep(0, count),
+    "chi2dof" = rep(0, count),
+    "dof" = rep(0, count),
+    "Npar" = rep(0, count),
+    "Ndat" = rep(0, count),
+    "mult" = rep(0, count),
+    "k" = rep(0, count)
+  )
+
+  # extract the C value from the string
+  labels <- list(c("WTI", "tm", "OS"))
+
+  for (j in seq_along(basenames)) {
+    # print(basenames[j])
+    fit <- Rose::read_fit_P_file(paste0(path, basenames[j], "_fit_P.dat"))
+    # print(make_table_fit_result(fit))
+    df[j, 1] <- basenames[j]
+    # M <- data.matrix(fit$C)
+    # for (i in c(1:dim(M)[1])) {
+    #   for (l in c(1:dim(M)[1])) {
+    #     M[i, l] <- as.numeric(fit$C[i, l])
+    #   }
+    # }
+    M <- matrix(as.numeric(as.matrix(fit$C)), nrow = nrow(fit$C))
+    e <- eigen(M)
+
+    lmin <- min(abs(e$values))
+    lmax <- max(abs(e$values))
+    k <- lmax / lmin
+    df[j, -1] <- c(fit$P[1, 2], fit$P[1, 3], fit$chi2dof, fit$dof, fit$npar, fit$ndata, 1, k)
+
+    gg <- plot_fit(paste0(path, basenames[j]), "a2",
+      # noline = TRUE,
+      data_type = reg,
+      gg = gg,
+      id_x = 1,
+      single_name_for_fit = legend_name[j],
+      # labelfit = "fit",
+      width = 0.0001,
+      nudge = 0,
+      noline = FALSE,
+      noribbon =TRUE
+    )
+  }
+  cat("reg:", reg, "<br>\n")
+  #### BAIC
+  ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+  tab <- data.frame("fit" = basenames, "$\\sqrt{t_0} [\\mbox{fm}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+  print(kable(tab, col.names = c("fit", "$\\sqrt{t_0} [\\mbox{fm}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$")))
+  cat("BAIC average $=", ave_BAIC$m, "(", ave_BAIC$stat, ")(", ave_BAIC$syst, ") =", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>\n")
+
+
+  ###
+  dft <- rbind(dft, df)
+}
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0} [\\mbox{fm}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+```{r,results='asis',echo=FALSE, warning=FALSE, dev='tikz'}
+library(stringr)
+dft <- NULL
+gg <- ggplot()
+for (reg in c("fit_sqrtt0_wp25_Cm5")) {
+  path <- "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
+  basenames <- c(
+    paste0(reg, "_a2"),
+    paste0(reg, "_a2_noB"),
+    paste0(reg, "_a2_noC"),
+    paste0(reg, "_a2_noD"),
+    paste0(reg, "_a2_noE"),
+    paste0(reg, "_a2_a4")
+    # paste0(reg, "_a2_Husung0.42")
+  )
+  if (reg =="fit_sqrtt0_FLAG" ){
+    print("ahuasdaskjdakjs")
+    basenames<-basenames[-length(basenames)]
+  }
+  legend_name <- basenames
+  count <- length(basenames)
+  df <- data.frame(
+    "fit" = rep("", count),
+    "res" = rep(0, count),
+    "err" = rep(0, count),
+    "chi2dof" = rep(0, count),
+    "dof" = rep(0, count),
+    "Npar" = rep(0, count),
+    "Ndat" = rep(0, count),
+    "mult" = rep(0, count),
+    "k" = rep(0, count)
+  )
+
+  # extract the C value from the string
+  labels <- list(c("WTI", "tm", "OS"))
+
+  for (j in seq_along(basenames)) {
+    # print(basenames[j])
+    fit <- Rose::read_fit_P_file(paste0(path, basenames[j], "_fit_P.dat"))
+    # print(make_table_fit_result(fit))
+    df[j, 1] <- basenames[j]
+    # M <- data.matrix(fit$C)
+    # for (i in c(1:dim(M)[1])) {
+    #   for (l in c(1:dim(M)[1])) {
+    #     M[i, l] <- as.numeric(fit$C[i, l])
+    #   }
+    # }
+    M <- matrix(as.numeric(as.matrix(fit$C)), nrow = nrow(fit$C))
+    e <- eigen(M)
+
+    lmin <- min(abs(e$values))
+    lmax <- max(abs(e$values))
+    k <- lmax / lmin
+    df[j, -1] <- c(fit$P[1, 2], fit$P[1, 3], fit$chi2dof, fit$dof, fit$npar, fit$ndata, 1, k)
+
+    gg <- plot_fit(paste0(path, basenames[j]), "a2",
+      # noline = TRUE,
+      data_type = reg,
+      gg = gg,
+      id_x = 1,
+      single_name_for_fit = legend_name[j],
+      # labelfit = "fit",
+      width = 0.0001,
+      nudge = 0,
+      noline = FALSE,
+      noribbon =TRUE
+    )
+  }
+  cat("reg:", reg, "<br>\n")
+  #### BAIC
+  ave_BAIC <- BAIC(v = df$res, err = df$err, chi2dof = df$chi2dof, dof = df$dof, npar = df$Npar, multiplicity = df$mult)
+  tab <- data.frame("fit" = basenames, "$\\sqrt{t_0} [\\mbox{fm}]$" = mapply(mean_print, df$res, df$err), "BAIC" = ave_BAIC$AIC, "chi2dof" = df$chi2dof, "lmax/lmin" = df$k)
+  print(kable(tab, col.names = c("fit", "$\\sqrt{t_0} [\\mbox{fm}]$", "BAIC", "$\\chi^2/dof$", "$\\lambda_{max}/\\lambda_{min}$")))
+  cat("BAIC average $=", ave_BAIC$m, "(", ave_BAIC$stat, ")(", ave_BAIC$syst, ") =", mean_print(ave_BAIC$m, ave_BAIC$dm), "\\,[\\text{MeV}]$<br>\n")
+
+
+  ###
+  dft <- rbind(dft, df)
+}
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0} [\\mbox{fm}]$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.7, 0.98)
+)
+```
+
+## $\sqrt{t_0}/w_0$
+
+```{r,results='asis',echo=FALSE, warning=FALSE, dev='tikz'}
+library(stringr)
+source("/home/garofalo/programs/Rose/R/plot_routines.R")
+dft <- NULL
+gg <- ggplot()
+for (reg in c("fit_sqrtt0_over_w0_FLAG", "fit_sqrtt0_over_w0_wp25_Cm5")) {
+  #"fit_sqrtt0_w0_fpiwp25"
+  path <- "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
+  basenames <- c(
+    paste0(reg, "_a2"),
+    paste0(reg, "_a2_noB"),
+    paste0(reg, "_a2_noC"),
+    paste0(reg, "_a2_noD"),
+    paste0(reg, "_a2_noE"),
+    paste0(reg, "_a2_a4")
+    #paste0(reg, "_a2_Husung0.42")
   )
   legend_name <- basenames
   count <- length(basenames)
@@ -124,7 +340,8 @@ for (reg in c("fit_sqrtt0_FLAG", "fit_sqrtt0_wp25_Cm5")) {
       # labelfit = "fit",
       width = 0.0001,
       nudge = 0,
-      noline = TRUE
+      noline = FALSE,
+      noribbon =TRUE
     )
   }
   cat("reg:", reg, "<br>\n")
@@ -138,7 +355,7 @@ for (reg in c("fit_sqrtt0_FLAG", "fit_sqrtt0_wp25_Cm5")) {
   ###
   dft <- rbind(dft, df)
 }
-fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0} [\\mbox{fm}]$",
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0}/w_0$",
   to_print = TRUE,
   # yrange = c(-1, 4),
   legend_position = c(0.7, 0.98)
