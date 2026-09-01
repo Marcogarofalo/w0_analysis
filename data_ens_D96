@@ -64,16 +64,16 @@ deriv/deriv_val_fpi_P5A0_D96_tm_l0_l0_A0P5.dat_jack20.dat
 deriv/zero.dat
 deriv/zero.dat
 deriv/deriv_fpi_P5A0_D96_tm_l0_l0_A0P5.dat_reweight_light_OS_D96.dat_jack20.dat
-deriv/average_mul_over_fpi_df_dmus_smallV_tm_fpi_A0P5_deriv_fpi_A0P5_jack20.dat
-deriv/average_mul_over_fpi_df_dmuc_smallV_tm_fpi_A0P5_deriv_fpi_A0P5_jack20.dat
+deriv/fit_smallV_chiral_after_Linf_fpi_A0P5_dms_deriv_fpi_A0P5_ave_jack20.dat
+deriv/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_deriv_fpi_A0P5_ave_jack20.dat
 ############ fpi_P5A0 OS
 deriv/fpi_P5A0_D96_OS_l0_l0_A0P5.dat_jack20.dat
 deriv/deriv_val_fpi_P5A0_D96_OS_l0_l0_A0P5.dat_jack20.dat
 deriv/zero.dat
 deriv/zero.dat
 deriv/deriv_fpi_P5A0_D96_OS_l0_l0_A0P5.dat_reweight_light_OS_D96.dat_jack20.dat
-deriv/average_mul_over_fpi_df_dmus_smallV_OS_fpi_A0P5_deriv_fpi_A0P5_jack20.dat
-deriv/average_mul_over_fpi_df_dmuc_smallV_OS_fpi_A0P5_deriv_fpi_A0P5_jack20.dat
+deriv/fit_smallV_chiral_after_Linf_fpi_A0P5_dms_OS_deriv_fpi_A0P5_ave_jack20.dat
+deriv/fit_smallV_chiral_after_Linf_fpi_A0P5_dmc_OS_deriv_fpi_A0P5_ave_jack20.dat
 #######
 skip
 skip
