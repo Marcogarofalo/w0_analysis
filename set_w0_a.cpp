@@ -942,6 +942,7 @@ int main(int argc, char** argv) {
     double* w0_L = myres->create_copy(data[75]);
     double* w0_small_L = myres->create_copy(data[4]);
     double* sqrt0_L = myres->create_copy(data[76]);
+    double* sqrtt0_small_L = myres->create_copy(data[62]);
 
     //////////////////////////////////////////////////////////////
     // max twist correction
@@ -3601,6 +3602,10 @@ int main(int argc, char** argv) {
         }printf("\n");
         printf("w0_sim (fm): %+.6g  (%.3g)\n", myres->mean(w0_sim), myres->comp_error(w0_sim));
     }
+
+    double *w0_wp25_j = myres->create_fake(w0_fm, 1e-12, -1);
+    write_jack(w0_wp25_j, Njack, jack_file);     check_correlatro_counter(id_w0_wp25);
+    write_jack(sqrtt0_small_L, Njack, jack_file);     check_correlatro_counter(id_w0_wp25 + 1);
 
     return 0;
 }
