@@ -1,10 +1,21 @@
 import os
 import matplotlib.pyplot as plt
 import pandas as pd
-from matplotlib import markers, rc
+# from matplotlib import markers, rc
 import numpy as np
+from matplotlib import rc
 
+import matplotlib.container as mcontainer
+from matplotlib.legend_handler import HandlerErrorbar
+ 
+handler_map = {
+    mcontainer.ErrorbarContainer: HandlerErrorbar(yerr_size=.7)
+}
+def legend(ax, *args, **kwargs):
+    kwargs.setdefault("handler_map", handler_map)
+    return ax.legend(*args, **kwargs)
 
+# Configurazione corretta per usare i font interni di LaTeX ovunque
 plt.rcParams.update({
     "text.usetex": False,         # Zero crash su Windows
     "mathtext.fontset": "cm",     # Usa il motore matematico Computer Modern
@@ -24,20 +35,26 @@ plt.rcParams.update({
     
     "xtick.labelsize": 14,    # Dimensione dei numeri sull'asse X
     "ytick.labelsize": 14,    # Dimensione dei numeri sull'asse Y
-
-    # --- Configurazione TICK MINORS ---
-    "xtick.minor.visible": True,  # Attiva i tick minori sull'asse X
-    "ytick.minor.visible": True,  # Attiva i tick minori sull'asse Y
-
-    # --- Configurazione TICK INTERNI ---
-    "xtick.direction": "in",  # Forzza i tick dell'asse X verso l'interno
-    "ytick.direction": "in",  # Forza i tick dell'asse Y verso l'interno        
     
     "legend.fontsize": 14,    # Dimensione del testo dentro la legenda
     "figure.titlesize": 18,   # Dimensione del titolo della figura intera (suptitle)
 
+    "legend.markerscale": 1.,       # Ingrandisce i simboli solo dentro la legenda (moltiplicatore)
+    "legend.labelspacing": 1.1,      # Aumenta lo spazio verticale tra le righe (default 0.5)
+    "legend.borderpad": .8,
+    "legend.handletextpad": 1.,
+
+
     "errorbar.capsize":5,
     "lines.markeredgewidth":2.0, 
+    "lines.markersize": 9.0, 
+    # --- Configurazione TICK MINORS ---
+    "xtick.minor.visible": True,  # Attiva i tick minori sull'asse X
+    "ytick.minor.visible": True,  # Attiva i tick minori sull'asse Y
+    # --- Configurazione TICK INTERNI ---
+    "xtick.direction": "in",  # Forzza i tick dell'asse X verso l'interno
+    "ytick.direction": "in",  # Forza i tick dell'asse Y verso l'interno        
+ 
     # --- Configurazione GRIGLIA AUTOMATICA (Major Ticks) ---
     "axes.grid": True,                   # Attiva la griglia di default su tutti i grafici
     "axes.grid.which": "major",          # Applica solo ai ticks principali (major)
@@ -47,18 +64,37 @@ plt.rcParams.update({
     "grid.alpha": 0.7,                   # Opzionale: trasparenza per non appesantire il grafico (da 0 a 1)
 })
 
+blue = "#4363d8"
+orange = "#f58231"
+yellow = "#ffe119"
+maroon = "#800000"
+navy = "#000075"
+lavender = "#dcbeff"
+red = "#e6194B"
+green= "#2CA02C"
+purple = "#6A3D9A"
+magenta = "#CAB2D6"
+
+colors = [orange,blue,maroon,navy,yellow,lavender]
+colors_dis = {"tm":red,"OS":blue}
+symbol_dis = {"tm":"^","OS":"v"}
+########################################################################################
+########################################################################################
+
+
 # Set up the plot style (equivalent to theme_bw)
 # plt.style.use("seaborn-v0_8-whitegrid")  # or 'ggplot' depending on preference
 # fig, ax = plt.subplots(figsize=(8, 6))
+
 width, height = 800, 600 
-fig, ax = plt.subplots(figsize=(16,9))
+fig, ax = plt.subplots(1,1,figsize=(12,6))
 
 # -------------------------------------------------------------------------
 # Loop 1: ic in (0, -5)
 # -------------------------------------------------------------------------
 ic_values = [0, -5]
 marker_list = ["o", "s"]  # Renamed to avoid overriding matplotlib.markers module
-
+mylabs= [r"WP25 $(C=0~\text{fm}^{-2})$", r"WP25' $(C=-5~\text{fm}^{-2})$"]
 for idx, ic in enumerate(ic_values):
     path_m = f"/home/garofalo/analysis/flow/data_20//fit_all_beta/data_from_wp25_lin_deriv_mc_la_MDs_C{ic}.txt"
 
@@ -68,7 +104,7 @@ for idx, ic in enumerate(ic_values):
         # Calculate x and y based on R logic
         x_val = df_m["a[fm]"] * df_m["a[fm]"]
         y_val = df_m["delta_amuc"] / df_m["amul"]
-        label_str = f"WP25 $C={ic}$"
+        label_str = mylabs[idx]
 
         # Error propagation for 
         y_err =  df_m["ddelta_amuc"] / df_m["amul"] + (df_m["delta_amuc"] * df_m["damul"]) / (df_m["amul"] ** 2)
@@ -112,8 +148,8 @@ else:
 # -------------------------------------------------------------------------
 # Plot Styling & Limits (Equivalent to your myplotly settings)
 # -------------------------------------------------------------------------
-ax.set_xlabel(r"$a^2$", fontsize=12)
-ax.set_ylabel(r"$\delta\mu_c /\mu_\ell$", fontsize=12)
+ax.set_xlabel(r"$a^2$")
+ax.set_ylabel(r"$\delta m_c / m_\ell$")
 ax.set_title("")  # Left blank as in your R snippet
 
 # Set x-axis range (equivalent to xrange = c(0, 0.008))
@@ -123,7 +159,8 @@ ax.set_xlim(0, 0.008)
 # ax.set_ylim(-0.0002, 0.0006)
 
 # Display legend and show plot
-ax.legend(frameon=True, facecolor="white", edgecolor="none")
+# ax.legend(frameon=True, facecolor="white", edgecolor="none")
+legend(ax,frameon=True, facecolor="white", edgecolor="none")
 fpi3reg = "Cvalue_plot"
 # plt.tight_layout()
 plt.savefig(f"{fpi3reg}.pdf", format="pdf")

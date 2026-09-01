@@ -75,6 +75,9 @@ green= "#2CA02C"
 purple = "#6A3D9A"
 magenta = "#CAB2D6"
 
+maroon = "#4363d8"
+purple = "#f58231"
+
 colors = [orange,blue,maroon,navy,yellow,lavender]
 colors_dis = {"tm":red,"OS":blue}
 symbol_dis = {"tm":"^","OS":"v"}
@@ -273,13 +276,13 @@ def calculate_baic_average(v, err, chi2dof, dof, npar, multiplicity=1):
 C = -5
 path = "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
 basenames = [
-    f"fit_sqrtt0_FLAG_a2",
-    f"fit_sqrtt0_FLAG_a2_noB",
-    f"fit_sqrtt0_FLAG_a2_noC",
-    f"fit_sqrtt0_FLAG_a2_noD",
-    f"fit_sqrtt0_FLAG_a2_noE"
-    #f"fit_sqrtt0_FLAG_a2_a4"
-    # f"fit_sqrtt0_FLAG_a2_Husung0.42"
+    f"fit_sqrtt0_over_w0_FLAG_a2",
+    f"fit_sqrtt0_over_w0_FLAG_a2_noB",
+    f"fit_sqrtt0_over_w0_FLAG_a2_noC",
+    f"fit_sqrtt0_over_w0_FLAG_a2_noD",
+    f"fit_sqrtt0_over_w0_FLAG_a2_noE",
+    f"fit_sqrtt0_over_w0_FLAG_a2_a4"
+    # f"fit_sqrtt0_over_w0_FLAG_a2_Husung0.42"
 ]
 
 count = len(basenames)
@@ -361,7 +364,7 @@ for j, basename in enumerate(basenames):
 # Typography and Axis setup
 title = ""
 xlabel = r"$a^2$ [fm$^2$]"
-ylabel = r"$\sqrt{t_{0}}$ [fm]"
+ylabel = r"$\sqrt{t_{0}}/w_0$"
 
 legend_position = (0.7, 0.98)
 
@@ -421,13 +424,13 @@ print("so far so good")
 ######################################################## now the WP25 scheme
 
 basenames = [
-    f"fit_sqrtt0_wp25_Cm5_a2",
-    f"fit_sqrtt0_wp25_Cm5_a2_noB",
-    f"fit_sqrtt0_wp25_Cm5_a2_noC",
-    f"fit_sqrtt0_wp25_Cm5_a2_noD",
-    f"fit_sqrtt0_wp25_Cm5_a2_noE",
-     f"fit_sqrtt0_wp25_Cm5_a2_a4",
-    # f"fit_sqrtt0_wp25_Cm5_a2_Husung0.42"
+    f"fit_sqrtt0_over_w0_wp25_Cm5_a2",
+    f"fit_sqrtt0_over_w0_wp25_Cm5_a2_noB",
+    f"fit_sqrtt0_over_w0_wp25_Cm5_a2_noC",
+    f"fit_sqrtt0_over_w0_wp25_Cm5_a2_noD",
+    f"fit_sqrtt0_over_w0_wp25_Cm5_a2_noE",
+     f"fit_sqrtt0_over_w0_wp25_Cm5_a2_a4",
+    # f"fit_sqrtt0_over_w0_wp25_Cm5_a2_Husung0.42"
 ]
 count = len(basenames)
 df = pd.DataFrame({
@@ -541,7 +544,7 @@ plt.subplots_adjust(left=0.12, right=0.95, top=0.92, bottom=0.12, wspace=0)
 # If your final step compiles in LaTeX via pgf/tikz, use .pgf extension format target instead.
 
 
-fpi3reg = "sqrtt0cont"
+fpi3reg = "sqrtt0_over_w0_cont"
 # plt.tight_layout()
 plt.savefig(f"{fpi3reg}.pdf", format="pdf")
 plt.close()

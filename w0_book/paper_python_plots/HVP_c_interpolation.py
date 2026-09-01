@@ -159,7 +159,7 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
                 color="black" ,
                 elinewidth=size,
                 capsize=width*1000, 
-                label=f"$f_\pi$-scheme results"
+                label=r"$f_\pi$-scheme results"
             )
     # ax.errorbar(x_data[3], y_data[3], yerr=y_err[3], marker = marker_choices[4], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B32")
     # ax.errorbar(x_data[4], y_data[4], yerr=y_err[4], marker = marker_choices[3], linestyle='none', elinewidth=size, capsize=width*1000, label=f"B24")
@@ -256,7 +256,7 @@ def calculate_baic_average(v, err, chi2dof, dof, npar, multiplicity=1):
 C = -5
 path = "/home/garofalo/analysis/gm2_analysis/build/interpolation_fpi"
 basenames = [
-    f"fit_fpi_obs_5"
+    f"fit_fpi_obs_18"
 ]
 
 count = len(basenames)
@@ -281,7 +281,7 @@ labels = [["sim","sim"], ["$m_0$ and L corrected"], ["full corrected"]]
 # Initialize the Matplotlib figure canvas
 # Defaulting layout variables width/height if missing in original snippet scope
 width, height = 900, 600 
-fig, ax = plt.subplots(figsize=(width / 100, height / 100))
+fig, ax = plt.subplots(1,1,figsize=(7, 5))
 # fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(9,6))
 
 Nboot=2000
@@ -369,9 +369,9 @@ by_label = dict(zip(plot_labels, handles))
 # ax.grid(True, which='minor', axis='x')
 # ax.tick_params(axis='x',which='minor',size=0)
 
-fpi_wp25=131.09  
-val=1.42617149993e-09  
-err=2.20037920503e-11
+fpi_wp25=131.00 
+val=1.43580772509e-09  
+err=2.02147824236e-11    
 ax.errorbar(fpi_wp25, val*scale, yerr=err*scale, marker = "s", linestyle='none', color="red", 
             # elinewidth=0.8,
             # capsize=width*1000,

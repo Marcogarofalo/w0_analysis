@@ -278,113 +278,211 @@ def calculate_baic_average(v, err, chi2dof, dof, npar, multiplicity=1):
 C = -5
 path = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_charm"
 basenames = [
-f"amu_SDpWpLDcor_3b_BOS_BTM",
-f"amu_SDpWpLDcor_3b",
-f"amu_SDpWpLDcor_3b_a4OS",
-f"amu_SDpWpLDcor_3b_a4TM",
-f"amu_SDpWpLDcor_3b_a4OS_a4TM",
-f"amu_SDpWpLDcor_3b_alogOS",
-f"amu_SDpWpLDcor_3b_alogTM",
-f"amu_SDpWpLDcor_3b_alogOS_alogTM",
-f"amu_SDpWpLDcor_3b_alog2OS",
-f"amu_SDpWpLDcor_3b_alog2TM",
-f"amu_SDpWpLDcor_3b_alog2OS_alog2TM",
-f"amu_SDpWpLDcor_3b_alog3OS",
-f"amu_SDpWpLDcor_3b_alog3TM",
-f"amu_SDpWpLDcor_3b_alog3OS_alog3TM",
-f"amu_SDpWpLDcor_3b_BOS",
-f"amu_SDpWpLDcor_3b_BOS_a4OS",
-f"amu_SDpWpLDcor_3b_BOS_a4TM",
-f"amu_SDpWpLDcor_3b_BOS_a4OS_a4TM",
-f"amu_SDpWpLDcor_3b_BOS_alogOS",
-f"amu_SDpWpLDcor_3b_BOS_alogTM",
-f"amu_SDpWpLDcor_3b_BOS_alogOS_alogTM",
-f"amu_SDpWpLDcor_3b_BOS_alog2OS",
-f"amu_SDpWpLDcor_3b_BOS_alog2TM",
-f"amu_SDpWpLDcor_3b_BOS_alog2OS_alog2TM",
-f"amu_SDpWpLDcor_3b_BOS_alog3OS",
-f"amu_SDpWpLDcor_3b_BOS_alog3TM",
-f"amu_SDpWpLDcor_3b_BOS_alog3OS_alog3TM",
-f"amu_SDpWpLDcor_3b_BTM",
-f"amu_SDpWpLDcor_3b_BTM_a4OS",
-f"amu_SDpWpLDcor_3b_BTM_a4TM",
-f"amu_SDpWpLDcor_3b_BTM_a4OS_a4TM",
-f"amu_SDpWpLDcor_3b_BTM_alogOS",
-f"amu_SDpWpLDcor_3b_BTM_alogTM",
-f"amu_SDpWpLDcor_3b_BTM_alogOS_alogTM",
-f"amu_SDpWpLDcor_3b_BTM_alog2OS",
-f"amu_SDpWpLDcor_3b_BTM_alog2TM",
-f"amu_SDpWpLDcor_3b_BTM_alog2OS_alog2TM",
-f"amu_SDpWpLDcor_3b_BTM_alog3OS",
-f"amu_SDpWpLDcor_3b_BTM_alog3TM",
-f"amu_SDpWpLDcor_3b_BTM_alog3OS_alog3TM",
-f"amu_SDpWpLDcor_3b_BOS_BTM_a4OS",
-f"amu_SDpWpLDcor_3b_BOS_BTM_a4TM",
-f"amu_SDpWpLDcor_3b_BOS_BTM_a4OS_a4TM",
-f"amu_SDpWpLDcor_3b_BOS_BTM_alogOS",
-f"amu_SDpWpLDcor_3b_BOS_BTM_alogTM",
-f"amu_SDpWpLDcor_3b_BOS_BTM_alogOS_alogTM",
-f"amu_SDpWpLDcor_3b_BOS_BTM_alog2OS",
-f"amu_SDpWpLDcor_3b_BOS_BTM_alog2TM",
-f"amu_SDpWpLDcor_3b_BOS_BTM_alog2OS_alog2TM",
-f"amu_SDpWpLDcor_3b_BOS_BTM_alog3OS",
-f"amu_SDpWpLDcor_3b_BOS_BTM_alog3TM",
-f"amu_SDpWpLDcor_3b_BOS_BTM_alog3OS_alog3TM",
-f"amu_SDpWpLDcor_3b_noC",
-f"amu_SDpWpLDcor_3b_noC_a4OS",
-f"amu_SDpWpLDcor_3b_noC_a4TM",
-f"amu_SDpWpLDcor_3b_noC_a4OS_a4TM",
-f"amu_SDpWpLDcor_3b_noC_alogOS",
-f"amu_SDpWpLDcor_3b_noC_alogTM",
-f"amu_SDpWpLDcor_3b_noC_alogOS_alogTM",
-f"amu_SDpWpLDcor_3b_noC_alog2OS",
-f"amu_SDpWpLDcor_3b_noC_alog2TM",
-f"amu_SDpWpLDcor_3b_noC_alog2OS_alog2TM",
-f"amu_SDpWpLDcor_3b_noC_alog3OS",
-f"amu_SDpWpLDcor_3b_noC_alog3TM",
-f"amu_SDpWpLDcor_3b_noC_alog3OS_alog3TM",
-f"amu_SDpWpLDcor_3b_noC_BOS",
-f"amu_SDpWpLDcor_3b_noC_BOS_a4OS",
-f"amu_SDpWpLDcor_3b_noC_BOS_a4TM",
-f"amu_SDpWpLDcor_3b_noC_BOS_a4OS_a4TM",
-f"amu_SDpWpLDcor_3b_noC_BOS_alogOS",
-f"amu_SDpWpLDcor_3b_noC_BOS_alogTM",
-f"amu_SDpWpLDcor_3b_noC_BOS_alogOS_alogTM",
-f"amu_SDpWpLDcor_3b_noC_BOS_alog2OS",
-f"amu_SDpWpLDcor_3b_noC_BOS_alog2TM",
-f"amu_SDpWpLDcor_3b_noC_BOS_alog2OS_alog2TM",
-f"amu_SDpWpLDcor_3b_noC_BOS_alog3OS",
-f"amu_SDpWpLDcor_3b_noC_BOS_alog3TM",
-f"amu_SDpWpLDcor_3b_noC_BOS_alog3OS_alog3TM",
-f"amu_SDpWpLDcor_3b_noC_BTM",
-f"amu_SDpWpLDcor_3b_noC_BTM_a4OS",
-f"amu_SDpWpLDcor_3b_noC_BTM_a4TM",
-f"amu_SDpWpLDcor_3b_noC_BTM_a4OS_a4TM",
-f"amu_SDpWpLDcor_3b_noC_BTM_alogOS",
-f"amu_SDpWpLDcor_3b_noC_BTM_alogTM",
-f"amu_SDpWpLDcor_3b_noC_BTM_alogOS_alogTM",
-f"amu_SDpWpLDcor_3b_noC_BTM_alog2OS",
-f"amu_SDpWpLDcor_3b_noC_BTM_alog2TM",
-f"amu_SDpWpLDcor_3b_noC_BTM_alog2OS_alog2TM",
-f"amu_SDpWpLDcor_3b_noC_BTM_alog3OS",
-f"amu_SDpWpLDcor_3b_noC_BTM_alog3TM",
-f"amu_SDpWpLDcor_3b_noC_BTM_alog3OS_alog3TM",
-f"amu_SDpWpLDcor_3b_onlyOS",
-f"amu_SDpWpLDcor_3b_onlyTM",
-f"amu_SDpWpLDcor_4b_onlyOS",
-f"amu_SDpWpLDcor_4b_onlyOS_a4",
-f"amu_SDpWpLDcor_4b_onlyOS_alog",
-f"amu_SDpWpLDcor_4b_onlyOS_alog2",
-f"amu_SDpWpLDcor_4b_onlyOS_alog3",
-f"amu_SDpWpLDcor_4b_onlyTM",
-f"amu_SDpWpLDcor_4b_onlyTM_a4",
-f"amu_SDpWpLDcor_4b_onlyTM_alog",
-f"amu_SDpWpLDcor_4b_onlyTM_alog2",
-f"amu_SDpWpLDcor_4b_onlyTM_alog3",
-f"amu_SDpWpLDcor_3b_noC_onlyOS",
-f"amu_SDpWpLDcor_3b_noC_onlyTM"
+f"amu_SDpWpLDdq_3b",
+f"amu_SDpWpLDdq_3b_a4OS",
+f"amu_SDpWpLDdq_3b_a4TM",
+f"amu_SDpWpLDdq_3b_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_alogOS",
+f"amu_SDpWpLDdq_3b_alogTM",
+f"amu_SDpWpLDdq_3b_alogOS_alogTM",
+f"amu_SDpWpLDdq_3b_alog2OS",
+f"amu_SDpWpLDdq_3b_alog2TM",
+f"amu_SDpWpLDdq_3b_alog2OS_alog2TM",
+f"amu_SDpWpLDdq_3b_alog3OS",
+f"amu_SDpWpLDdq_3b_alog3TM",
+f"amu_SDpWpLDdq_3b_alog3OS_alog3TM",
+f"amu_SDpWpLDdq_3b_rlog1",
+f"amu_SDpWpLDdq_3b_rlog2",
+f"amu_SDpWpLDdq_3b_rlog3",
+f"amu_SDpWpLDdq_3b_rlog1_a4OS",
+f"amu_SDpWpLDdq_3b_rlog2_a4OS",
+f"amu_SDpWpLDdq_3b_rlog3_a4OS",
+f"amu_SDpWpLDdq_3b_rlog1_a4TM",
+f"amu_SDpWpLDdq_3b_rlog2_a4TM",
+f"amu_SDpWpLDdq_3b_rlog3_a4TM",
+f"amu_SDpWpLDdq_3b_rlog1_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_rlog2_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_rlog3_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BOS",
+f"amu_SDpWpLDdq_3b_BOS_a4OS",
+f"amu_SDpWpLDdq_3b_BOS_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_alogOS",
+f"amu_SDpWpLDdq_3b_BOS_alogTM",
+f"amu_SDpWpLDdq_3b_BOS_alogOS_alogTM",
+f"amu_SDpWpLDdq_3b_BOS_alog2OS",
+f"amu_SDpWpLDdq_3b_BOS_alog2TM",
+f"amu_SDpWpLDdq_3b_BOS_alog2OS_alog2TM",
+f"amu_SDpWpLDdq_3b_BOS_alog3OS",
+f"amu_SDpWpLDdq_3b_BOS_alog3TM",
+f"amu_SDpWpLDdq_3b_BOS_alog3OS_alog3TM",
+f"amu_SDpWpLDdq_3b_BOS_rlog1",
+f"amu_SDpWpLDdq_3b_BOS_rlog2",
+f"amu_SDpWpLDdq_3b_BOS_rlog3",
+f"amu_SDpWpLDdq_3b_BOS_rlog1_a4OS",
+f"amu_SDpWpLDdq_3b_BOS_rlog2_a4OS",
+f"amu_SDpWpLDdq_3b_BOS_rlog3_a4OS",
+f"amu_SDpWpLDdq_3b_BOS_rlog1_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_rlog2_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_rlog3_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_rlog1_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_rlog2_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_rlog3_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BTM",
+f"amu_SDpWpLDdq_3b_BTM_a4OS",
+f"amu_SDpWpLDdq_3b_BTM_a4TM",
+f"amu_SDpWpLDdq_3b_BTM_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BTM_alogOS",
+f"amu_SDpWpLDdq_3b_BTM_alogTM",
+f"amu_SDpWpLDdq_3b_BTM_alogOS_alogTM",
+f"amu_SDpWpLDdq_3b_BTM_alog2OS",
+f"amu_SDpWpLDdq_3b_BTM_alog2TM",
+f"amu_SDpWpLDdq_3b_BTM_alog2OS_alog2TM",
+f"amu_SDpWpLDdq_3b_BTM_alog3OS",
+f"amu_SDpWpLDdq_3b_BTM_alog3TM",
+f"amu_SDpWpLDdq_3b_BTM_alog3OS_alog3TM",
+f"amu_SDpWpLDdq_3b_BTM_rlog1",
+f"amu_SDpWpLDdq_3b_BTM_rlog2",
+f"amu_SDpWpLDdq_3b_BTM_rlog3",
+f"amu_SDpWpLDdq_3b_BTM_rlog1_a4OS",
+f"amu_SDpWpLDdq_3b_BTM_rlog2_a4OS",
+f"amu_SDpWpLDdq_3b_BTM_rlog3_a4OS",
+f"amu_SDpWpLDdq_3b_BTM_rlog1_a4TM",
+f"amu_SDpWpLDdq_3b_BTM_rlog2_a4TM",
+f"amu_SDpWpLDdq_3b_BTM_rlog3_a4TM",
+f"amu_SDpWpLDdq_3b_BTM_rlog1_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BTM_rlog2_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BTM_rlog3_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_a4OS",
+f"amu_SDpWpLDdq_3b_BOS_BTM_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_alogOS",
+f"amu_SDpWpLDdq_3b_BOS_BTM_alogTM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_alogOS_alogTM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_alog2OS",
+f"amu_SDpWpLDdq_3b_BOS_BTM_alog2TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_alog2OS_alog2TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_alog3OS",
+f"amu_SDpWpLDdq_3b_BOS_BTM_alog3TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_alog3OS_alog3TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog1",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog2",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog3",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog1_a4OS",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog2_a4OS",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog3_a4OS",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog1_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog2_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog3_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog1_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog2_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_BOS_BTM_rlog3_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC",
+f"amu_SDpWpLDdq_3b_noC_a4OS",
+f"amu_SDpWpLDdq_3b_noC_a4TM",
+f"amu_SDpWpLDdq_3b_noC_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_alogOS",
+f"amu_SDpWpLDdq_3b_noC_alogTM",
+f"amu_SDpWpLDdq_3b_noC_alogOS_alogTM",
+f"amu_SDpWpLDdq_3b_noC_alog2OS",
+f"amu_SDpWpLDdq_3b_noC_alog2TM",
+f"amu_SDpWpLDdq_3b_noC_alog2OS_alog2TM",
+f"amu_SDpWpLDdq_3b_noC_alog3OS",
+f"amu_SDpWpLDdq_3b_noC_alog3TM",
+f"amu_SDpWpLDdq_3b_noC_alog3OS_alog3TM",
+f"amu_SDpWpLDdq_3b_noC_rlog1",
+f"amu_SDpWpLDdq_3b_noC_rlog2",
+f"amu_SDpWpLDdq_3b_noC_rlog3",
+f"amu_SDpWpLDdq_3b_noC_rlog1_a4OS",
+f"amu_SDpWpLDdq_3b_noC_rlog2_a4OS",
+f"amu_SDpWpLDdq_3b_noC_rlog3_a4OS",
+f"amu_SDpWpLDdq_3b_noC_rlog1_a4TM",
+f"amu_SDpWpLDdq_3b_noC_rlog2_a4TM",
+f"amu_SDpWpLDdq_3b_noC_rlog3_a4TM",
+f"amu_SDpWpLDdq_3b_noC_rlog1_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_rlog2_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_rlog3_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BOS",
+f"amu_SDpWpLDdq_3b_noC_BOS_a4OS",
+f"amu_SDpWpLDdq_3b_noC_BOS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_alogOS",
+f"amu_SDpWpLDdq_3b_noC_BOS_alogTM",
+f"amu_SDpWpLDdq_3b_noC_BOS_alogOS_alogTM",
+f"amu_SDpWpLDdq_3b_noC_BOS_alog2OS",
+f"amu_SDpWpLDdq_3b_noC_BOS_alog2TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_alog2OS_alog2TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_alog3OS",
+f"amu_SDpWpLDdq_3b_noC_BOS_alog3TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_alog3OS_alog3TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog1",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog2",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog3",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog1_a4OS",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog2_a4OS",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog3_a4OS",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog1_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog2_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog3_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog1_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog2_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BOS_rlog3_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BTM",
+f"amu_SDpWpLDdq_3b_noC_BTM_a4OS",
+f"amu_SDpWpLDdq_3b_noC_BTM_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_alogOS",
+f"amu_SDpWpLDdq_3b_noC_BTM_alogTM",
+f"amu_SDpWpLDdq_3b_noC_BTM_alogOS_alogTM",
+f"amu_SDpWpLDdq_3b_noC_BTM_alog2OS",
+f"amu_SDpWpLDdq_3b_noC_BTM_alog2TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_alog2OS_alog2TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_alog3OS",
+f"amu_SDpWpLDdq_3b_noC_BTM_alog3TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_alog3OS_alog3TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog1",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog2",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog3",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog1_a4OS",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog2_a4OS",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog3_a4OS",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog1_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog2_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog3_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog1_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog2_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_noC_BTM_rlog3_a4OS_a4TM",
+f"amu_SDpWpLDdq_3b_onlyOS",
+f"amu_SDpWpLDdq_3b_onlyTM",
+f"amu_SDpWpLDdq_4b_onlyOS",
+f"amu_SDpWpLDdq_4b_onlyOS_a4",
+f"amu_SDpWpLDdq_4b_onlyOS_alog",
+f"amu_SDpWpLDdq_4b_onlyOS_alog2",
+f"amu_SDpWpLDdq_4b_onlyOS_alog3",
+f"amu_SDpWpLDdq_4b_onlyTM",
+f"amu_SDpWpLDdq_4b_onlyTM_a4",
+f"amu_SDpWpLDdq_4b_onlyTM_alog",
+f"amu_SDpWpLDdq_4b_onlyTM_alog2",
+f"amu_SDpWpLDdq_4b_onlyTM_alog3",
+f"amu_SDpWpLDdq_3b_noC_onlyOS",
+f"amu_SDpWpLDdq_3b_noC_onlyTM"
 ]
+# filtered_basenames = [item for item in basenames if "noC" not in item]
+# basenames = filtered_basenames
+filtered_basenames = [item for item in basenames if "only" not in item]
+basenames = filtered_basenames
+# filtered_basenames = [item for item in basenames if "BTM" not in item]
+# basenames = filtered_basenames
+# filtered_basenames = [item for item in basenames if "BOS" not in item]
+# basenames = filtered_basenames
+# filtered_basenames = [item for item in basenames if "log" not in item]
+# basenames = filtered_basenames
 
+
+    
+# print(basenames)
+print(len(basenames))
 count = len(basenames)
 
 df = pd.DataFrame({
@@ -402,7 +500,7 @@ df = pd.DataFrame({
 legend_name = [re.sub(r"fit_fpi_|\.000000", "", name) for name in basenames]
 # legend_name = [f"\\verb|{name}|" for name in legend_name]
 
-labels = [[ "OS", "tm"]]
+labels = [[ "OS", "TM"]]
 
 # Initialize the Matplotlib figure canvas
 # Defaulting layout variables width/height if missing in original snippet scope
@@ -414,22 +512,22 @@ Nboot=2000
 flat_boot = [] 
 # Iterate and append layers directly onto the initialized axes
 for j, basename in enumerate(basenames):
-    plot_fit(
-        ax=ax[1],
-        basename=os.path.join(path, basename),
-        var="afm",
-        data_type=labels[0],
-        id_x=1,
-        single_name_for_fit="",
-        width=0.004,
-        size=0.8,
-        nudge=0,
-        noline=False,
-        noribbon=True,
-        alpha_line = 0.5,
-        stroke=0.1,
-        counter =j
-    )
+    # plot_fit(
+    #     ax=ax[1],
+    #     basename=os.path.join(path, basename),
+    #     var="afm",
+    #     data_type=labels[0],
+    #     id_x=1,
+    #     single_name_for_fit="",
+    #     width=0.004,
+    #     size=0.8,
+    #     nudge=0,
+    #     noline=False,
+    #     noribbon=True,
+    #     alpha_line = 0.5,
+    #     stroke=0.1,
+    #     counter =j
+    # )
     # Assuming 'path', 'basenames', and 'j' are defined in your loop:
     file_path = os.path.join(path, f"{basenames[j]}_fit_P.dat")
 
@@ -439,14 +537,13 @@ for j, basename in enumerate(basenames):
     # Note: The list must have the exact same number of elements as there are columns (9 columns)
     mul=1
     if 'log' in basenames[j]:
-    # Your code here
-        # print(f"Found 'log' in {basenames[j]}")
         mul=3
-        
+    
         
     df.iloc[j] = [basenames[j], fit['P'].iloc[0,1], fit['P'].iloc[0,2], fit['chi2dof'], fit['dof'], fit['npar'], fit['ndata'], mul]
     bt=np.random.normal(fit['P'].iloc[0,1], fit['P'].iloc[0,2], Nboot)
     flat_boot.extend(bt)
+    print(j, "  ", basenames[j]," ",fit['P'].iloc[0,1])
     
 ave_BAIC = calculate_baic_average(
     v=df['res'].to_numpy(),
@@ -462,6 +559,34 @@ stat_err = ave_BAIC['stat']
 flat_weig =[]
 for j, basename in enumerate(basenames):
     flat_weig.extend([ave_BAIC['AIC'][j]]*Nboot)
+
+plot_data=1
+for j, basename in enumerate(basenames):
+    if (j==78):
+        plot_data=0
+    
+    if (ave_BAIC["AIC"][j]>0.001 or j==78):
+        # print("plot")
+        plot_fit(
+                ax=ax[1],
+                basename=os.path.join(path, basename),
+                var="afm",
+                data_type=labels[0],
+                id_x=1,
+                single_name_for_fit="",
+                width=0.004,
+                size=0.8,
+                nudge=0,
+                noline=False,
+                noribbon=True,
+                alpha_line = 0.5,
+                stroke=0.1,
+                counter =plot_data
+            )
+        
+        if (j==78):
+            plot_data=1
+            
 
 # Reference benchmark flag lines
 # fpi_FLAG = 130.5
@@ -505,6 +630,7 @@ ax[0].hist(np.array(flat_boot)*scale, bins=20, weights=np.array(flat_weig)*100/N
 print(np.array(flat_weig).sum()/Nboot )
 ax[0].set_xlim(ax[0].get_xlim())
 # BAIC_ave e BAIC_err si capisce cosa sono e te li devi calcolare a parte
+print(BAIC_ave, BAIC_err, stat_err)
 ax[0].fill_between(ax[0].get_xlim(),np.array([BAIC_ave-BAIC_err,BAIC_ave-BAIC_err])*scale,
                                         np.array([BAIC_ave+BAIC_err,BAIC_ave+BAIC_err])*scale,color=lavender,alpha=0.2)
 ax[0].fill_between(ax[0].get_xlim(),np.array([BAIC_ave-stat_err,BAIC_ave-stat_err])*scale,

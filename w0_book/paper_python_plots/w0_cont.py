@@ -273,7 +273,7 @@ basenames = [
     f"fit_w0_lin_deriv_FLAG_a2_noD",
     f"fit_w0_lin_deriv_FLAG_a2_noE",
     f"fit_w0_lin_deriv_FLAG_a2_a4",
-    f"fit_w0_lin_deriv_FLAG_a2_Husung0.42"
+    # f"fit_w0_lin_deriv_FLAG_a2_Husung0.42"
 ]
 
 count = len(basenames)

@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 import numpy as np
 import matplotlib.ticker as ticker
+is_first_iteration = True
+
+scale = 1e+10
+
 import matplotlib.container as mcontainer
 from matplotlib.legend_handler import HandlerErrorbar
  
@@ -85,7 +89,7 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
              id_x=1, noline=False, labelfit="fit", width=0.02, size=1,
              id_color=None, id_shape=None, single_name_for_fit=None,
              nolabel_for_fit=False, nudge=0, alpha_line=1, alpha_ribbon=0.5,
-             stroke=1, filter_data=None, ii =0):
+             stroke=1,  counter=0, filter_data=None):
     """
     Translates the R plot_fit logic into Matplotlib.
     Instead of passing a 'gg' object, we pass a Matplotlib Axis object ('ax').
@@ -148,11 +152,9 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
         
     if single_name_for_fit is not None:
         mycol = [single_name_for_fit] * len(Nfits)
-
-    marker_choices = ['o','s','^', 'v',  'D', 's', '<', '>', 'p', '*']
-    colorlist = [purple, maroon]
-    colorlist1 = [ purple, maroon]
-
+    color_list = [blue ,red]
+    if 'onlyTM' in basenames[j]:
+        color_list = [red ,red]
     # 1. Plot the fits (Ribbons and Lines)
     if (not noribbon) or (not noline):
         for idx, n in enumerate(Nfits):
@@ -173,36 +175,39 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
                 ax.fill_between(x_vals, ymin, ymax, alpha=alpha_ribbon, label=lbl)
             if not noline:
                 # ax.plot(x_vals, y_vals, alpha=alpha_line, label=lbl, color="gray", linewidth=0.5)
-                ax.plot(x_vals, y_vals,color=colorlist[ii],alpha=0.5,linestyle="dashed",linewidth=0.4)
+                ax.plot(x_vals, y_vals*scale,color=color_list[idx],alpha=0.2,linestyle="dashed",linewidth=0.4)
 
-    # 2. Plot Points & Errorbars from main text data frame
-    # Collect data arrays
-    x_data = df.iloc[:, idx_col] + nudge
-    y_data = df.iloc[:, idy_col]
-    y_err = df.iloc[:, idy_col + 1]
-    
-    # We dynamically handle categorical colors/shapes by splitting scatter plots
-    unique_combos = sorted(list(set(zip(color_type, shape_type))))
-    
-    # Marker map variant safely addressing varied markers
-    marker_map = {combo: marker_choices[i % len(marker_choices)] for i, combo in enumerate(unique_combos)}
-    #marker_map = ["o","^","^"]
-    color_map ={combo: colorlist[i % len(colorlist)] for i, combo in enumerate(unique_combos)}
-    for combo in unique_combos:
-        mask = [c == combo[0] and s == combo[1] for c, s in zip(color_type, shape_type)]
-        if any(mask):
-            ax.errorbar(
-                x_data[mask], y_data[mask], yerr=y_err[mask],
-                # fmt=marker_map[combo],
-                marker = marker_choices[ii],
-                color = colorlist[ii],
-                 markersize=4,
-                linestyle='none', 
-                elinewidth=size, capsize=width*1000, 
-                # markersize=size*5,
-                # markeredgewidth=stroke,
-                label=data_type
-            )
+
+    if counter==0:
+        # 2. Plot Points & Errorbars from main text data frame
+        # Collect data arrays
+        x_data = df.iloc[:, idx_col] + nudge
+        y_data = df.iloc[:, idy_col]
+        y_err = df.iloc[:, idy_col + 1]
+        
+        # We dynamically handle categorical colors/shapes by splitting scatter plots
+        unique_combos = sorted(list(set(zip(color_type, shape_type))))
+        
+        # Marker map variant safely addressing varied markers
+        # marker_choices = ['o', 's', '^', 'D', 'v', '<', '>', 'p', '*']
+        marker_choices = ['v', '^', '^', 'D', 's', '<', '>', 'p', '*']
+        marker_map = {combo: marker_choices[i % len(marker_choices)] for i, combo in enumerate(unique_combos)}
+        #marker_map = ["o","^","^"]
+        idx=0
+        for combo in unique_combos:
+            mask = [c == combo[0] and s == combo[1] for c, s in zip(color_type, shape_type)]
+            if any(mask):
+                ax.errorbar(
+                    x_data[mask], y_data[mask]*scale, yerr=y_err[mask]*scale,
+                    fmt=marker_map[combo],
+                    color=color_list[idx],
+                    elinewidth=size, capsize=width*1000, 
+                    # markersize=size*5,
+                    # markeredgewidth=stroke,
+                    label=f"${{\\rm {combo[0]}}}$"
+                )
+                idx +=1
+            
 def read_fit_file(file_path):
     # Read space-separated data (equivalent to read.table with fill=True)
     # Generate 40 columns (0 to 39 in Python's 0-based indexing)
@@ -271,17 +276,213 @@ def calculate_baic_average(v, err, chi2dof, dof, npar, multiplicity=1):
 # --- Main Script Execution ---
 
 C = -5
-path = "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
+path = "/home/garofalo/analysis/g-2_new_stat/130.5/fit_all_strange"
 basenames = [
-    f"fit_sqrtt0_FLAG_a2",
-    f"fit_sqrtt0_FLAG_a2_noB",
-    f"fit_sqrtt0_FLAG_a2_noC",
-    f"fit_sqrtt0_FLAG_a2_noD",
-    f"fit_sqrtt0_FLAG_a2_noE"
-    #f"fit_sqrtt0_FLAG_a2_a4"
-    # f"fit_sqrtt0_FLAG_a2_Husung0.42"
+f"amu_SDdq_3b",
+f"amu_SDdq_3b_a4OS",
+f"amu_SDdq_3b_a4TM",
+f"amu_SDdq_3b_a4OS_a4TM",
+f"amu_SDdq_3b_alogOS",
+f"amu_SDdq_3b_alogTM",
+f"amu_SDdq_3b_alogOS_alogTM",
+f"amu_SDdq_3b_alog2OS",
+f"amu_SDdq_3b_alog2TM",
+f"amu_SDdq_3b_alog2OS_alog2TM",
+f"amu_SDdq_3b_alog3OS",
+f"amu_SDdq_3b_alog3TM",
+f"amu_SDdq_3b_alog3OS_alog3TM",
+f"amu_SDdq_3b_rlog1",
+f"amu_SDdq_3b_rlog2",
+f"amu_SDdq_3b_rlog3",
+f"amu_SDdq_3b_rlog1_a4OS",
+f"amu_SDdq_3b_rlog2_a4OS",
+f"amu_SDdq_3b_rlog3_a4OS",
+f"amu_SDdq_3b_rlog1_a4TM",
+f"amu_SDdq_3b_rlog2_a4TM",
+f"amu_SDdq_3b_rlog3_a4TM",
+f"amu_SDdq_3b_rlog1_a4OS_a4TM",
+f"amu_SDdq_3b_rlog2_a4OS_a4TM",
+f"amu_SDdq_3b_rlog3_a4OS_a4TM",
+f"amu_SDdq_3b_BOS",
+f"amu_SDdq_3b_BOS_a4OS",
+f"amu_SDdq_3b_BOS_a4TM",
+f"amu_SDdq_3b_BOS_a4OS_a4TM",
+f"amu_SDdq_3b_BOS_alogOS",
+f"amu_SDdq_3b_BOS_alogTM",
+f"amu_SDdq_3b_BOS_alogOS_alogTM",
+f"amu_SDdq_3b_BOS_alog2OS",
+f"amu_SDdq_3b_BOS_alog2TM",
+f"amu_SDdq_3b_BOS_alog2OS_alog2TM",
+f"amu_SDdq_3b_BOS_alog3OS",
+f"amu_SDdq_3b_BOS_alog3TM",
+f"amu_SDdq_3b_BOS_alog3OS_alog3TM",
+f"amu_SDdq_3b_BOS_rlog1",
+f"amu_SDdq_3b_BOS_rlog2",
+f"amu_SDdq_3b_BOS_rlog3",
+f"amu_SDdq_3b_BOS_rlog1_a4OS",
+f"amu_SDdq_3b_BOS_rlog2_a4OS",
+f"amu_SDdq_3b_BOS_rlog3_a4OS",
+f"amu_SDdq_3b_BOS_rlog1_a4TM",
+f"amu_SDdq_3b_BOS_rlog2_a4TM",
+f"amu_SDdq_3b_BOS_rlog3_a4TM",
+f"amu_SDdq_3b_BOS_rlog1_a4OS_a4TM",
+f"amu_SDdq_3b_BOS_rlog2_a4OS_a4TM",
+f"amu_SDdq_3b_BOS_rlog3_a4OS_a4TM",
+f"amu_SDdq_3b_BTM",
+f"amu_SDdq_3b_BTM_a4OS",
+f"amu_SDdq_3b_BTM_a4TM",
+f"amu_SDdq_3b_BTM_a4OS_a4TM",
+f"amu_SDdq_3b_BTM_alogOS",
+f"amu_SDdq_3b_BTM_alogTM",
+f"amu_SDdq_3b_BTM_alogOS_alogTM",
+f"amu_SDdq_3b_BTM_alog2OS",
+f"amu_SDdq_3b_BTM_alog2TM",
+f"amu_SDdq_3b_BTM_alog2OS_alog2TM",
+f"amu_SDdq_3b_BTM_alog3OS",
+f"amu_SDdq_3b_BTM_alog3TM",
+f"amu_SDdq_3b_BTM_alog3OS_alog3TM",
+f"amu_SDdq_3b_BTM_rlog1",
+f"amu_SDdq_3b_BTM_rlog2",
+f"amu_SDdq_3b_BTM_rlog3",
+f"amu_SDdq_3b_BTM_rlog1_a4OS",
+f"amu_SDdq_3b_BTM_rlog2_a4OS",
+f"amu_SDdq_3b_BTM_rlog3_a4OS",
+f"amu_SDdq_3b_BTM_rlog1_a4TM",
+f"amu_SDdq_3b_BTM_rlog2_a4TM",
+f"amu_SDdq_3b_BTM_rlog3_a4TM",
+f"amu_SDdq_3b_BTM_rlog1_a4OS_a4TM",
+f"amu_SDdq_3b_BTM_rlog2_a4OS_a4TM",
+f"amu_SDdq_3b_BTM_rlog3_a4OS_a4TM",
+f"amu_SDdq_3b_BOS_BTM",
+f"amu_SDdq_3b_BOS_BTM_a4OS",
+f"amu_SDdq_3b_BOS_BTM_a4TM",
+f"amu_SDdq_3b_BOS_BTM_a4OS_a4TM",
+f"amu_SDdq_3b_BOS_BTM_alogOS",
+f"amu_SDdq_3b_BOS_BTM_alogTM",
+f"amu_SDdq_3b_BOS_BTM_alogOS_alogTM",
+f"amu_SDdq_3b_BOS_BTM_alog2OS",
+f"amu_SDdq_3b_BOS_BTM_alog2TM",
+f"amu_SDdq_3b_BOS_BTM_alog2OS_alog2TM",
+f"amu_SDdq_3b_BOS_BTM_alog3OS",
+f"amu_SDdq_3b_BOS_BTM_alog3TM",
+f"amu_SDdq_3b_BOS_BTM_alog3OS_alog3TM",
+f"amu_SDdq_3b_BOS_BTM_rlog1",
+f"amu_SDdq_3b_BOS_BTM_rlog2",
+f"amu_SDdq_3b_BOS_BTM_rlog3",
+f"amu_SDdq_3b_BOS_BTM_rlog1_a4OS",
+f"amu_SDdq_3b_BOS_BTM_rlog2_a4OS",
+f"amu_SDdq_3b_BOS_BTM_rlog3_a4OS",
+f"amu_SDdq_3b_BOS_BTM_rlog1_a4TM",
+f"amu_SDdq_3b_BOS_BTM_rlog2_a4TM",
+f"amu_SDdq_3b_BOS_BTM_rlog3_a4TM",
+f"amu_SDdq_3b_BOS_BTM_rlog1_a4OS_a4TM",
+f"amu_SDdq_3b_BOS_BTM_rlog2_a4OS_a4TM",
+f"amu_SDdq_3b_BOS_BTM_rlog3_a4OS_a4TM",
+f"amu_SDdq_3b_noC",
+f"amu_SDdq_3b_noC_a4OS",
+f"amu_SDdq_3b_noC_a4TM",
+f"amu_SDdq_3b_noC_a4OS_a4TM",
+f"amu_SDdq_3b_noC_alogOS",
+f"amu_SDdq_3b_noC_alogTM",
+f"amu_SDdq_3b_noC_alogOS_alogTM",
+f"amu_SDdq_3b_noC_alog2OS",
+f"amu_SDdq_3b_noC_alog2TM",
+f"amu_SDdq_3b_noC_alog2OS_alog2TM",
+f"amu_SDdq_3b_noC_alog3OS",
+f"amu_SDdq_3b_noC_alog3TM",
+f"amu_SDdq_3b_noC_alog3OS_alog3TM",
+f"amu_SDdq_3b_noC_rlog1",
+f"amu_SDdq_3b_noC_rlog2",
+f"amu_SDdq_3b_noC_rlog3",
+f"amu_SDdq_3b_noC_rlog1_a4OS",
+f"amu_SDdq_3b_noC_rlog2_a4OS",
+f"amu_SDdq_3b_noC_rlog3_a4OS",
+f"amu_SDdq_3b_noC_rlog1_a4TM",
+f"amu_SDdq_3b_noC_rlog2_a4TM",
+f"amu_SDdq_3b_noC_rlog3_a4TM",
+f"amu_SDdq_3b_noC_rlog1_a4OS_a4TM",
+f"amu_SDdq_3b_noC_rlog2_a4OS_a4TM",
+f"amu_SDdq_3b_noC_rlog3_a4OS_a4TM",
+f"amu_SDdq_3b_noC_BOS",
+f"amu_SDdq_3b_noC_BOS_a4OS",
+f"amu_SDdq_3b_noC_BOS_a4TM",
+f"amu_SDdq_3b_noC_BOS_a4OS_a4TM",
+f"amu_SDdq_3b_noC_BOS_alogOS",
+f"amu_SDdq_3b_noC_BOS_alogTM",
+f"amu_SDdq_3b_noC_BOS_alogOS_alogTM",
+f"amu_SDdq_3b_noC_BOS_alog2OS",
+f"amu_SDdq_3b_noC_BOS_alog2TM",
+f"amu_SDdq_3b_noC_BOS_alog2OS_alog2TM",
+f"amu_SDdq_3b_noC_BOS_alog3OS",
+f"amu_SDdq_3b_noC_BOS_alog3TM",
+f"amu_SDdq_3b_noC_BOS_alog3OS_alog3TM",
+f"amu_SDdq_3b_noC_BOS_rlog1",
+f"amu_SDdq_3b_noC_BOS_rlog2",
+f"amu_SDdq_3b_noC_BOS_rlog3",
+f"amu_SDdq_3b_noC_BOS_rlog1_a4OS",
+f"amu_SDdq_3b_noC_BOS_rlog2_a4OS",
+f"amu_SDdq_3b_noC_BOS_rlog3_a4OS",
+f"amu_SDdq_3b_noC_BOS_rlog1_a4TM",
+f"amu_SDdq_3b_noC_BOS_rlog2_a4TM",
+f"amu_SDdq_3b_noC_BOS_rlog3_a4TM",
+f"amu_SDdq_3b_noC_BOS_rlog1_a4OS_a4TM",
+f"amu_SDdq_3b_noC_BOS_rlog2_a4OS_a4TM",
+f"amu_SDdq_3b_noC_BOS_rlog3_a4OS_a4TM",
+f"amu_SDdq_3b_noC_BTM",
+f"amu_SDdq_3b_noC_BTM_a4OS",
+f"amu_SDdq_3b_noC_BTM_a4TM",
+f"amu_SDdq_3b_noC_BTM_a4OS_a4TM",
+f"amu_SDdq_3b_noC_BTM_alogOS",
+f"amu_SDdq_3b_noC_BTM_alogTM",
+f"amu_SDdq_3b_noC_BTM_alogOS_alogTM",
+f"amu_SDdq_3b_noC_BTM_alog2OS",
+f"amu_SDdq_3b_noC_BTM_alog2TM",
+f"amu_SDdq_3b_noC_BTM_alog2OS_alog2TM",
+f"amu_SDdq_3b_noC_BTM_alog3OS",
+f"amu_SDdq_3b_noC_BTM_alog3TM",
+f"amu_SDdq_3b_noC_BTM_alog3OS_alog3TM",
+f"amu_SDdq_3b_noC_BTM_rlog1",
+f"amu_SDdq_3b_noC_BTM_rlog2",
+f"amu_SDdq_3b_noC_BTM_rlog3",
+f"amu_SDdq_3b_noC_BTM_rlog1_a4OS",
+f"amu_SDdq_3b_noC_BTM_rlog2_a4OS",
+f"amu_SDdq_3b_noC_BTM_rlog3_a4OS",
+f"amu_SDdq_3b_noC_BTM_rlog1_a4TM",
+f"amu_SDdq_3b_noC_BTM_rlog2_a4TM",
+f"amu_SDdq_3b_noC_BTM_rlog3_a4TM",
+f"amu_SDdq_3b_noC_BTM_rlog1_a4OS_a4TM",
+f"amu_SDdq_3b_noC_BTM_rlog2_a4OS_a4TM",
+f"amu_SDdq_3b_noC_BTM_rlog3_a4OS_a4TM",
+f"amu_SDdq_3b_onlyOS",
+f"amu_SDdq_3b_onlyTM",
+f"amu_SDdq_4b_onlyOS",
+f"amu_SDdq_4b_onlyOS_a4",
+f"amu_SDdq_4b_onlyOS_alog",
+f"amu_SDdq_4b_onlyOS_alog2",
+f"amu_SDdq_4b_onlyOS_alog3",
+f"amu_SDdq_4b_onlyTM",
+f"amu_SDdq_4b_onlyTM_a4",
+f"amu_SDdq_4b_onlyTM_alog",
+f"amu_SDdq_4b_onlyTM_alog2",
+f"amu_SDdq_4b_onlyTM_alog3",
+f"amu_SDdq_3b_noC_onlyOS",
+f"amu_SDdq_3b_noC_onlyTM"
 ]
+# filtered_basenames = [item for item in basenames if "noC" not in item]
+# basenames = filtered_basenames
+filtered_basenames = [item for item in basenames if "only" not in item]
+basenames = filtered_basenames
+# filtered_basenames = [item for item in basenames if "BTM" not in item]
+# basenames = filtered_basenames
+# filtered_basenames = [item for item in basenames if "BOS" not in item]
+# basenames = filtered_basenames
+# filtered_basenames = [item for item in basenames if "log" not in item]
+# basenames = filtered_basenames
 
+
+    
+# print(basenames)
+print(len(basenames))
 count = len(basenames)
 
 df = pd.DataFrame({
@@ -299,34 +500,34 @@ df = pd.DataFrame({
 legend_name = [re.sub(r"fit_fpi_|\.000000", "", name) for name in basenames]
 # legend_name = [f"\\verb|{name}|" for name in legend_name]
 
-labels = ["FLAG"]
+labels = [[ "OS", "TM"]]
 
 # Initialize the Matplotlib figure canvas
 # Defaulting layout variables width/height if missing in original snippet scope
 width, height = 800, 600 
 #fig, ax = plt.subplots(figsize=(width / 100, height / 100))
-fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(12,6))
+fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(7,5))
 
 Nboot=2000
 flat_boot = [] 
 # Iterate and append layers directly onto the initialized axes
 for j, basename in enumerate(basenames):
-    plot_fit(
-        ax=ax[1],
-        basename=os.path.join(path, basename),
-        var="a2",
-        data_type=labels[0],
-        id_x=1,
-        single_name_for_fit="",
-        width=0.004,
-        size=0.8,
-        nudge=0,
-        noline=False,
-        noribbon=True,
-        alpha_line = 0.5,
-        stroke=0.1,
-        ii=0
-    )
+    # plot_fit(
+    #     ax=ax[1],
+    #     basename=os.path.join(path, basename),
+    #     var="afm",
+    #     data_type=labels[0],
+    #     id_x=1,
+    #     single_name_for_fit="",
+    #     width=0.004,
+    #     size=0.8,
+    #     nudge=0,
+    #     noline=False,
+    #     noribbon=True,
+    #     alpha_line = 0.5,
+    #     stroke=0.1,
+    #     counter =j
+    # )
     # Assuming 'path', 'basenames', and 'j' are defined in your loop:
     file_path = os.path.join(path, f"{basenames[j]}_fit_P.dat")
 
@@ -334,9 +535,15 @@ for j, basename in enumerate(basenames):
     fit = read_fit_file(file_path)
     # Initialize row j with a list of values
     # Note: The list must have the exact same number of elements as there are columns (9 columns)
-    df.iloc[j] = [basenames[j], fit['P'].iloc[0,1], fit['P'].iloc[0,2], fit['chi2dof'], fit['dof'], fit['npar'], fit['ndata'], 1]
+    mul=1
+    if 'log' in basenames[j]:
+        mul=3
+    
+        
+    df.iloc[j] = [basenames[j], fit['P'].iloc[0,1], fit['P'].iloc[0,2], fit['chi2dof'], fit['dof'], fit['npar'], fit['ndata'], mul]
     bt=np.random.normal(fit['P'].iloc[0,1], fit['P'].iloc[0,2], Nboot)
     flat_boot.extend(bt)
+    print(j, "  ", basenames[j]," ",fit['P'].iloc[0,1])
     
 ave_BAIC = calculate_baic_average(
     v=df['res'].to_numpy(),
@@ -353,15 +560,43 @@ flat_weig =[]
 for j, basename in enumerate(basenames):
     flat_weig.extend([ave_BAIC['AIC'][j]]*Nboot)
 
+plot_data=1
+for j, basename in enumerate(basenames):
+    if (j==78):
+        plot_data=0
+    
+    if (ave_BAIC["AIC"][j]>0.001 or j==78):
+        # print("plot")
+        plot_fit(
+                ax=ax[1],
+                basename=os.path.join(path, basename),
+                var="afm",
+                data_type=labels[0],
+                id_x=1,
+                single_name_for_fit="",
+                width=0.004,
+                size=0.8,
+                nudge=0,
+                noline=False,
+                noribbon=True,
+                alpha_line = 0.5,
+                stroke=0.1,
+                counter =plot_data
+            )
+        
+        if (j==78):
+            plot_data=1
+            
+
 # Reference benchmark flag lines
-# fpi_FLAG = 0.17236
-# ax[1].axhline(y=fpi_FLAG, color='black', linestyle='--', label='wp25')
-# ax[1].scatter([0], [fpi_FLAG], color='red', marker='x', label='wp25')
+# fpi_FLAG = 130.5
+# ax[1].axhline(y=fpi_FLAG, color='black', linestyle='--', label='FLAG')
+# ax[1].scatter([0], [fpi_FLAG], color='red', marker='x', label='FLAG')
 
 # Typography and Axis setup
 title = ""
 xlabel = r"$a^2$ [fm$^2$]"
-ylabel = r"$\sqrt{t_{0}}$ [fm]"
+ylabel = r"$a_{\mu}^{\rm SD}(s)\times 10^{10}$"
 
 legend_position = (0.7, 0.98)
 
@@ -380,168 +615,38 @@ for spine in ax[1].spines.values():
 # ax[1].tick_params(colors='black', direction='out')
 ax[1].yaxis.get_label().set_visible(False)
 ax[1].tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
-# Clean duplicate handles generated during the iterative subplot loops
+ax[1].errorbar([0.],np.array([BAIC_ave]) * scale, np.array([BAIC_err]) * scale,fmt="x",color="black",label=f"BAIC average")
+ax[1].errorbar([0.],np.array([BAIC_ave]) * scale, np.array([stat_err]) * scale,fmt="",color="black")
 handles, plot_labels = ax[1].get_legend_handles_labels()
 by_label = dict(zip(plot_labels, handles))
-ax[1].legend(by_label.values(), by_label.keys(), loc="upper left",
-            #  bbox_to_anchor=legend_position
-             )
-print("BAIC FLAG ",[BAIC_ave],"  ",[BAIC_err] )
-ax[1].errorbar([0.],[BAIC_ave],[BAIC_err],fmt="x",color="black",label=f"BAIC average FLAG")
-ax[1].errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
-#ax[1].set_ylim(0.167, 0.176)
+legend(ax[1],by_label.values(), by_label.keys(), loc="upper left"    )
 # histogram
 # Nota per Marco: in flat_boot c'è sostanzialmente un array che contiene un ricampionamento bootstrap
 # dei limiti al continuo. flat_weig sono i pesi normalizzati con la somma dei pesi (e li moltiplico
 # per 100 per ottenere la percentuale). Ogni modello ha il suo peso che è lo stesso per ogni bootstrap.
 # Nota importante: flat_boot ha dimensione (numero di modelli)*(numero di samples) ma è un array 1D. Lo stesso
 # vale per flat_weights, dove ripeti (numero di samples) volte lo stesso weight per ogni modello.
-ax[0].hist(flat_boot, bins=20, weights=np.array(flat_weig)*100/Nboot,orientation="horizontal",histtype='step', linewidth=1.5,color="black")
+ax[0].hist(np.array(flat_boot)*scale, bins=20, weights=np.array(flat_weig)*100/Nboot,orientation="horizontal",histtype='step', linewidth=1.5,color="black")
 print(np.array(flat_weig).sum()/Nboot )
 ax[0].set_xlim(ax[0].get_xlim())
 # BAIC_ave e BAIC_err si capisce cosa sono e te li devi calcolare a parte
-ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-BAIC_err,BAIC_ave-BAIC_err],
-                                        [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color=lavender,alpha=0.2)
-# ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
-#                                         [BAIC_ave+stat_err,BAIC_ave+stat_err],color=lavender,alpha=0.2)
-
+print(BAIC_ave, BAIC_err, stat_err)
+ax[0].fill_between(ax[0].get_xlim(),np.array([BAIC_ave-BAIC_err,BAIC_ave-BAIC_err])*scale,
+                                        np.array([BAIC_ave+BAIC_err,BAIC_ave+BAIC_err])*scale,color=lavender,alpha=0.2)
+ax[0].fill_between(ax[0].get_xlim(),np.array([BAIC_ave-stat_err,BAIC_ave-stat_err])*scale,
+                                        np.array([BAIC_ave+stat_err,BAIC_ave+stat_err])*scale,color=lavender,alpha=0.2)
 
 ax[0].set_xlabel(r"%")
 ax[0].xaxis.set_minor_locator(ticker.AutoMinorLocator())
 ax[0].grid(True, which='minor', axis='x')
 ax[0].tick_params(axis='x',which='minor',size=0)
-
+ax[1].set_ylim([8.6,9.8])
 plt.subplots_adjust(left=0.12, right=0.95, top=0.92, bottom=0.12, wspace=0)
 
 # Save configuration
 # Matplotlib saves vector figures cleanly via .pdf or .svg. 
 # If your final step compiles in LaTeX via pgf/tikz, use .pgf extension format target instead.
-
-print("so far so good")
-######################################################## now the WP25 scheme
-
-basenames = [
-    f"fit_sqrtt0_wp25_Cm5_a2",
-    f"fit_sqrtt0_wp25_Cm5_a2_noB",
-    f"fit_sqrtt0_wp25_Cm5_a2_noC",
-    f"fit_sqrtt0_wp25_Cm5_a2_noD",
-    f"fit_sqrtt0_wp25_Cm5_a2_noE",
-     f"fit_sqrtt0_wp25_Cm5_a2_a4",
-    # f"fit_sqrtt0_wp25_Cm5_a2_Husung0.42"
-]
-count = len(basenames)
-df = pd.DataFrame({
-    "fit": [""] * count,
-    "res": [0.0] * count,
-    "err": [0.0] * count,
-    "chi2dof": [0.0] * count,
-    "dof": [0] * count,
-    "Npar": [0] * count,
-    "Ndat": [0] * count,
-    "mult": [0.0] * count
-    })
-
-flat_boot = [] 
-
-# Iterate and append layers directly onto the initialized axes
-for j, basename in enumerate(basenames):
-    plot_fit(
-        ax=ax[1],
-        basename=os.path.join(path, basename),
-        var="a2",
-        data_type="WP25",
-        id_x=1,
-        single_name_for_fit="",
-        width=0.004,
-        size=0.8,
-        nudge=0,
-        noline=False,
-        noribbon=True,
-        alpha_line = 0.5,
-        stroke=0.1,
-        ii=1
-    )
-    # Assuming 'path', 'basenames', and 'j' are defined in your loop:
-    file_path = os.path.join(path, f"{basenames[j]}_fit_P.dat")
-
-    # Call the converted python function
-    fit = read_fit_file(file_path)
-    # Initialize row j with a list of values
-    # Note: The list must have the exact same number of elements as there are columns (9 columns)
-    df.iloc[j] = [basenames[j], fit['P'].iloc[0,1], fit['P'].iloc[0,2], fit['chi2dof'], fit['dof'], fit['npar'], fit['ndata'], 1]
-    bt=np.random.normal(fit['P'].iloc[0,1], fit['P'].iloc[0,2], Nboot)
-    flat_boot.extend(bt)
-
-ave_BAIC = calculate_baic_average(
-    v=df['res'].to_numpy(),
-    err=df['err'].to_numpy(),
-    chi2dof=df['chi2dof'].to_numpy(),
-    dof=df['dof'].to_numpy(),
-    npar=df['Npar'].to_numpy(),
-    multiplicity=df['mult'].to_numpy()
-)
-BAIC_ave = ave_BAIC['m']
-BAIC_err = ave_BAIC['dm']
-stat_err = ave_BAIC['stat']
-flat_weig =[]
-for j, basename in enumerate(basenames):
-    flat_weig.extend([ave_BAIC['AIC'][j]]*Nboot)
-
-# Reference benchmark flag lines
-# fpi_FLAG = 0.17236
-# ax[1].axhline(y=fpi_FLAG, color='black', linestyle='--', label='wp25')
-# ax[1].scatter([0], [fpi_FLAG], color='red', marker='x', label='wp25')
-
-
-# Customizing the Classic Matplotlib border presentation (Replicates theme_matplotlib)
-ax[1].patch.set_facecolor('white')
-for spine in ax[1].spines.values():
-    spine.set_color('black')
-    spine.set_linewidth(1)
-# ax[1].tick_params(colors='black', direction='out')
-ax[1].yaxis.get_label().set_visible(False)
-ax[1].tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
-# Clean duplicate handles generated during the iterative subplot loops
-print("BAIC wp25 cm5",[BAIC_ave],"  ",[BAIC_err] )
-ax[1].errorbar([0.],[BAIC_ave],[BAIC_err],fmt="^",color="red",label=f"BAIC average WP25")
-# ax[1].errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="red")
-
-
-handles, plot_labels = ax[1].get_legend_handles_labels()
-by_label = dict(zip(plot_labels, handles))
-ax[1].legend(by_label.values(), by_label.keys(), loc="lower right",
-            #  bbox_to_anchor=legend_position
-             )
-#ax[1].set_ylim(0.167, 0.176)
-# histogram
-# Nota per Marco: in flat_boot c'è sostanzialmente un array che contiene un ricampionamento bootstrap
-# dei limiti al continuo. flat_weig sono i pesi normalizzati con la somma dei pesi (e li moltiplico
-# per 100 per ottenere la percentuale). Ogni modello ha il suo peso che è lo stesso per ogni bootstrap.
-# Nota importante: flat_boot ha dimensione (numero di modelli)*(numero di samples) ma è un array 1D. Lo stesso
-# vale per flat_weights, dove ripeti (numero di samples) volte lo stesso weight per ogni modello.
-ax[0].hist(flat_boot, bins=20, weights=np.array(flat_weig)*100/Nboot,orientation="horizontal",histtype='step', linewidth=1.5,color="black")
-print(np.array(flat_weig).sum()/Nboot )
-ax[0].set_xlim(ax[0].get_xlim())
-# BAIC_ave e BAIC_err si capisce cosa sono e te li devi calcolare a parte
-
-ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-BAIC_err,BAIC_ave-BAIC_err],
-                                        [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color=maroon,alpha=0.2)
-# ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
-#                                         [BAIC_ave+stat_err,BAIC_ave+stat_err],color=maroon,alpha=0.2)
-
-ax[0].set_xlabel(r"%")
-ax[0].xaxis.set_minor_locator(ticker.AutoMinorLocator())
-ax[0].grid(True, which='minor', axis='x')
-ax[0].tick_params(axis='x',which='minor',size=0)
-
-plt.subplots_adjust(left=0.12, right=0.95, top=0.92, bottom=0.12, wspace=0)
-
-# Save configuration
-# Matplotlib saves vector figures cleanly via .pdf or .svg. 
-# If your final step compiles in LaTeX via pgf/tikz, use .pgf extension format target instead.
-
-
-fpi3reg = "sqrtt0cont"
+fpi3reg = "amu_s_SD"
 # plt.tight_layout()
 plt.savefig(f"{fpi3reg}.pdf", format="pdf")
 plt.close()

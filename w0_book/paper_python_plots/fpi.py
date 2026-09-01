@@ -74,8 +74,8 @@ lavender = "#dcbeff"
 red = "#e6194B"
 
 colors = [orange,blue,maroon,navy,yellow,lavender]
-colors_dis = {"tm":red,"OS":blue}
-symbol_dis = {"tm":"^","OS":"v"}
+colors_dis = {"TM":red,"OS":blue}
+symbol_dis = {"TM":"^","OS":"v"}
 
 def plot_fit(ax, basename, var, data_type=None, noribbon=False,
              id_x=1, noline=False, labelfit="fit", width=0.02, size=1,
@@ -298,13 +298,13 @@ df = pd.DataFrame({
 legend_name = [re.sub(r"fit_fpi_|\.000000", "", name) for name in basenames]
 # legend_name = [f"\\verb|{name}|" for name in legend_name]
 
-labels = [["WTI", "tm", "OS"]]
+labels = [["WTI", "TM", "OS"]]
 
 # Initialize the Matplotlib figure canvas
 # Defaulting layout variables width/height if missing in original snippet scope
 width, height = 800, 600 
 #fig, ax = plt.subplots(figsize=(width / 100, height / 100))
-fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True,figsize=(12,6))
+fig, ax = plt.subplots(1, 2, width_ratios=[1.,2.], sharey=True, figsize=(12,6))
 
 Nboot=2000
 flat_boot = [] 
