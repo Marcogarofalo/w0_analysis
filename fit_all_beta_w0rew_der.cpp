@@ -448,12 +448,14 @@ int main(int argc, char** argv) {
     int id_w0 = 1;
     int id_sqrtt0 = 21;
 
+    int id_sqrtt0_over_w0 = 25;
+    int id_der_sqrtt0_over_w0 = 26;
     //////////////////////////////////////////////////////////////
     // fitting
     //////////////////////////////////////////////////////////////
-    std::vector<std::string> der_name = { "w0","sqrtt0" };
-    std::vector<int> id_der = { id_dw0_dmu , id_dsqrtt0_dmu };
-    std::vector<int> id_Obs = { id_w0 , id_sqrtt0 };
+    std::vector<std::string> der_name = { "w0", "sqrtt0" , "sqrtt0_over_w0" };
+    std::vector<int> id_der = { id_dw0_dmu , id_dsqrtt0_dmu, id_der_sqrtt0_over_w0 };
+    std::vector<int> id_Obs = { id_w0 , id_sqrtt0 , id_sqrtt0_over_w0 };
 
     int id_amuliso = 13;
     int id_a_fm = 16;

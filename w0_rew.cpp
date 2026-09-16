@@ -537,7 +537,7 @@ int main(int argc, char** argv) {
     check_correlatro_counter(1);
 
     char name_w0[NAMESIZE];
-    mysprintf(name_w0, NAMESIZE, "deriv/w0_%s_%s%d.dat", argv[3], myres->option, Njack-1);
+    mysprintf(name_w0, NAMESIZE, "deriv/w0_%s_%s%d.dat", argv[3], myres->option, Njack - 1);
     myres->write_jack_in_file(w0.data(), name_w0);
 
 
@@ -567,7 +567,7 @@ int main(int argc, char** argv) {
             tmp[j] = lhs_function_W_rew(j, conf_jack, 150, fit_info);
         }
         char name[NAMESIZE];
-        mysprintf(name, NAMESIZE, "%s/out/W_%s_t150_%s%d.txt", option[3], argv[8], myres->option, Njack-1);
+        mysprintf(name, NAMESIZE, "%s/out/W_%s_t150_%s%d.txt", option[3], argv[8], myres->option, Njack - 1);
         myres->write_jack_in_file(tmp, name);
         free(tmp);
 
@@ -655,7 +655,7 @@ int main(int argc, char** argv) {
     write_jack(der.data(), Njack, jack_file);
     check_correlatro_counter(4);
 
-    mysprintf(name_rew, NAMESIZE, "deriv/der_%s_%s_%s%d.dat", argv[8], argv[3], myres->option, Njack-1);
+    mysprintf(name_rew, NAMESIZE, "deriv/der_%s_%s_%s%d.dat", argv[8], argv[3], myres->option, Njack - 1);
     myres->write_jack_in_file(der.data(), name_rew);
 
     std::vector<double> zeros(Njack, 0.0);
@@ -737,7 +737,7 @@ int main(int argc, char** argv) {
         check_correlatro_counter(21);
 
         char name_t0[NAMESIZE];
-        mysprintf(name_t0, NAMESIZE, "deriv/sqrtt0_%s_%s%d.dat", argv[3], myres->option, Njack-1);
+        mysprintf(name_t0, NAMESIZE, "deriv/sqrtt0_%s_%s%d.dat", argv[3], myres->option, Njack - 1);
         myres->write_jack_in_file(sqrtt0.data(), name_t0);
 
 
@@ -760,7 +760,7 @@ int main(int argc, char** argv) {
                 printf("Warning: W(t) with charm reweighting never gets to 0.3\n");
         }
 
-        
+
 
         char name_rew[NAMESIZE];
         mysprintf(name_rew, NAMESIZE, "E_%s(t)", argv[8]);
@@ -798,8 +798,34 @@ int main(int argc, char** argv) {
     write_jack(der_sqrtt0.data(), Njack, jack_file);
     check_correlatro_counter(24);
 
-    mysprintf(name_rew, NAMESIZE, "deriv/der_sqrtt0_%s_%s_%s%d.dat", argv[8], argv[3], myres->option, Njack-1);
+    mysprintf(name_rew, NAMESIZE, "deriv/der_sqrtt0_%s_%s_%s%d.dat", argv[8], argv[3], myres->option, Njack - 1);
     myres->write_jack_in_file(der_sqrtt0.data(), name_rew);
     printf("Nobs=%d\n", corr_counter);
+
+
+    double* sqrtt0_over_w0 = myres->create_zero();
+    for (size_t j = 0; j < Njack; j++) {
+        sqrtt0_over_w0[j] = sqrtt0[j] / w0[j];
+    }
+    print_result_in_file(outfile, sqrtt0_over_w0, "sqrtt0_over_w0", 0.0, fit_info.tmin, fit_info.tmax);
+    printf("sqrtt0_over_w0 = %g  %g\n", sqrtt0_over_w0[Njack - 1], myres->comp_error(sqrtt0_over_w0));
+    write_jack(sqrtt0_over_w0, Njack, jack_file);    check_correlatro_counter(25);
+
+    double* der_sqrtt0_over_w0 = myres->create_zero();
+    for (size_t j = 0; j < Njack; j++) {
+        der_sqrtt0_over_w0[j] = (sqrtt0_rew[j] / w0_rew[j]) - (sqrtt0[j] / w0[j]);
+        der_sqrtt0_over_w0[j] /= dmu;
+    }
+    print_result_in_file(outfile, der_sqrtt0_over_w0, "der_sqrtt0_over_w0", 0.0, fit_info.tmin, fit_info.tmax);
+    printf("der_sqrtt0_over_w0 = %g  %g\n", der_sqrtt0_over_w0[Njack - 1], myres->comp_error(der_sqrtt0_over_w0));
+    write_jack(der_sqrtt0_over_w0, Njack, jack_file);    check_correlatro_counter(26);
+
+    double* der_prod_sqrtt0_over_w0 = myres->create_zero();
+    for (size_t j = 0; j < Njack; j++) {
+        der_prod_sqrtt0_over_w0[j] = der_sqrtt0[j]/ w0[j] - sqrtt0[j] * der[j] / (w0[j]*w0[j]) ;
+    }
+    print_result_in_file(outfile, der_prod_sqrtt0_over_w0, "der_prod_sqrtt0_over_w0", 0.0, fit_info.tmin, fit_info.tmax);
+    printf("der_prod_sqrtt0_over_w0 = %g  %g\n", der_prod_sqrtt0_over_w0[Njack - 1], myres->comp_error(der_prod_sqrtt0_over_w0));
+    write_jack(der_prod_sqrtt0_over_w0, Njack, jack_file);    check_correlatro_counter(27);
 
 }

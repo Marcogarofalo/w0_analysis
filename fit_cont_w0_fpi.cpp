@@ -911,9 +911,9 @@ int main(int argc, char** argv) {
     std::vector<std::string> from = { "fpi" ,"w0", "w0_hybrid" };
     std::vector<std::string> obs2 = { "ms_over_ml" ,"mc_over_ms" };
     std::vector<std::vector<int>> id_obs_m = {
-        {31,30}, {32,31},  // from fpi
-        {36,35}, {37,36},  // from w0
-        {49,48}, {50,49}   // from w0_hybrid
+        { 31,30 },{ 32,31 },  // from fpi
+        { 36,35 },{ 37,36 },  // from w0
+        { 49,48 },{ 50,49 }   // from w0_hybrid
     };
     id_a = { 33, 38  ,51 };
     for (int ifrom = 0; ifrom < from.size(); ifrom++) {
@@ -1035,7 +1035,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // quark masses
     //////////////////////////////////////////////////////////////
-    std::vector<std::vector<int>> id_masses = { {30,31,32}, {35,36,37}, {48,49,50} };
+    std::vector<std::vector<int>> id_masses = { { 30,31,32 },{ 35,36,37 },{ 48,49,50 } };
 
     for (int ifrom = 0; ifrom < from.size(); ifrom++) {
         fit_type fit_info;
@@ -1128,7 +1128,7 @@ int main(int argc, char** argv) {
     std::vector<std::string> fits = { "a2", "a2_3pt", "a2_a4" , "a2_3pt_noC" };
     double (*funcArray[])(int, int, double*, int, double*) = { rhs_a2, rhs_a2, rhs_a2_a4 ,rhs_a2 };
     std::vector<int> Npars = { 2, 2, 3, 2 };
-    std::vector<std::vector<int>> ens_to_fit = { {0,1,2,3}, {1,2,3}, {0,1,2,3}, {0,2,3} };
+    std::vector<std::vector<int>> ens_to_fit = { { 0,1,2,3 },{ 1,2,3 },{ 0,1,2,3 },{ 0,2,3 } };
 
     for (auto [ifit, fit] : std::views::enumerate(fits)) {
         for (int i = 0; i < obs.size(); i++) {
@@ -1190,17 +1190,17 @@ int main(int argc, char** argv) {
     // multifit fpi
     //////////////////////////////////////////////////////////////
     std::vector<std::vector<std::vector<int>>> points = {
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{1,2,3}, {1,2,3}, {1,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{0,2,3}, {0,2,3}, {0,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },{{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },{{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },
-         {{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },{{0,1,2,3}, {0,1,2,3}, {0,1,2,3} },{{0,1,2,3}, {0,1,2,3}, {0,1,2,3} }
+         { { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },
+         { { 1,2,3 },{ 1,2,3 },{ 1,2,3 } },
+         { { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },
+         { { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },
+         { { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },
+         { { 0,2,3 },{ 0,2,3 },{ 0,2,3 } },
+         { { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },
+         { { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },
+         { { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },
+         { { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },{ { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },{ { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },
+         { { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },{ { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } },{ { 0,1,2,3 },{ 0,1,2,3 },{ 0,1,2,3 } }
     };
     std::vector<std::string> fits_fpi = { "N3_a2", "N3_a2_noBOS_noBtm_noBWTI" ,
         "N3_a2_a4",
@@ -1301,7 +1301,7 @@ int main(int argc, char** argv) {
         fit_type fit_info;
         fit_info.corr_id = { 1 };
         fit_info.N = 1;
-        fit_info.Nxen = { {0,1} };
+        fit_info.Nxen = { { 0,1 } };
         fit_info.init_N_etot_form_Nxen();
         fit_info.function = rhs_a2;
         fit_info.linear_fit = true;
@@ -1398,22 +1398,25 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     //fits
     points = {
-        {{0,1,2,3}},
-        {{1,2,3}},
-        {{0,2,3}},
-        {{0,1,2,3}},
-        {{0,1,2,3}},
-        {{0,1,3}},
-        {{0,1,2}}
+        { { 0,1,2,3 } },
+        { { 1,2,3 } },
+        { { 0,2,3 } },
+        { { 0,1,2,3 } },
+        { { 0,1,2,3 } },
+        { { 0,1,3 } },
+        { { 0,1,2 } }
     };
     std::vector<std::string> fits_sqrtt0 = { "a2", "a2_noB", "a2_noC", "a2_a4", "a2_Husung0.21" , "a2_noD", "a2_noE" };
     std::vector<double (*)(int, int, double*, int, double*)> funcArray_sqrtt0 = { rhs_a2,rhs_a2,rhs_a2, rhs_a2_a4 , rhs_a2_Husung<0.21>,rhs_a2,rhs_a2 };
     std::vector<int> Npars_sqrtt0 = { 2,2,2, 3, 3, 2, 2 };
 
     //obs to fit
-    id_obs = { id_sqrtt0_from_fpi ,id_sqrtt0_Cm5 , id_w0_lin_deriv , id_fpiwp25_sol + 6 };
-    obs = { "sqrtt0_FLAG", "sqrtt0_wp25_Cm5", "w0_lin_deriv_FLAG", "sqrtt0_fpiwp25" };
-    id_a = { 33 , 95 + static_cast<int>(id_Cm5) * 8, 33 ,id_fpiwp25_sol + 3 };
+    id_obs = { id_sqrtt0_from_fpi ,id_sqrtt0_Cm5 , id_w0_lin_deriv , id_fpiwp25_sol + 6,
+        id_RGF_fpi + 0, id_RGF_fpi + 1, id_RGF_fpi + 2, id_RGF_fpi + 3 };
+    obs = { "sqrtt0_FLAG", "sqrtt0_wp25_Cm5", "w0_lin_deriv_FLAG", "sqrtt0_fpiwp25",
+        "RGF_fpi_nocorr_lsc", "RGF_fpi_nocorr_sc", "RGF_fpi_nocorr_c", "RGF_fpi" };
+    id_a = { 33 , 95 + static_cast<int>(id_Cm5) * 8, 33 ,id_fpiwp25_sol + 3,
+        33,33,33,33 };
 
     for (int i = 0; i < obs.size(); i++) {
         for (auto [ifit, fit] : std::views::enumerate(fits_sqrtt0)) {
@@ -1460,7 +1463,7 @@ int main(int argc, char** argv) {
         fit_type fit_info;
 
         fit_info.corr_id = { id_w0_small_L, id_w0_big_L , id_a }; // w0, fpi
-        fit_info.Nxen = { {0,1,2,3}, {0,2} };
+        fit_info.Nxen = { { 0,1,2,3 },{ 0,2 } };
         fit_info.init_N_etot_form_Nxen();
         fit_info.function = rhs_a2;
         fit_info.linear_fit = true;
@@ -1497,7 +1500,7 @@ int main(int argc, char** argv) {
         fit_type fit_info;
 
         fit_info.corr_id = { id_fpi_sim_big_L + 1, id_fpi_sim_big_L + 2 , id_fpi_sim_big_L + 3 }; // w0, fpi
-        fit_info.Nxen = { {0,1,2,3}, {0,1} };
+        fit_info.Nxen = { { 0,1,2,3 },{ 0,1 } };
         fit_info.init_N_etot_form_Nxen();
         fit_info.function = rhs_a2;
         fit_info.linear_fit = true;
@@ -1534,7 +1537,7 @@ int main(int argc, char** argv) {
         fit_type fit_info;
 
         fit_info.corr_id = { id_fpi_sim_big_L + 4, id_fpi_sim_big_L + 5 }; // w0, fpi
-        fit_info.Nxen = { {0,1,2,3} };
+        fit_info.Nxen = { { 0,1,2,3 } };
         fit_info.init_N_etot_form_Nxen();
         fit_info.function = rhs_a2;
         fit_info.linear_fit = true;
@@ -1575,7 +1578,7 @@ int main(int argc, char** argv) {
         fit_type fit_info;
 
         fit_info.corr_id = { id_w0_small_L, id_fpi_small_L , id_fpi_sim_big_L, id_w0_big_L }; // w0, fpi
-        fit_info.Nxen = { {0,1,2,3}, {0,1,2} };
+        fit_info.Nxen = { { 0,1,2,3 },{ 0,1,2 } };
         fit_info.init_N_etot_form_Nxen();
         fit_info.function = rhs_a2;
         fit_info.linear_fit = true;
@@ -1612,7 +1615,7 @@ int main(int argc, char** argv) {
         fit_type fit_info;
 
         fit_info.corr_id = { id_w0, id_a }; // w0, fpi
-        fit_info.Nxen = { {0,1,2,3} };
+        fit_info.Nxen = { { 0,1,2,3 } };
         fit_info.init_N_etot_form_Nxen();
         fit_info.function = rhs_a2;
         fit_info.linear_fit = true;
@@ -1648,13 +1651,13 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     //fits
     points = {
-        {{0,1,2,3}},
-        {{1,2,3}},
-        {{0,2,3}},
-        {{0,1,2,3}},
-        {{0,1,2,3}},
-        {{0,1,3}},
-        {{0,1,2}}
+        { { 0,1,2,3 } },
+        { { 1,2,3 } },
+        { { 0,2,3 } },
+        { { 0,1,2,3 } },
+        { { 0,1,2,3 } },
+        { { 0,1,3 } },
+        { { 0,1,2 } }
     };
     fits_sqrtt0 = { "a2", "a2_noB", "a2_noC", "a2_a4", "a2_Husung0.42" , "a2_noD", "a2_noE" };
     funcArray_sqrtt0 = { rhs_a2,rhs_a2,rhs_a2, rhs_a2_a4 , rhs_a2_Husung<0.42>,rhs_a2,rhs_a2 };
@@ -1663,9 +1666,9 @@ int main(int argc, char** argv) {
     //obs to fit
     id_obs = { id_sqrtt0_from_fpi ,id_sqrtt0_Cm5 , id_w0_lin_deriv , id_fpiwp25_sol + 6 };
     std::vector<std::vector<int>> id_set_obs = {
-        {id_sqrtt0_from_fpi, id_w0_lin_deriv  },
-        {id_sqrtt0_Cm5, id_w0_wp25},
-        {id_fpiwp25_sol + 6, id_w0_wp25},
+        { id_sqrtt0_from_fpi, id_w0_lin_deriv },
+        { id_sqrtt0_Cm5, id_w0_wp25 },
+        { id_fpiwp25_sol + 6, id_w0_wp25 },
     };
     obs = { "sqrtt0_over_w0_FLAG", "sqrtt0_over_w0_wp25_Cm5", "sqrtt0_w0_fpiwp25" };
     id_a = { 33 , 95 + static_cast<int>(id_Cm5) * 8, id_fpiwp25_sol + 3 };
@@ -1706,10 +1709,10 @@ int main(int argc, char** argv) {
         }
     }
 
-        // done with B96 and C112
-    //////////////////////////////////////////////////////////////
-    // sqrtt0/w0 sim
-    //////////////////////////////////////////////////////////////
+    // done with B96 and C112
+//////////////////////////////////////////////////////////////
+// sqrtt0/w0 sim
+//////////////////////////////////////////////////////////////
     {
         int id_sqrtt0_small_L = id_w0_wp25 + 1;
         int id_w0_small_L = id_fpi_sim_big_L + 9;
@@ -1718,7 +1721,7 @@ int main(int argc, char** argv) {
         fit_type fit_info;
 
         fit_info.corr_id = { id_w0_small_L, id_sqrtt0_small_L , id_w0_big_L, id_sqrtt0_big_L }; // w0, fpi
-        fit_info.Nxen = { {0,1,2,3}, {0,1,2} };
+        fit_info.Nxen = { { 0,1,2,3 },{ 0,1,2 } };
         fit_info.init_N_etot_form_Nxen();
         fit_info.function = rhs_a2;
         fit_info.linear_fit = true;
@@ -1731,7 +1734,7 @@ int main(int argc, char** argv) {
         for (int n = 0; n < fit_info.N; n++) {
             for (int e : fit_info.Nxen[n]) {
                 for (int j = 0; j < Njack; j++) {
-                    
+
                     fit_info.x[0][count][j] = pow(jackall.en[e].jack[33][j], 2); // a^2 fm^2 FLAG
                 }
                 count++;

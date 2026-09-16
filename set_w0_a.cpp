@@ -297,21 +297,21 @@ double comp_error_pool(double* j1, double* j2) {
 }
 
 // we need the reference to a pointer to change is status
-void check_pull_factor(double *&pull, std::string filename){
+void check_pull_factor(double*& pull, std::string filename) {
     std::string filepath = filename;
-    double *previous_pull;
-    if (std::filesystem::exists(filepath)){
+    double* previous_pull;
+    if (std::filesystem::exists(filepath)) {
         previous_pull = myres->create_zero();
         myres->read_jack_from_file(previous_pull, filename.c_str());
     }
-    else{
-       previous_pull = myres->create_fake_exact(0.0,1e-16,-1); 
+    else {
+        previous_pull = myres->create_fake_exact(0.0, 1e-16, -1);
     }
     printf("comparing pull values current = %g  previous= %g\n", myres->comp_error(pull), myres->comp_error(previous_pull));
     if (myres->comp_error(pull) < myres->comp_error(previous_pull)) {
-       printf("using pull factor from existing file %s \n", filename.c_str());
-       free(pull);
-       pull = previous_pull;
+        printf("using pull factor from existing file %s \n", filename.c_str());
+        free(pull);
+        pull = previous_pull;
     }
     else {
         printf("using current pull factor and updating %s \n", filename.c_str());
@@ -325,16 +325,16 @@ double* weighted_average_plus_pool(double* M0, double* M1) {
     double dM1 = myres->comp_error(M1);
     double wM0 = 1.0 / (dM0 * dM0);
     double wM1 = 1.0 / (dM1 * dM1);
-    printf("averaging \n%.12g  %.12g\n%.12g  %.12g\n",myres->mean(M0), myres->comp_error(M0), myres->mean(M1), myres->comp_error(M1));
+    printf("averaging \n%.12g  %.12g\n%.12g  %.12g\n", myres->mean(M0), myres->comp_error(M0), myres->mean(M1), myres->comp_error(M1));
 
-    double pool_err = comp_error_pool(M0,M1);
-    double* pool_err_j = myres->create_fake_exact(0, pool_err,-1);
-    printf("pool error = %.12g  \n",pool_err);
-    printf("pool error = %.12g  %.12g\n",myres->mean(pool_err_j), myres->comp_error(pool_err_j));
+    double pool_err = comp_error_pool(M0, M1);
+    double* pool_err_j = myres->create_fake_exact(0, pool_err, -1);
+    printf("pool error = %.12g  \n", pool_err);
+    printf("pool error = %.12g  %.12g\n", myres->mean(pool_err_j), myres->comp_error(pool_err_j));
     for (int j = 0; j < myres->Njack; j++) {
         M0[j] = (wM0 * M0[j] + wM1 * M1[j]) / (wM0 + wM1);
     }
-    printf("weighted average = %.12g  %.12g\n",myres->mean(M0), myres->comp_error(M0));
+    printf("weighted average = %.12g  %.12g\n", myres->mean(M0), myres->comp_error(M0));
     // for (int j = 0; j < myres->Njack; j++) {
     //     M0[j] += pool_err_j[j];
     // }
@@ -510,7 +510,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // read the jacks
     //////////////////////////////////////////////////////////////
-    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2 + 2 + (7 + 4 + 2)+ 2;
+    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2 + 2 + (7 + 4 + 2) + 2;
     printf("%d\n", file_to_read);
     error(files.size() - 2 != file_to_read, 1, "main", "No input files found in  file %s we need %d lines but we have %d", argv[4], file_to_read, files.size() - 2);
     double** data = malloc_2<double>(file_to_read, Njack);
@@ -588,7 +588,7 @@ int main(int argc, char** argv) {
     read_file_debug(data[3 + 5 * 5], files[3 + 5 * 5].c_str());// dfpi / dmus(sea)
     read_file_debug(data[4 + 5 * 5], files[4 + 5 * 5].c_str());// dw0 / dmus(sea)
 
-    
+
     for (int j = 0; j < Njack;j++) {
         double mul = amuiso[0][j];
         double f = data[3][j];
@@ -599,10 +599,10 @@ int main(int argc, char** argv) {
         *dR = (*dR) * (w0) / mul;
     }
     for (int i = 0; i < 3; i++) {
-        std::vector<std::string> splitted_f = split(files[ i + 5 * 5],'/');
+        std::vector<std::string> splitted_f = split(files[i + 5 * 5], '/');
         // for (auto s : splitted_f){          std::cout<< s << "\n";        }
         // 1. Get the last element safely
-        const std::string& last_elem = splitted_f.back(); 
+        const std::string& last_elem = splitted_f.back();
 
         // 2. Define the regex pattern (.* matches any sequence of characters)
         std::regex pattern("^mul_over_R.*_dR.*_dms\\.dat$");
@@ -634,7 +634,7 @@ int main(int argc, char** argv) {
                 double M = data[i][j];
                 // if (j == Njack - 1 && i == 2)    printf(" %g     %g   %g  %g \n", *dR, f, M, mul);
                 double df = data[3 + 5 * 5][j];
-                *dR = (*dR) * (M ) / mul;
+                *dR = (*dR) * (M) / mul;
             }
         }
     }
@@ -662,11 +662,11 @@ int main(int argc, char** argv) {
             (*dR) = ((*dR) + M * df / (f * f)) * f;
         }
     }
-    double *tmp_c= data[id_deriv(3,1,2,1)];
-    printf("%d  %d\n",id_deriv(3,1,2,1),3 + 5 * 6 );
-    myres->change_mean_and_error(tmp_c,myres->mean(tmp_c),myres->mean(tmp_c)  );
+    double* tmp_c = data[id_deriv(3, 1, 2, 1)];
+    printf("%d  %d\n", id_deriv(3, 1, 2, 1), 3 + 5 * 6);
+    myres->change_mean_and_error(tmp_c, myres->mean(tmp_c), myres->mean(tmp_c));
     printf("enlargin error dfpi/dmc\n");
-    printf("%g   %g\n",myres->mean(tmp_c),myres->mean(tmp_c) );
+    printf("%g   %g\n", myres->mean(tmp_c), myres->mean(tmp_c));
 
     // decorrelate jacks
     // for (int iM = 0; iM < 5;iM++) {
@@ -772,7 +772,7 @@ int main(int argc, char** argv) {
         mpcac_over_mu[j] = data[43][j] / amusim[0][j];
     }
 
-    std::vector<std::vector<int>> id_to_correct = { {0,3} };
+    std::vector<std::vector<int>> id_to_correct = { { 0,3 } };
     std::vector<int> Ls = { L };
     std::vector<bool> correct_M = { true };
     std::vector<bool> correct_M_twist = { true };
@@ -985,6 +985,13 @@ int main(int argc, char** argv) {
         printf("fpi after max twist correction id=%d: %.12g  %.12g\n", idf, data[idf][Njack - 1], myres->comp_error(data[idf]));
     }
 
+    int isqrtt0 = id_deriv_sqrtt0(0, 0, 0);
+    printf("w0 before max twist correction id=%d: %.12g  %.12g\n", iw0, data[iw0][Njack - 1], myres->comp_error(data[iw0]));
+    printf("sqrtt0 before max twist correction id=%d: %.12g  %.12g\n", isqrtt0, data[isqrtt0][Njack - 1], myres->comp_error(data[isqrtt0]));
+    double *sqrtt0_over_w0 = myres->create_copy(data[isqrtt0]);
+    myres->div(sqrtt0_over_w0, sqrtt0_over_w0, data[iw0]);
+    printf("RGF before max twist correction %.12g  %.12g\n", sqrtt0_over_w0[Njack - 1], myres->comp_error(sqrtt0_over_w0));
+
     for (int j = 0; j < Njack;j++) {
         double dm0 = data[35][j];
         double dw0_dm0 = data[36][j] + 0.5 * (data[37][j] + data[38][j]);
@@ -1000,8 +1007,16 @@ int main(int argc, char** argv) {
             data[76][j] += delta_sqrtt0;
         }
     }
+    printf("w0 after max twist correction id=%d: %.12g  %.12g\n", iw0, data[iw0][Njack - 1], myres->comp_error(data[iw0]));
+    printf("sqrtt0 after max twist correction id=%d: %.12g  %.12g\n", isqrtt0, data[isqrtt0][Njack - 1], myres->comp_error(data[isqrtt0]));
+    myres->div(sqrtt0_over_w0, data[isqrtt0], data[iw0]);
+    printf("RGF after max twist correction %.12g  %.12g\n", sqrtt0_over_w0[Njack - 1], myres->comp_error(sqrtt0_over_w0));
 
-    
+    double *sqrtt0_over_w0_L = myres->create_copy(sqrtt0_over_w0);
+    if (bigLw0){
+        myres->div(sqrtt0_over_w0_L, data[76],data[75]);
+    }
+
     double* w0_max_twist = myres->create_copy(data[iw0]);
     double* fpi_max_twist = myres->create_copy(data[3]);
     double* fpi_big_L_max_twist = myres->create_copy(data[45]);
@@ -1098,28 +1113,40 @@ int main(int argc, char** argv) {
 
     double* pull_w0;
     double* pull_sqrtt0;
-    if (bigLw0){
+    double* pull_RGF;
+    if (bigLw0) {
         // weighted_average(data[iw0], data[75]);
         // weighted_average(data[id_deriv_sqrtt0(0,0,0)], data[76]);
         pull_w0 = weighted_average_plus_pool(data[iw0], data[75]);
-        pull_sqrtt0 = weighted_average_plus_pool(data[id_deriv_sqrtt0(0,0,0)], data[76]);
+        pull_sqrtt0 = weighted_average_plus_pool(data[id_deriv_sqrtt0(0, 0, 0)], data[76]);
+        pull_RGF = weighted_average_plus_pool(sqrtt0_over_w0, sqrtt0_over_w0_L);
     }
-    else{
-        pull_w0 = myres->create_fake_exact(0.0,1e-16,-1);
-        pull_sqrtt0 = myres->create_fake_exact(0.0,1e-16,-1);
+    else {
+        pull_w0 = myres->create_fake_exact(0.0, 1e-16, -1);
+        pull_sqrtt0 = myres->create_fake_exact(0.0, 1e-16, -1);
+        pull_RGF = myres->create_fake_exact(0.0, 1e-16, -1);
     }
 
-    
-    double *previous_pull_w0= myres->create_zero();
-    double *previous_pull_sqrtt0= myres->create_zero();
-    std::string filename_pull =std::string("deriv/pull_w0_jack") + std::to_string(Njack) +".dat";
+
+    std::string filename_pull = std::string("deriv/pull_w0_jack") + std::to_string(Njack) + ".dat";
     check_pull_factor(pull_w0, filename_pull);
-    filename_pull =std::string("deriv/pull_sqrtt0_jack") + std::to_string(Njack) +".dat";
+    filename_pull = std::string("deriv/pull_sqrtt0_jack") + std::to_string(Njack) + ".dat";
     check_pull_factor(pull_sqrtt0, filename_pull);
-    
+    filename_pull = std::string("deriv/pull_RGF_jack") + std::to_string(Njack) + ".dat";
+    check_pull_factor(pull_RGF, filename_pull);
+
     myres->add(data[iw0], data[iw0], pull_w0);
     myres->add(data[id_deriv_sqrtt0(0, 0, 0)], data[id_deriv_sqrtt0(0, 0, 0)], pull_sqrtt0);
-    
+    double *RGF = myres->create_copy(sqrtt0_over_w0);
+    myres->add(RGF, RGF, pull_RGF);
+
+
+    printf("w0 after pullL correction id=%d: %.12g  %.12g\n", iw0, data[iw0][Njack - 1], myres->comp_error(data[iw0]));
+    printf("sqrtt0 after pullL correction id=%d: %.12g  %.12g\n", isqrtt0, data[isqrtt0][Njack - 1], myres->comp_error(data[isqrtt0]));
+    myres->div(sqrtt0_over_w0, data[isqrtt0], data[iw0]);
+    printf("RGF after pullL sqrtt0 and w0 separately correction %.12g  %.12g\n", sqrtt0_over_w0[Njack - 1], myres->comp_error(sqrtt0_over_w0));
+    printf("RGF after pullL correction %.12g  %.12g\n", RGF[Njack - 1], myres->comp_error(RGF));
+
     // exit(1);
 
     double* w0_Linf_twist = myres->create_copy(data[iw0]);
@@ -1202,6 +1229,12 @@ int main(int argc, char** argv) {
     double** w0_split = malloc_2<double>(7, Njack);
     double* w0_a_lin_der = myres->create_copy(data[iw0]);
     double* w0_sim = myres->create_copy(data[iw0]);
+
+    std::vector<double*> sqrtt0_over_w0_fpi(4);
+    for (int i = 0; i < 4; i++) {
+        sqrtt0_over_w0_fpi[i] = myres->create_copy(RGF);
+        // myres->div(sqrtt0_over_w0_fpi[i], sqrtt0_over_w0_fpi[i], data[iw0]);
+    }
 
     {
         for (int j = 0; j < Njack;j++) {
@@ -1411,6 +1444,7 @@ int main(int argc, char** argv) {
                 w0_a_split[1 + im + 0 * 3][j] = 0.0;
                 w0_split[1 + im + val_sea * 3][j] = w0_a_split[1 + im + val_sea * 3][j] * a_fm[j];
                 w0_split[1 + im + 0 * 3][j] = 0.0;
+                sqrtt0_over_w0_fpi[im + 1][j] = sqrtt0_over_w0_fpi[im][j] + dm * (dt / data[iw0][j] - dw * sqrtt0_from_fpi[j] / (data[iw0][j] * data[iw0][j]));
             }
             w0_sim[j] = data[iw0][j] * data[id_deriv(3, 0, 0, 0)][j] / (fpi_MeV / hbarc);
             w0_a_lin_der[j] = w0_lin_deriv[j];
@@ -1449,17 +1483,17 @@ int main(int argc, char** argv) {
             }
             printf("\n");
         }
-        printf("a [fm]         : %g\n",myres->mean(a_fm));
-        printf("error on a [fm]: %g\n",myres->comp_error(a_fm));
-        printf("a*mu_l         : %g\n",myres->mean(miso[0]));
-        printf("error on a*mu_l: %g\n",myres->comp_error(miso[0]));
-        printf("a*mu_s         : %g\n",myres->mean(miso[1]));   
-        printf("error on a*mu_s: %g\n",myres->comp_error(miso[1]));
-        printf("a*mu_c         : %g\n",myres->mean(miso[2]));
-        printf("error on a*mu_c: %g\n",myres->comp_error(miso[2]));
+        printf("a [fm]         : %g\n", myres->mean(a_fm));
+        printf("error on a [fm]: %g\n", myres->comp_error(a_fm));
+        printf("a*mu_l         : %g\n", myres->mean(miso[0]));
+        printf("error on a*mu_l: %g\n", myres->comp_error(miso[0]));
+        printf("a*mu_s         : %g\n", myres->mean(miso[1]));
+        printf("error on a*mu_s: %g\n", myres->comp_error(miso[1]));
+        printf("a*mu_c         : %g\n", myres->mean(miso[2]));
+        printf("error on a*mu_c: %g\n", myres->comp_error(miso[2]));
         printf("#\n#\n#\n#\n#\n#\n#\n");
         for (int i = 0; i < 4; i++) {
-            printf("C_%dj : ",i);
+            printf("C_%dj : ", i);
             for (int j = 0; j < 4; j++) {
                 // double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
                 // printf("%-22.12g", corr);
@@ -3305,12 +3339,12 @@ int main(int argc, char** argv) {
 
     write_jack(pull_w0, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 10);
     write_jack(pull_sqrtt0, Njack, jack_file); check_correlatro_counter(id_fpi_sim_big_L + 11);
-    
+
 
     //////////////////////////////////////////////////////////////
     // fpiwp25
     //////////////////////////////////////////////////////////////
-    double *fpi_wp25j = myres->create_fake_exact(fpi_wp25,fpi_wp25_err,-1);
+    double* fpi_wp25j = myres->create_fake_exact(fpi_wp25, fpi_wp25_err, -1);
     {
         for (int j = 0; j < Njack;j++) {
 
@@ -3445,10 +3479,10 @@ int main(int argc, char** argv) {
         myres->write_jack_in_file(w0_from_fpi, name_out);
 
         write_jack(miso[0], Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol);
-        write_jack(miso[1], Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+1);
-        write_jack(miso[2], Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+2);
-        write_jack(a_fm, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+3);
-        write_jack(w0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+4);
+        write_jack(miso[1], Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol + 1);
+        write_jack(miso[2], Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol + 2);
+        write_jack(a_fm, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol + 3);
+        write_jack(w0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol + 4);
 
         // w0 from fpi with strange and charm deriv ensemble
         for (int j = 0; j < Njack;j++) {
@@ -3500,10 +3534,10 @@ int main(int argc, char** argv) {
         for (int ii = 0;ii < 4;ii++)
             myres->mult(w0_split[ii], w0_a_split[ii], a_fm);
 
-            // linear deriv mc
+        // linear deriv mc
         for (int j = 0; j < Njack;j++) {
-            w0_lin_deriv[j]= data[4][j];
-            sqrtt0_from_fpi[j]=data[id_deriv_sqrtt0(0, 0, 0)][j];
+            w0_lin_deriv[j] = data[4][j];
+            sqrtt0_from_fpi[j] = data[id_deriv_sqrtt0(0, 0, 0)][j];
             for (int im = 0; im < 3; im++) {
                 int val_sea = 1;
                 double dm = (miso[im][j] - amusim[im][j]);
@@ -3529,8 +3563,8 @@ int main(int argc, char** argv) {
             sqrtt0_from_fpi[j] *= a_fm[j];
         }
 
-        write_jack(w0_lin_deriv, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+5);
-        write_jack(sqrtt0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol+6);
+        write_jack(w0_lin_deriv, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol + 5);
+        write_jack(sqrtt0_from_fpi, Njack, jack_file);     check_correlatro_counter(id_fpiwp25_sol + 6);
 
         // printf("w0 from fpi (ensemble deriv): %g +/- %g\n", myres->mean(w0_from_fpi_ensemble), myres->comp_error(w0_from_fpi_ensemble));
         // printf("w0 from fpi (hybrid): %g +/- %g\n", myres->mean(w0_from_fpi_hybrid), myres->comp_error(w0_from_fpi_hybrid));
@@ -3564,17 +3598,17 @@ int main(int argc, char** argv) {
             }
             printf("\n");
         }
-        printf("a [fm]         : %g\n",myres->mean(a_fm));
-        printf("error on a [fm]: %g\n",myres->comp_error(a_fm));
-        printf("a*mu_l         : %g\n",myres->mean(miso[0]));
-        printf("error on a*mu_l: %g\n",myres->comp_error(miso[0]));
-        printf("a*mu_s         : %g\n",myres->mean(miso[1]));   
-        printf("error on a*mu_s: %g\n",myres->comp_error(miso[1]));
-        printf("a*mu_c         : %g\n",myres->mean(miso[2]));
-        printf("error on a*mu_c: %g\n",myres->comp_error(miso[2]));
+        printf("a [fm]         : %g\n", myres->mean(a_fm));
+        printf("error on a [fm]: %g\n", myres->comp_error(a_fm));
+        printf("a*mu_l         : %g\n", myres->mean(miso[0]));
+        printf("error on a*mu_l: %g\n", myres->comp_error(miso[0]));
+        printf("a*mu_s         : %g\n", myres->mean(miso[1]));
+        printf("error on a*mu_s: %g\n", myres->comp_error(miso[1]));
+        printf("a*mu_c         : %g\n", myres->mean(miso[2]));
+        printf("error on a*mu_c: %g\n", myres->comp_error(miso[2]));
         printf("#\n#\n#\n#\n#\n#\n#\n");
         for (int i = 0; i < 4; i++) {
-            printf("C_%dj : ",i);
+            printf("C_%dj : ", i);
             for (int j = 0; j < 4; j++) {
                 // double corr = cov_m_a[i][j] / sqrt(cov_m_a[i][i] * cov_m_a[j][j]);
                 // printf("%-22.12g", corr);
@@ -3603,9 +3637,15 @@ int main(int argc, char** argv) {
         printf("w0_sim (fm): %+.6g  (%.3g)\n", myres->mean(w0_sim), myres->comp_error(w0_sim));
     }
 
-    double *w0_wp25_j = myres->create_fake(w0_fm, 1e-12, -1);
+    double* w0_wp25_j = myres->create_fake(w0_fm, 1e-12, -1);
     write_jack(w0_wp25_j, Njack, jack_file);     check_correlatro_counter(id_w0_wp25);
     write_jack(sqrtt0_small_L, Njack, jack_file);     check_correlatro_counter(id_w0_wp25 + 1);
+
+
+    write_jack(sqrtt0_over_w0_fpi[0],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 0);
+    write_jack(sqrtt0_over_w0_fpi[1],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 1);
+    write_jack(sqrtt0_over_w0_fpi[2],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 2);
+    write_jack(sqrtt0_over_w0_fpi[3],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 3);
 
     return 0;
 }

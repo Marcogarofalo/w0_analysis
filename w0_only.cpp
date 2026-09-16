@@ -238,11 +238,11 @@ int main(int argc, char** argv) {
     head.Nconf = head.Njack;
     head.Njack = Njack;
     //////////////////////////////////// setup output files
-    mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_output", option[3], option[6], argv[7]);
+    mysprintf(namefile, NAMESIZE, "%s/out/%s_%s_output", option[3], option[6], argv[6]);
     printf("writing output in :\n %s \n", namefile);
     FILE* outfile = open_file(namefile, "w+");
 
-    mysprintf(namefile, NAMESIZE, "%s/jackknife/%s_%s_%s", option[3], option[4], option[6], argv[7]);
+    mysprintf(namefile, NAMESIZE, "%s/jackknife/%s_%s_%s", option[3], option[4], option[6], argv[6]);
     printf("writing jackknife in :\n %s \n", namefile);
     FILE* jack_file = open_file(namefile, "w+");
     // write_header_g2(jack_file, head);
@@ -486,6 +486,7 @@ int main(int argc, char** argv) {
         w0[j] = rtbis_func_eq_input(fit_info.function, 0 /*n*/, fit_info.Nvar, swapped_x.data(), fit_info.Npar, tif[j], 0, 0.3, fit_info.tmin, fit_info.tmax, 1e-10, 2);
         w0[j] = int2flowt(w0[j]);
         w0[j] = std::sqrt(w0[j]);
+        // printf("w0[%ld]=%g\n",j, w0[j]);
     }
     printf("w0 = %g  %g\n", w0[Njack - 1], myres->comp_error(w0.data()));
     write_jack(w0.data(), Njack, jack_file);
