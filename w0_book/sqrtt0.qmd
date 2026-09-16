@@ -22,47 +22,6 @@ myplotly(ggplot())
 ```
 
 
-```{r,results='asis',echo=FALSE, warning=FALSE}
-gg <- NULL
-basenames <- c(
-  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_sqrtt0_w0_sim_a2",
-  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_sqrtt0_over_w0_FLAG_a2"
-)
-labels <- c(
-  "sim",
-  # "max-twist",
-  # "infinite volume",
-  "all-misstuning"
-)
-my_noribbon=c(TRUE,TRUE,FALSE)
-
-
-for (j in seq_along(basenames)) {
-  print(basenames[j])
-  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
-  make_table_fit_result(fit)
-  gg <- plot_fit(basenames[j], "a2",
-    # noline = TRUE,
-    data_type = c(labels[j]),
-    gg = gg,
-    id_x = 1,
-    single_name_for_fit = labels[j],
-    width = 0.0001,
-    size = 0.1,
-    # noribbon = my_noribbon[j],
-    # noline =my_noribbon[j]
-  )
-}
-# w0_wp25 <- 0.17236
-# gg <- gg + geom_hline(yintercept = w0_wp25, linetype = "dashed")
-# gg <- gg + geom_point(aes(x = 0, y = w0_wp25, color = "wp25", shape = "wp25", fill = "wp25"))
-
-fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$w_0 f_\\pi$",
-  to_print = TRUE,
-  # yrange = c(-1, 4),
-  legend_position = c(0.7, 0.98)
-)
-```
 
 
 ```{r,results='asis',echo=FALSE, warning=FALSE}
@@ -109,6 +68,7 @@ library(stringr)
 dft <- NULL
 gg <- ggplot()
 for (reg in c("fit_sqrtt0_FLAG")) {#"fit_sqrtt0_fpiwp25"
+# for (reg in c("fit_sqrtt0_FLAG")) {#"fit_sqrtt0_fpiwp25"
   path <- "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
   basenames <- c(
     paste0(reg, "_a2"),
@@ -278,13 +238,66 @@ fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0} [\\mbox{fm}]$",
 
 ## $\sqrt{t_0}/w_0$
 
+
+```{r,results='asis',echo=FALSE, warning=FALSE}
+gg <- NULL
+basenames <- c(
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_sqrtt0_w0_sim_a2",
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_sqrtt0_over_w0_FLAG_a2",
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_RGF_fpi_nocorr_lsc_a2",
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_RGF_fpi_nocorr_sc_a2",
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_RGF_fpi_nocorr_c_a2",
+  "/home/garofalo/analysis/flow/data_20/fit_all_beta/fit_RGF_fpi_a2"
+)
+labels <- c(
+  "sim",
+  # "max-twist",
+  # "infinite volume",
+  "all-misstuning",
+  "corr m0",
+  "corr m0+ml",
+  "corr m0+mls",
+  "corr m0+mlsc"
+)
+my_noribbon=c(TRUE,TRUE,FALSE)
+
+
+for (j in seq_along(basenames)) {
+  print(basenames[j])
+  fit <- Rose::read_fit_P_file(paste0(basenames[j], "_fit_P.dat"))
+  make_table_fit_result(fit)
+  gg <- plot_fit(basenames[j], "a2",
+    # noline = TRUE,
+    data_type = c(labels[j]),
+    gg = gg,
+    id_x = 1,
+    single_name_for_fit = labels[j],
+    width = 0.0001,
+    size = 0.1,
+    nudge = j*1e-4,
+    noribbon = TRUE,
+    noline = TRUE
+    # noline =my_noribbon[j]
+  )
+}
+# w0_wp25 <- 0.17236
+# gg <- gg + geom_hline(yintercept = w0_wp25, linetype = "dashed")
+# gg <- gg + geom_point(aes(x = 0, y = w0_wp25, color = "wp25", shape = "wp25", fill = "wp25"))
+
+fig <- myplotly(gg, "", "$a^2 [\\mbox{fm}^2]$", "$\\sqrt{t_0}/w_0$",
+  to_print = TRUE,
+  # yrange = c(-1, 4),
+  legend_position = c(0.0, 0.98)
+)
+```
+
 ```{r,results='asis',echo=FALSE, warning=FALSE, dev='tikz'}
 library(stringr)
 source("/home/garofalo/programs/Rose/R/plot_routines.R")
 dft <- NULL
 gg <- ggplot()
-for (reg in c("fit_sqrtt0_over_w0_FLAG", "fit_sqrtt0_over_w0_wp25_Cm5")) {
-  #"fit_sqrtt0_w0_fpiwp25"
+for (reg in c("fit_sqrtt0_over_w0_FLAG", "fit_RGF_fpi")) {
+  #fit_sqrtt0_over_w0_wp25_Cm5 , "fit_sqrtt0_w0_fpiwp25", 
   path <- "/home/garofalo/analysis/flow/data_20/fit_all_beta/"
   basenames <- c(
     paste0(reg, "_a2"),
@@ -340,8 +353,8 @@ for (reg in c("fit_sqrtt0_over_w0_FLAG", "fit_sqrtt0_over_w0_wp25_Cm5")) {
       # labelfit = "fit",
       width = 0.0001,
       nudge = 0,
-      noline = FALSE,
-      noribbon =TRUE
+      noline = TRUE,
+      noribbon =FALSE
     )
   }
   cat("reg:", reg, "<br>\n")

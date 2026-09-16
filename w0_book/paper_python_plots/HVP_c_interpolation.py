@@ -152,6 +152,9 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
     marker_map = {combo: marker_choices[i % len(marker_choices)] for i, combo in enumerate(unique_combos)}
     #marker_map = ["o","^","^"]
 
+
+    # shift the 131.0 data
+    x_data[1] = x_data[1] + 0.01
     ax.errorbar(
                 x_data, y_data*scale, yerr=y_err*scale,
                 marker = marker_choices[0],
