@@ -1412,11 +1412,17 @@ int main(int argc, char** argv) {
 
     //obs to fit
     id_obs = { id_sqrtt0_from_fpi ,id_sqrtt0_Cm5 , id_w0_lin_deriv , id_fpiwp25_sol + 6,
-        id_RGF_fpi + 0, id_RGF_fpi + 1, id_RGF_fpi + 2, id_RGF_fpi + 3 };
+        id_RGF_fpi + 0, id_RGF_fpi + 1, id_RGF_fpi + 2, id_RGF_fpi + 3,
+        id_RGF_no_pullL_fpi + 0, id_RGF_no_pullL_fpi + 1, id_RGF_no_pullL_fpi + 2, id_RGF_no_pullL_fpi + 3
+    };
     obs = { "sqrtt0_FLAG", "sqrtt0_wp25_Cm5", "w0_lin_deriv_FLAG", "sqrtt0_fpiwp25",
-        "RGF_fpi_nocorr_lsc", "RGF_fpi_nocorr_sc", "RGF_fpi_nocorr_c", "RGF_fpi" };
+        "RGF_fpi_nocorr_lsc", "RGF_fpi_nocorr_sc", "RGF_fpi_nocorr_c", "RGF_fpi",
+        "RGF_no_pullL_fpi_nocorr_lsc", "RGF_no_pullL_fpi_nocorr_sc", "RGF_no_pullL_fpi_nocorr_c", "RGF_no_pullL_fpi"
+    };
     id_a = { 33 , 95 + static_cast<int>(id_Cm5) * 8, 33 ,id_fpiwp25_sol + 3,
-        33,33,33,33 };
+        33, 33, 33, 33,
+        33, 33, 33, 33
+    };
 
     for (int i = 0; i < obs.size(); i++) {
         for (auto [ifit, fit] : std::views::enumerate(fits_sqrtt0)) {

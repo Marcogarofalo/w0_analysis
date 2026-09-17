@@ -1138,6 +1138,7 @@ int main(int argc, char** argv) {
     myres->add(data[iw0], data[iw0], pull_w0);
     myres->add(data[id_deriv_sqrtt0(0, 0, 0)], data[id_deriv_sqrtt0(0, 0, 0)], pull_sqrtt0);
     double *RGF = myres->create_copy(sqrtt0_over_w0);
+    double *RGF_no_pullL = myres->create_copy(sqrtt0_over_w0);
     myres->add(RGF, RGF, pull_RGF);
 
 
@@ -1231,8 +1232,10 @@ int main(int argc, char** argv) {
     double* w0_sim = myres->create_copy(data[iw0]);
 
     std::vector<double*> sqrtt0_over_w0_fpi(4);
+    std::vector<double*> sqrtt0_over_w0_no_pullL_fpi(4);
     for (int i = 0; i < 4; i++) {
         sqrtt0_over_w0_fpi[i] = myres->create_copy(RGF);
+        sqrtt0_over_w0_no_pullL_fpi[i] = myres->create_copy(RGF_no_pullL);
         // myres->div(sqrtt0_over_w0_fpi[i], sqrtt0_over_w0_fpi[i], data[iw0]);
     }
 
@@ -1445,6 +1448,7 @@ int main(int argc, char** argv) {
                 w0_split[1 + im + val_sea * 3][j] = w0_a_split[1 + im + val_sea * 3][j] * a_fm[j];
                 w0_split[1 + im + 0 * 3][j] = 0.0;
                 sqrtt0_over_w0_fpi[im + 1][j] = sqrtt0_over_w0_fpi[im][j] + dm * (dt / data[iw0][j] - dw * sqrtt0_from_fpi[j] / (data[iw0][j] * data[iw0][j]));
+                sqrtt0_over_w0_no_pullL_fpi[im + 1][j] = sqrtt0_over_w0_no_pullL_fpi[im][j] + dm * (dt / data[iw0][j] - dw * sqrtt0_from_fpi[j] / (data[iw0][j] * data[iw0][j]));
             }
             w0_sim[j] = data[iw0][j] * data[id_deriv(3, 0, 0, 0)][j] / (fpi_MeV / hbarc);
             w0_a_lin_der[j] = w0_lin_deriv[j];
@@ -3646,6 +3650,12 @@ int main(int argc, char** argv) {
     write_jack(sqrtt0_over_w0_fpi[1],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 1);
     write_jack(sqrtt0_over_w0_fpi[2],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 2);
     write_jack(sqrtt0_over_w0_fpi[3],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 3);
+
+    write_jack(sqrtt0_over_w0_no_pullL_fpi[0],Njack,jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 0);
+    write_jack(sqrtt0_over_w0_no_pullL_fpi[1],Njack,jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 1);
+    write_jack(sqrtt0_over_w0_no_pullL_fpi[2],Njack,jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 2);
+    write_jack(sqrtt0_over_w0_no_pullL_fpi[3],Njack,jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 3);
+
 
     return 0;
 }
