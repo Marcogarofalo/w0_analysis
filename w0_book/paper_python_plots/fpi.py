@@ -146,7 +146,7 @@ def plot_fit(ax, basename, var, data_type=None, noribbon=False,
         mycol = [single_name_for_fit] * len(Nfits)
 
     marker_choices = ['v','o','^', 'v',  'D', 's', '<', '>', 'p', '*']
-    colorlist = [blue, orange, red]
+    colorlist = [blue, red, orange]
     
     colorlist1 = [ orange, red, blue]
     # 1. Plot the fits (Ribbons and Lines)
@@ -390,7 +390,7 @@ legend(ax[1], by_label.values(), by_label.keys(), loc="upper left",
 
 
 ax[1].errorbar([0.],[BAIC_ave],[BAIC_err],fmt="x",color="black",label=f"BAIC average")
-ax[1].errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
+# ax[1].errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
 
 # histogram
 # Nota per Marco: in flat_boot c'è sostanzialmente un array che contiene un ricampionamento bootstrap
@@ -407,9 +407,9 @@ ax[0].set_xlim(ax[0].get_xlim())
 # ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
 #                             [BAIC_ave+stat_err,BAIC_ave+stat_err],color="red",alpha=0.1)
 ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-BAIC_err,BAIC_ave-BAIC_err],
-                                        [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color=lavender,alpha=0.2)
-ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
-                                        [BAIC_ave+stat_err,BAIC_ave+stat_err],color=lavender,alpha=0.2)
+                                        [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color=lavender,alpha=0.4)
+# ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
+#                                         [BAIC_ave+stat_err,BAIC_ave+stat_err],color=lavender,alpha=0.2)
 
 ax[0].set_xlabel(r"%")
 ax[0].xaxis.set_minor_locator(ticker.AutoMinorLocator())

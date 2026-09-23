@@ -614,7 +614,7 @@ for spine in ax[1].spines.values():
 ax[1].yaxis.get_label().set_visible(False)
 ax[1].tick_params(axis='y', which='both', left=False, right=False, labelleft=False)
 ax[1].errorbar([0.],np.array([BAIC_ave]) * scale, np.array([BAIC_err]) * scale,fmt="x",color="black",label=f"BAIC average")
-ax[1].errorbar([0.],np.array([BAIC_ave]) * scale, np.array([stat_err]) * scale,fmt="",color="black")
+# ax[1].errorbar([0.],np.array([BAIC_ave]) * scale, np.array([stat_err]) * scale,fmt="",color="black")
 handles, plot_labels = ax[1].get_legend_handles_labels()
 by_label = dict(zip(plot_labels, handles))
 legend(ax[1],by_label.values(), by_label.keys(), loc="upper left"    )
@@ -630,9 +630,9 @@ ax[0].set_xlim(ax[0].get_xlim())
 # BAIC_ave e BAIC_err si capisce cosa sono e te li devi calcolare a parte
 print(BAIC_ave, BAIC_err, stat_err)
 ax[0].fill_between(ax[0].get_xlim(),np.array([BAIC_ave-BAIC_err,BAIC_ave-BAIC_err])*scale,
-                                        np.array([BAIC_ave+BAIC_err,BAIC_ave+BAIC_err])*scale,color=lavender,alpha=0.2)
-ax[0].fill_between(ax[0].get_xlim(),np.array([BAIC_ave-stat_err,BAIC_ave-stat_err])*scale,
-                                        np.array([BAIC_ave+stat_err,BAIC_ave+stat_err])*scale,color=lavender,alpha=0.2)
+                                        np.array([BAIC_ave+BAIC_err,BAIC_ave+BAIC_err])*scale,color=lavender,alpha=0.4)
+# ax[0].fill_between(ax[0].get_xlim(),np.array([BAIC_ave-stat_err,BAIC_ave-stat_err])*scale,
+#                                         np.array([BAIC_ave+stat_err,BAIC_ave+stat_err])*scale,color=lavender,alpha=0.2)
 
 ax[0].set_xlabel(r"%")
 ax[0].xaxis.set_minor_locator(ticker.AutoMinorLocator())

@@ -384,7 +384,7 @@ legend(ax[1],by_label.values(), by_label.keys(), loc="upper left",
              )
 
 ax[1].errorbar([0.],[BAIC_ave],[BAIC_err],fmt="x",color="black",label=f"BAIC average")
-ax[1].errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
+# ax[1].errorbar([0.],[BAIC_ave],[stat_err],fmt="",color="black")
 ax[1].set_ylim(0.167, 0.176)
 # histogram
 # Nota per Marco: in flat_boot c'è sostanzialmente un array che contiene un ricampionamento bootstrap
@@ -397,9 +397,9 @@ print(np.array(flat_weig).sum()/Nboot )
 ax[0].set_xlim(ax[0].get_xlim())
 # BAIC_ave e BAIC_err si capisce cosa sono e te li devi calcolare a parte
 ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-BAIC_err,BAIC_ave-BAIC_err],
-                            [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color=lavender,alpha=0.2)
-ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
-                            [BAIC_ave+stat_err,BAIC_ave+stat_err],color=lavender,alpha=0.2)
+                            [BAIC_ave+BAIC_err,BAIC_ave+BAIC_err],color=lavender,alpha=0.4)
+# ax[0].fill_between(ax[0].get_xlim(),[BAIC_ave-stat_err,BAIC_ave-stat_err],
+#                             [BAIC_ave+stat_err,BAIC_ave+stat_err],color=lavender,alpha=0.2)
 
 ax[0].set_xlabel(r"%")
 ax[0].xaxis.set_minor_locator(ticker.AutoMinorLocator())

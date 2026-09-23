@@ -82,7 +82,7 @@ for spine in ax.spines.values():
 
 # Ottimizzazione spazi per il salvataggio
 plt.tight_layout()
-
+ax.set_xlim(-0.7, 2.7)
 # Salvataggio in PDF
 plt.savefig("unblinding_plot_colored.pdf", format="pdf")
 # plt.show()
