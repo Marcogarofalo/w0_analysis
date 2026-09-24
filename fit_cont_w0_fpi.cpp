@@ -235,7 +235,7 @@ double lhs_w0_sim_aiso(int n, int e, int j, data_all gjack, struct fit_type fit_
     int id = (n == 0) ? fit_info.corr_id[0] : fit_info.corr_id[1];
     double w0_a = gjack.en[e].jack[id][j];
 
-    double a = myres->mean(gjack.en[e].jack[fit_info.corr_id[2]]);
+    double a = gjack.en[e].jack[fit_info.corr_id[2]][j];
     return w0_a * a;
 }
 
@@ -1413,13 +1413,16 @@ int main(int argc, char** argv) {
     //obs to fit
     id_obs = { id_sqrtt0_from_fpi ,id_sqrtt0_Cm5 , id_w0_lin_deriv , id_fpiwp25_sol + 6,
         id_RGF_fpi + 0, id_RGF_fpi + 1, id_RGF_fpi + 2, id_RGF_fpi + 3,
-        id_RGF_no_pullL_fpi + 0, id_RGF_no_pullL_fpi + 1, id_RGF_no_pullL_fpi + 2, id_RGF_no_pullL_fpi + 3
+        id_RGF_no_pullL_fpi + 0, id_RGF_no_pullL_fpi + 1, id_RGF_no_pullL_fpi + 2, id_RGF_no_pullL_fpi + 3,
+        id_sqrtt0_corr_FLAG + 0, id_sqrtt0_corr_FLAG + 1, id_sqrtt0_corr_FLAG + 2, id_sqrtt0_corr_FLAG + 3
     };
     obs = { "sqrtt0_FLAG", "sqrtt0_wp25_Cm5", "w0_lin_deriv_FLAG", "sqrtt0_fpiwp25",
         "RGF_fpi_nocorr_lsc", "RGF_fpi_nocorr_sc", "RGF_fpi_nocorr_c", "RGF_fpi",
-        "RGF_no_pullL_fpi_nocorr_lsc", "RGF_no_pullL_fpi_nocorr_sc", "RGF_no_pullL_fpi_nocorr_c", "RGF_no_pullL_fpi"
+        "RGF_no_pullL_fpi_nocorr_lsc", "RGF_no_pullL_fpi_nocorr_sc", "RGF_no_pullL_fpi_nocorr_c", "RGF_no_pullL_fpi",
+        "sqrtt0_FLAG_nocorr_lsc", "sqrtt0_FLAG_nocorr_sc", "sqrtt0_FLAG_nocorr_c", "sqrtt0_FLAG_tot_check"
     };
     id_a = { 33 , 95 + static_cast<int>(id_Cm5) * 8, 33 ,id_fpiwp25_sol + 3,
+        33, 33, 33, 33,
         33, 33, 33, 33,
         33, 33, 33, 33
     };
@@ -1755,6 +1758,97 @@ int main(int argc, char** argv) {
         fit_info.restore_default();
 
     }
+
+
+    //////////////////////////////////////////////////////////////
+    // s0=sqrtt0 sim * aiso
+    //////////////////////////////////////////////////////////////
+    std::vector<int> id_smallL = {id_w0_wp25 + 1, id_sqrtt0_m0corr, id_sqrtt0_m0corr + 2 };
+    std::vector<int> id_bigL = {id_fpi_sim_big_L + 7, id_sqrtt0_m0corr + 1 , -1};
+    std::vector<std::vector<std::vector<int>>> ensembles_to_fit={
+        { { 0,1,2,3 },{ 0,1,2 } },
+        { { 0,1,2,3 },{ 0,1,2 } },
+        { { 0,1,2,3 } }
+    };
+    std::vector<std::string> names = {"fit_sqrtt0_sim_aiso_a2","fit_sqrtt0_m0corr_aiso_a2", "fit_sqrtt0_m0corr_Lcorr_aiso_a2" };
+
+    for(int id=0;id<id_smallL.size();id++){
+        int id_a = 33;
+        int id_s0_small_L = id_w0_wp25 + 1;
+        int id_s0_big_L = id_fpi_sim_big_L + 7;
+        fit_type fit_info;
+
+        // fit_info.corr_id = { id_s0_small_L, id_s0_big_L , id_a }; // w0, fpi
+        fit_info.corr_id = { id_smallL[id], id_bigL[id], id_a };
+        // fit_info.Nxen = { { 0,1,2,3 },{ 0,1,2 } };
+        fit_info.Nxen = ensembles_to_fit[id];
+        fit_info.init_N_etot_form_Nxen();
+        fit_info.function = rhs_a2;
+        fit_info.linear_fit = true;
+        fit_info.Npar = 2;
+        fit_info.Nvar = 1; // a2
+        fit_info.Njack = jackall.en[0].Njack;
+        fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+        int count = 0;
+        for (int n = 0; n < fit_info.N; n++) {
+            for (int e : fit_info.Nxen[n]) {
+                for (int j = 0; j < Njack; j++) {
+                    double a = jackall.en[e].jack[id_a][j];
+                    fit_info.x[0][count][j] = a * a; // a^2 fm^2
+                }
+                count++;
+            }
+        }
+        // std::string namefit = "fit_sqrtt0_sim_aiso_a2";
+        std::string namefit = names[id];
+        fit_result res_sqrtt0 = fit_all_data(argv, jackall, lhs_w0_sim_aiso, fit_info, namefit.c_str());
+        fit_info.band_range = { 0, 0.008145209846823482 };
+        print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", res_sqrtt0, res_sqrtt0, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
+        res_sqrtt0.clear();
+
+        fit_info.restore_default();
+
+    }
+    // //////////////////////////////////////////////////////////////
+    // // s0=sqrtt0 m0 corrected * aiso
+    // //////////////////////////////////////////////////////////////
+    // {
+    //     int id_a = 33;
+    //     int id_s0_small_L = id_sqrtt0_m0corr ;
+    //     int id_s0_big_L = id_sqrtt0_m0corr + 1;
+    //     fit_type fit_info;
+
+    //     fit_info.corr_id = { id_s0_small_L, id_s0_big_L , id_a }; // w0, fpi
+    //     fit_info.Nxen = { { 0,1,2,3 },{ 0,1,2 } };
+    //     fit_info.init_N_etot_form_Nxen();
+    //     fit_info.function = rhs_a2;
+    //     fit_info.linear_fit = true;
+    //     fit_info.Npar = 2;
+    //     fit_info.Nvar = 1; // a2
+    //     fit_info.Njack = jackall.en[0].Njack;
+    //     fit_info.x = double_malloc_3(fit_info.Nvar, fit_info.entot, fit_info.Njack);
+
+    //     int count = 0;
+    //     for (int n = 0; n < fit_info.N; n++) {
+    //         for (int e : fit_info.Nxen[n]) {
+    //             for (int j = 0; j < Njack; j++) {
+    //                 double a = jackall.en[e].jack[id_a][j];
+    //                 fit_info.x[0][count][j] = a * a; // a^2 fm^2
+    //             }
+    //             count++;
+    //         }
+    //     }
+    //     std::string namefit = "fit_sqrtt0_m0corr_aiso_a2";
+    //     fit_result res_sqrtt0 = fit_all_data(argv, jackall, lhs_w0_sim_aiso, fit_info, namefit.c_str());
+    //     fit_info.band_range = { 0, 0.008145209846823482 };
+    //     print_fit_band(argv, jackall, fit_info, fit_info, namefit.c_str(), "a2", res_sqrtt0, res_sqrtt0, 0, fit_info.Nxen[0][0] /* set the other variables to the first of the n*/, 0.001, {});
+    //     res_sqrtt0.clear();
+
+    //     fit_info.restore_default();
+
+    // }
+
 
 
     printf("Njack: %d\n", Njack);
