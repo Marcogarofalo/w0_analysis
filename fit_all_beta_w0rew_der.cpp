@@ -688,7 +688,7 @@ int main(int argc, char** argv) {
 
 
     ///////////////// 5pt
-
+    fit_info.corr_id = { id_dw0_dmu, id_amuliso, id_w0 };
 
     fit_info.Nxen = std::vector<std::vector<int>>(1);
     for (int n = 0; n < 1; n++) {
