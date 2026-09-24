@@ -893,7 +893,8 @@ int main(int argc, char** argv) {
     for (int j = 0; j < Njack;j++) {
         double mul = amuiso[0][j];
         double f = data[3][j];
-        double sqrtt0 = data[64][j];
+        double sqrtt0 = data[62][j];
+        // double sqrtt0 = data[64][j];
         double* dR = &data[67][j];
         *dR = (*dR) * (sqrtt0) / mul;
     }
@@ -901,7 +902,7 @@ int main(int argc, char** argv) {
     for (int j = 0; j < Njack;j++) {
         double mul = amuiso[0][j];
         double f = data[3][j];
-        double sqrtt0 = data[64][j];
+        double sqrtt0 = data[62][j];
         double* dR = &data[68][j]; // remove prefactor in dw0/dmc(sea)
         *dR = (*dR) * (sqrtt0) / mul;
     }
@@ -917,12 +918,12 @@ int main(int argc, char** argv) {
 
     // read delta m0 and m0 derivative
     read_file_debug(data[69], files[72].c_str());// dm0
-    read_file_debug(data[70], files[73].c_str());// dw0/dm0l
-    read_file_debug(data[71], files[74].c_str());// dw0/dm0s
-    read_file_debug(data[72], files[75].c_str());// dw0/dm0c
+    read_file_debug(data[70], files[73].c_str());// dsqrtt0/dm0l
+    read_file_debug(data[71], files[74].c_str());// dsqrtt0/dm0s
+    read_file_debug(data[72], files[75].c_str());// dsqrtt0/dm0c
 
-    read_file_debug(data[73], files[76].c_str());// dw0/dms_sea P0
-    read_file_debug(data[74], files[77].c_str());// dw0/dmc_sea P1
+    read_file_debug(data[73], files[76].c_str());// dsqrtt0/dms_sea P0
+    read_file_debug(data[74], files[77].c_str());// dsqrtt0/dmc_sea P1
 
     double* fpi_sim = myres->create_copy(data[3]);
 
@@ -988,7 +989,7 @@ int main(int argc, char** argv) {
     int isqrtt0 = id_deriv_sqrtt0(0, 0, 0);
     printf("w0 before max twist correction id=%d: %.12g  %.12g\n", iw0, data[iw0][Njack - 1], myres->comp_error(data[iw0]));
     printf("sqrtt0 before max twist correction id=%d: %.12g  %.12g\n", isqrtt0, data[isqrtt0][Njack - 1], myres->comp_error(data[isqrtt0]));
-    double *sqrtt0_over_w0 = myres->create_copy(data[isqrtt0]);
+    double* sqrtt0_over_w0 = myres->create_copy(data[isqrtt0]);
     myres->div(sqrtt0_over_w0, sqrtt0_over_w0, data[iw0]);
     printf("RGF before max twist correction %.12g  %.12g\n", sqrtt0_over_w0[Njack - 1], myres->comp_error(sqrtt0_over_w0));
 
@@ -1012,9 +1013,12 @@ int main(int argc, char** argv) {
     myres->div(sqrtt0_over_w0, data[isqrtt0], data[iw0]);
     printf("RGF after max twist correction %.12g  %.12g\n", sqrtt0_over_w0[Njack - 1], myres->comp_error(sqrtt0_over_w0));
 
-    double *sqrtt0_over_w0_L = myres->create_copy(sqrtt0_over_w0);
-    if (bigLw0){
-        myres->div(sqrtt0_over_w0_L, data[76],data[75]);
+    double* sqrt0_L_m0cor = myres->create_copy(data[76]);
+    double* sqrtt0_small_L_m0cor = myres->create_copy(data[isqrtt0]);
+
+    double* sqrtt0_over_w0_L = myres->create_copy(sqrtt0_over_w0);
+    if (bigLw0) {
+        myres->div(sqrtt0_over_w0_L, data[76], data[75]);
     }
 
     double* w0_max_twist = myres->create_copy(data[iw0]);
@@ -1137,8 +1141,10 @@ int main(int argc, char** argv) {
 
     myres->add(data[iw0], data[iw0], pull_w0);
     myres->add(data[id_deriv_sqrtt0(0, 0, 0)], data[id_deriv_sqrtt0(0, 0, 0)], pull_sqrtt0);
-    double *RGF = myres->create_copy(sqrtt0_over_w0);
-    double *RGF_no_pullL = myres->create_copy(sqrtt0_over_w0);
+
+    double* sqrtt0_corr_m0_L = myres->create_copy(data[isqrtt0]);
+    double* RGF = myres->create_copy(sqrtt0_over_w0);
+    double* RGF_no_pullL = myres->create_copy(sqrtt0_over_w0);
     myres->add(RGF, RGF, pull_RGF);
 
 
@@ -1232,10 +1238,12 @@ int main(int argc, char** argv) {
     double* w0_sim = myres->create_copy(data[iw0]);
 
     std::vector<double*> sqrtt0_over_w0_fpi(4);
+    std::vector<double*> sqrtt0_corrections_FLAG(4);
     std::vector<double*> sqrtt0_over_w0_no_pullL_fpi(4);
     for (int i = 0; i < 4; i++) {
         sqrtt0_over_w0_fpi[i] = myres->create_copy(RGF);
         sqrtt0_over_w0_no_pullL_fpi[i] = myres->create_copy(RGF_no_pullL);
+        sqrtt0_corrections_FLAG[i] = myres->create_copy(data[id_deriv_sqrtt0(0, 0, 0)]);
         // myres->div(sqrtt0_over_w0_fpi[i], sqrtt0_over_w0_fpi[i], data[iw0]);
     }
 
@@ -1435,10 +1443,10 @@ int main(int argc, char** argv) {
                 double dw = data[id_deriv(iw0, 1, im, val_sea)][j];
                 double dt = data[id_deriv_sqrtt0(1, im, val_sea)][j];
                 if (im == 2 && val_sea == 1) {
-                    if (j == Njack - 1) printf("replacing dw0/dmc = %g\n", dw);
+                    if (j == Njack - 1) printf("replacing dw0/dmc = %g   dsqrtt0/dmc = %g \n", dw, dt);
                     dw = get_linear_deriv_w0c(data, amuiso, previous_a, j);
                     dt = get_linear_deriv_sqrtt0c(data, amuiso, previous_a, j);
-                    if (j == Njack - 1) printf("with      dw0/dmc = %g\n", dw);
+                    if (j == Njack - 1) printf("with      dw0/dmc = %g   dsqrtt0/dmc = %g\n", dw, dt);
                 }
 
                 w0_lin_deriv[j] += dm * dw;
@@ -1447,18 +1455,36 @@ int main(int argc, char** argv) {
                 w0_a_split[1 + im + 0 * 3][j] = 0.0;
                 w0_split[1 + im + val_sea * 3][j] = w0_a_split[1 + im + val_sea * 3][j] * a_fm[j];
                 w0_split[1 + im + 0 * 3][j] = 0.0;
-                sqrtt0_over_w0_fpi[im + 1][j] = sqrtt0_over_w0_fpi[im][j] + dm * (dt / data[iw0][j] - dw * sqrtt0_from_fpi[j] / (data[iw0][j] * data[iw0][j]));
-                sqrtt0_over_w0_no_pullL_fpi[im + 1][j] = sqrtt0_over_w0_no_pullL_fpi[im][j] + dm * (dt / data[iw0][j] - dw * sqrtt0_from_fpi[j] / (data[iw0][j] * data[iw0][j]));
+                sqrtt0_over_w0_fpi[im + 1][j] = sqrtt0_over_w0_fpi[im][j] + dm * (dt / data[iw0][j] - dw * data[id_deriv_sqrtt0(0, 0, 0)][j] / (data[iw0][j] * data[iw0][j]));
+                sqrtt0_corrections_FLAG[im + 1][j] = sqrtt0_corrections_FLAG[im][j] + dm * dt;
+                // if (j == Njack - 1) printf("\n\n corr = %.12g   dm =%.12g  der = %.12g  dt=%.12g   w0 =%.12g  dw=%.12g  sqrtt0=%.12g     1=%.12g  2%.12g\n\n",
+                //     dm * (dt / data[iw0][j] - dw * data[id_deriv_sqrtt0(0, 0, 0)][j] / (data[iw0][j] * data[iw0][j])),
+                //     dm,
+                //     (dt / data[iw0][j] - dw * data[id_deriv_sqrtt0(0, 0, 0)][j] / (data[iw0][j] * data[iw0][j])),
+                //     dt, data[iw0][j], dw, data[id_deriv_sqrtt0(0, 0, 0)][j],
+                //     dt / data[iw0][j], dw * data[id_deriv_sqrtt0(0, 0, 0)][j] / (data[iw0][j] * data[iw0][j]));
+                sqrtt0_over_w0_no_pullL_fpi[im + 1][j] = sqrtt0_over_w0_no_pullL_fpi[im][j] + dm * (dt / data[iw0][j] - dw * data[id_deriv_sqrtt0(0, 0, 0)][j] / (data[iw0][j] * data[iw0][j]));
             }
             w0_sim[j] = data[iw0][j] * data[id_deriv(3, 0, 0, 0)][j] / (fpi_MeV / hbarc);
             w0_a_lin_der[j] = w0_lin_deriv[j];
             w0_lin_deriv[j] *= a_fm[j];
             sqrtt0_from_fpi[j] *= a_fm[j];
+            for (int icor = 0; icor < 4; icor++)
+                sqrtt0_corrections_FLAG[icor][j] *= a_fm[j];
+
         }
         // printf("w0 from fpi (ensemble deriv): %g +/- %g\n", myres->mean(w0_from_fpi_ensemble), myres->comp_error(w0_from_fpi_ensemble));
         // printf("w0 from fpi (hybrid): %g +/- %g\n", myres->mean(w0_from_fpi_hybrid), myres->comp_error(w0_from_fpi_hybrid));
         printf("w0 from fpi (linear deriv): %g +/- %g\n", myres->mean(w0_lin_deriv), myres->comp_error(w0_lin_deriv));
         printf("sqrt(t0) from fpi (linear deriv): %g +/- %g\n", myres->mean(sqrtt0_from_fpi), myres->comp_error(sqrtt0_from_fpi));
+        printf("sqrtt0 summing the derivatives ");
+        for (int icor = 0; icor < 4; icor++)
+            printf("%g(%g)\t", myres->mean(sqrtt0_corrections_FLAG[icor]), myres->comp_error(sqrtt0_corrections_FLAG[icor]));
+        printf("\n");
+        double* check_s = myres->create_copy(sqrtt0_corr_m0_L);
+        myres->mult(check_s, check_s, a_fm);
+        printf("comparing with sqrtt0 = %g(%g)\n", myres->mean(check_s), myres->comp_error(check_s));
+
         double** data_m_a = malloc_2<double>(4, Njack);
         for (int j = 0; j < Njack;j++) {
             data_m_a[0][j] = a_fm[j];
@@ -3646,15 +3672,25 @@ int main(int argc, char** argv) {
     write_jack(sqrtt0_small_L, Njack, jack_file);     check_correlatro_counter(id_w0_wp25 + 1);
 
 
-    write_jack(sqrtt0_over_w0_fpi[0],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 0);
-    write_jack(sqrtt0_over_w0_fpi[1],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 1);
-    write_jack(sqrtt0_over_w0_fpi[2],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 2);
-    write_jack(sqrtt0_over_w0_fpi[3],Njack,jack_file);     check_correlatro_counter(id_RGF_fpi + 3);
+    write_jack(sqrtt0_over_w0_fpi[0], Njack, jack_file);     check_correlatro_counter(id_RGF_fpi + 0);
+    write_jack(sqrtt0_over_w0_fpi[1], Njack, jack_file);     check_correlatro_counter(id_RGF_fpi + 1);
+    write_jack(sqrtt0_over_w0_fpi[2], Njack, jack_file);     check_correlatro_counter(id_RGF_fpi + 2);
+    write_jack(sqrtt0_over_w0_fpi[3], Njack, jack_file);     check_correlatro_counter(id_RGF_fpi + 3);
 
-    write_jack(sqrtt0_over_w0_no_pullL_fpi[0],Njack,jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 0);
-    write_jack(sqrtt0_over_w0_no_pullL_fpi[1],Njack,jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 1);
-    write_jack(sqrtt0_over_w0_no_pullL_fpi[2],Njack,jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 2);
-    write_jack(sqrtt0_over_w0_no_pullL_fpi[3],Njack,jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 3);
+    write_jack(sqrtt0_over_w0_no_pullL_fpi[0], Njack, jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 0);
+    write_jack(sqrtt0_over_w0_no_pullL_fpi[1], Njack, jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 1);
+    write_jack(sqrtt0_over_w0_no_pullL_fpi[2], Njack, jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 2);
+    write_jack(sqrtt0_over_w0_no_pullL_fpi[3], Njack, jack_file);     check_correlatro_counter(id_RGF_no_pullL_fpi + 3);
+
+    write_jack(sqrtt0_corrections_FLAG[0], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_corr_FLAG + 0);
+    write_jack(sqrtt0_corrections_FLAG[1], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_corr_FLAG + 1);
+    write_jack(sqrtt0_corrections_FLAG[2], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_corr_FLAG + 2);
+    write_jack(sqrtt0_corrections_FLAG[3], Njack, jack_file);     check_correlatro_counter(id_sqrtt0_corr_FLAG + 3);
+
+    write_jack(sqrtt0_small_L_m0cor, Njack, jack_file);     check_correlatro_counter(id_sqrtt0_m0corr);
+    write_jack(sqrt0_L_m0cor, Njack, jack_file);     check_correlatro_counter(id_sqrtt0_m0corr + 1);
+
+    write_jack(sqrtt0_corr_m0_L, Njack, jack_file);     check_correlatro_counter(id_sqrtt0_m0corr + 2);
 
 
     return 0;
