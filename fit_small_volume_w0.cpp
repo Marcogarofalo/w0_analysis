@@ -331,9 +331,10 @@ int main(int argc, char** argv) {
             if (word.size() == 2) {
                 basename = word[0];
                 mysprintf(namefile, NAMESIZE, "%s/%s_%s_%s", argv[2], argv[1], word[0].c_str(), word[1].c_str());
-                printf("adding file %s\n", namefile);
+                printf("adding file %s    myen[%d]", namefile, beta_count);
                 files.emplace_back(namefile);
                 myen[beta_count].emplace_back(file_count);
+                printf("[%ld]\n", myen[beta_count].size()-1);
                 file_count++;
             }
             else if (word.size() == 1) {
@@ -416,7 +417,7 @@ int main(int argc, char** argv) {
     for (int i = 0; i < der_name.size(); i++) {
         fit_type fit_info;
 
-        fit_info.corr_id = { id_dw0_dmu, id_amuliso, id_w0 };
+        fit_info.corr_id = { id_der[i], id_amuliso, id_Obs[i] };
 
         //////////////////////////////////////////////////////////////
         // charm small volume fit - constant
