@@ -20,6 +20,8 @@ static constexpr int id_fpiwp25_sol = id_fpi_sim_big_L + 12;
 static constexpr int id_w0_wp25 = id_fpiwp25_sol +7;
 static constexpr int id_RGF_fpi = id_w0_wp25 + 2;
 static constexpr int id_RGF_no_pullL_fpi = id_RGF_fpi + 4;
+static constexpr int id_sqrtt0_corr_FLAG = id_RGF_no_pullL_fpi + 4;
+static constexpr int id_sqrtt0_m0corr = id_sqrtt0_corr_FLAG + 4;
 
 static constexpr double hbarc = 197.326963; // MeV*fm
 static constexpr double fpi_MeV = 130.5;
