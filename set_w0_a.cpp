@@ -1122,7 +1122,9 @@ int main(int argc, char** argv) {
         // weighted_average(data[iw0], data[75]);
         // weighted_average(data[id_deriv_sqrtt0(0,0,0)], data[76]);
         pull_w0 = weighted_average_plus_pool(data[iw0], data[75]);
+        myres->mult(pull_w0, pull_w0, previous_a);
         pull_sqrtt0 = weighted_average_plus_pool(data[id_deriv_sqrtt0(0, 0, 0)], data[76]);
+        myres->mult(pull_sqrtt0, pull_sqrtt0, previous_a);
         pull_RGF = weighted_average_plus_pool(sqrtt0_over_w0, sqrtt0_over_w0_L);
     }
     else {
@@ -1138,6 +1140,13 @@ int main(int argc, char** argv) {
     check_pull_factor(pull_sqrtt0, filename_pull);
     filename_pull = std::string("deriv/pull_RGF_jack") + std::to_string(Njack) + ".dat";
     check_pull_factor(pull_RGF, filename_pull);
+
+    // pull_w0 = myres->create_fake_exact(pull_w0[Njack - 1], myres->comp_error(pull_w0), -1);
+    // pull_sqrtt0 = myres->create_fake_exact(pull_sqrtt0[Njack - 1], myres->comp_error(pull_sqrtt0), -1);
+
+    myres->div(pull_w0, pull_w0, previous_a);
+    myres->div(pull_sqrtt0, pull_sqrtt0, previous_a);
+
 
     myres->add(data[iw0], data[iw0], pull_w0);
     myres->add(data[id_deriv_sqrtt0(0, 0, 0)], data[id_deriv_sqrtt0(0, 0, 0)], pull_sqrtt0);
@@ -1236,6 +1245,8 @@ int main(int argc, char** argv) {
     double** w0_split = malloc_2<double>(7, Njack);
     double* w0_a_lin_der = myres->create_copy(data[iw0]);
     double* w0_sim = myres->create_copy(data[iw0]);
+
+    double* a_fm_FLAG = myres->create_zero();
 
     std::vector<double*> sqrtt0_over_w0_fpi(4);
     std::vector<double*> sqrtt0_corrections_FLAG(4);
@@ -1484,6 +1495,10 @@ int main(int argc, char** argv) {
         double* check_s = myres->create_copy(sqrtt0_corr_m0_L);
         myres->mult(check_s, check_s, a_fm);
         printf("comparing with sqrtt0 = %g(%g)\n", myres->mean(check_s), myres->comp_error(check_s));
+        printf("RGF summing the derivatives ");
+        for (int icor = 0; icor < 4; icor++)
+            printf("%g(%g)\t", myres->mean(sqrtt0_over_w0_fpi[icor]), myres->comp_error(sqrtt0_over_w0_fpi[icor]));
+        printf("\n");
 
         double** data_m_a = malloc_2<double>(4, Njack);
         for (int j = 0; j < Njack;j++) {
@@ -1550,7 +1565,30 @@ int main(int argc, char** argv) {
             printf("%+.6g  (%.3g) ", myres->mean(w0_split[ii]), myres->comp_error(w0_split[ii]));
         }printf("\n");
         printf("w0_sim (fm): %+.6g  (%.3g)\n", myres->mean(w0_sim), myres->comp_error(w0_sim));
+        a_fm_FLAG = a_fm;
     }
+
+    double** values_for_corr = malloc_2<double>(6, Njack);
+    values_for_corr[0] = a_fm_FLAG;
+    values_for_corr[1] = miso[0];
+    values_for_corr[2] = miso[1];
+    values_for_corr[3] = miso[2];
+    values_for_corr[4] = data[iw0];
+    values_for_corr[5] = data[isqrtt0];
+
+    double** cov = myres->comp_cov(6, values_for_corr);
+    char name_corr[NAMESIZE];
+    mysprintf(name_corr, NAMESIZE, "correlations/correlation_matrix_FLAG_%s.dat", ensemble.c_str());
+    FILE* corr_file = fopen(name_corr, "w+");
+    fprintf(corr_file, "# correlation matrix for (in order) a, m^iso l,s,c, w0, sqrtt0  ens: %s\n", ensemble.c_str());
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 6; j++) {
+            double corr = cov[i][j] / sqrt(cov[i][i] * cov[j][j]);
+            fprintf(corr_file, "%-22.12g", corr);
+        }
+        fprintf(corr_file, "\n");
+    }
+
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2808,6 +2846,29 @@ int main(int argc, char** argv) {
         write_jack(dm_w0[0], Njack, jack_file);     check_correlatro_counter(97 + ic * 8);
         write_jack(dm_w0[1], Njack, jack_file);     check_correlatro_counter(98 + ic * 8);
         write_jack(dm_w0[2], Njack, jack_file);     check_correlatro_counter(99 + ic * 8);
+
+
+        double** values_for_corr = malloc_2<double>(6, Njack);
+        values_for_corr[0] = a_from_w0;
+        values_for_corr[1] = miso_w0[0];
+        values_for_corr[2] = miso_w0[1];
+        values_for_corr[3] = miso_w0[2];
+        values_for_corr[4] = data[iw0];
+        values_for_corr[5] = data[isqrtt0];
+
+        double** cov = myres->comp_cov(6, values_for_corr);
+        char name_corr[NAMESIZE];
+        mysprintf(name_corr, NAMESIZE, "correlations/correlation_matrix_WP25_C-5_%s.dat", ensemble.c_str());
+        FILE* corr_file = fopen(name_corr, "w+");
+        fprintf(corr_file, "# correlation matrix for (in order) a, m^iso l,s,c, w0, sqrtt0  ens: %s\n", ensemble.c_str());
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 6; j++) {
+                double corr = cov[i][j] / sqrt(cov[i][i] * cov[j][j]);
+                fprintf(corr_file, "%-22.12g", corr);
+            }
+            fprintf(corr_file, "\n");
+        }
+
 
     }
 
