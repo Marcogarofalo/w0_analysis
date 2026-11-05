@@ -197,12 +197,10 @@ int main(int argc, char** argv) {
     fread(&tmp_st, sizeof(size_t), 1, infile_loop);printf("tmp_st %ld\n", tmp_st);
     double tmp_mu;
     fread(&tmp_mu, sizeof(double), 1, infile_loop);printf("tmp_mu %f\n", tmp_mu);
-    // error(fabs(tmp_mu - head_loops.mus[0]) > 1e-10, 1, "main", "mu in file %f differ from mu extracted %f", tmp_mu, head_loops.mus[0]);
     head_loops.mus.push_back(tmp_mu);
     fread(&tmp_mu, sizeof(double), 1, infile_loop);printf("tmp_mu %f\n", tmp_mu);
-    // error(fabs(tmp_mu - head_loops.mus[0]) > 1e-10, 1, "main", "mu in file %f differ from mu extracted %f", tmp_mu, head_loops.mus[0]);
     head_loops.mus.push_back(tmp_mu);
-
+    
     head_loops.Njack = head_loops.Nconf;
     head_loops.ncorr = 1;
     char c[1];
@@ -335,6 +333,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // correcting w0
     //////////////////////////////////////////////////////////////
+    printf("ncorr in loop file: %d\n", head_loops.ncorr);
     for (int i = 0; i < head_loops.ncorr; i++) {
         for (int j = 0; j < head.Njack; j++) {
             std::complex<double> bubble(0, 0);
@@ -343,10 +342,14 @@ int main(int argc, char** argv) {
             }
 
             for (int tf = 0; tf < head.T; tf++) {
+                // w0
                 std::complex<double> Wt(data[j][6][tf][0], data[j][6][tf][1]);
                 Wt *= bubble;
                 data[j][head.ncorr + i][tf][0] = Wt.real();
                 data[j][head.ncorr + i][tf][1] = Wt.imag();
+                // sqrtt0
+                Wt = std::complex<double>(data[j][5][tf][0], data[j][5][tf][1]);
+                Wt *= bubble;
                 data[j][head.ncorr + i + head_loops.ncorr][tf][0] = Wt.real();
                 data[j][head.ncorr + i + head_loops.ncorr][tf][1] = Wt.imag();
             }
@@ -749,7 +752,7 @@ int main(int argc, char** argv) {
         fit_info.function = poly3;
         fit_info.linear_fit = true;
         fit_info.T = head.T * 2;
-        fit_info.corr_id = { 6 };
+        fit_info.corr_id = { 5 };
 
         for (int t = 1; t < head.T; t++) {
             if (lhs_function_w0_eg(Njack - 1, conf_jack, t, fit_info) > 0.3) {
@@ -790,7 +793,7 @@ int main(int argc, char** argv) {
 
 
             int Ng = head_loops.gammas.size();
-            fit_info.corr_id = { 6, head.ncorr + head_loops.ncorr }; // the second id is the one with the correction, the first is the one without
+            fit_info.corr_id = { 5, head.ncorr + head_loops.ncorr }; // the second id is the one with the correction, the first is the one without
             fit_info.myen = { 0 }; // reim of corr_id[1] (the correction)
 
 
