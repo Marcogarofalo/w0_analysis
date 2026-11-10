@@ -932,7 +932,7 @@ int main(int argc, char** argv) {
     bool bigLw0 = files.size() > 79 && strcmp(files[78].c_str(), "skip") != 0 && strcmp(files[79].c_str(), "skip") != 0;
     if (bigLw0) {
         read_file_debug(data[75], files[78].c_str());// w0 tm B96 
-        read_file_debug(data[76], files[79].c_str());// fpi OS B96
+        read_file_debug(data[76], files[79].c_str());// sqrtt0 OS B96
     }
     else {
         for (int j = 0; j < Njack;j++) {
@@ -950,7 +950,7 @@ int main(int argc, char** argv) {
     bool smallLw0 = files.size() > 81 && strcmp(files[80].c_str(), "skip") != 0 && strcmp(files[81].c_str(), "skip") != 0;
     if (smallLw0) {
         read_file_debug(data[77], files[80].c_str());// w0 tm B48 
-        read_file_debug(data[78], files[81].c_str());// fpi OS B48
+        read_file_debug(data[78], files[81].c_str());// sqrtt0 OS B48
     }
     else {
         for (int j = 0; j < Njack;j++) {
