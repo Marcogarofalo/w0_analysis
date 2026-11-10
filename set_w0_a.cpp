@@ -510,7 +510,7 @@ int main(int argc, char** argv) {
     //////////////////////////////////////////////////////////////
     // read the jacks
     //////////////////////////////////////////////////////////////
-    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2 + 2 + (7 + 4 + 2) + 2;
+    int file_to_read = 5 * (1 + 3 * 2) + 4 + 2 + 2 + 1 + 3 + 7 * 2 + 2 + (7 + 4 + 2) + 2 + 2;
     printf("%d\n", file_to_read);
     error(files.size() - 2 != file_to_read, 1, "main", "No input files found in  file %s we need %d lines but we have %d", argv[4], file_to_read, files.size() - 2);
     double** data = malloc_2<double>(file_to_read, Njack);
@@ -945,6 +945,21 @@ int main(int argc, char** argv) {
     double* sqrt0_L = myres->create_copy(data[76]);
     double* sqrtt0_small_L = myres->create_copy(data[62]);
 
+
+    // B48 w0 and t0
+    bool smallLw0 = files.size() > 81 && strcmp(files[80].c_str(), "skip") != 0 && strcmp(files[81].c_str(), "skip") != 0;
+    if (smallLw0) {
+        read_file_debug(data[77], files[80].c_str());// w0 tm B48 
+        read_file_debug(data[78], files[81].c_str());// fpi OS B48
+    }
+    else {
+        for (int j = 0; j < Njack;j++) {
+            data[77][j] = 0;
+            data[78][j] = 0;
+        }
+    }
+
+
     //////////////////////////////////////////////////////////////
     // max twist correction
     //////////////////////////////////////////////////////////////
@@ -1007,11 +1022,24 @@ int main(int argc, char** argv) {
             data[75][j] += delta;
             data[76][j] += delta_sqrtt0;
         }
+        if (smallLw0) {
+            data[77][j] += delta;
+            data[78][j] += delta_sqrtt0;
+        }
     }
     printf("w0 after max twist correction id=%d: %.12g  %.12g\n", iw0, data[iw0][Njack - 1], myres->comp_error(data[iw0]));
     printf("sqrtt0 after max twist correction id=%d: %.12g  %.12g\n", isqrtt0, data[isqrtt0][Njack - 1], myres->comp_error(data[isqrtt0]));
     myres->div(sqrtt0_over_w0, data[isqrtt0], data[iw0]);
     printf("RGF after max twist correction %.12g  %.12g\n", sqrtt0_over_w0[Njack - 1], myres->comp_error(sqrtt0_over_w0));
+
+    if (smallLw0) {
+        printf("w0 B48 after max twist correction id=%d: %.12g  %.12g\n", iw0, data[77][Njack - 1], myres->comp_error(data[77]));
+        printf("sqrtt0 B48 after max twist correction id=%d: %.12g  %.12g\n", isqrtt0, data[78][Njack - 1], myres->comp_error(data[78]));
+        double* sqrtt0_over_w0_B48 = myres->create_copy(data[78]);
+        myres->div(sqrtt0_over_w0_B48, data[78], data[77]);
+        printf("RGF B48 after max twist correction %.12g  %.12g\n", sqrtt0_over_w0_B48[Njack - 1], myres->comp_error(sqrtt0_over_w0_B48));
+        free(sqrtt0_over_w0_B48);
+    }
 
     double* sqrt0_L_m0cor = myres->create_copy(data[76]);
     double* sqrtt0_small_L_m0cor = myres->create_copy(data[isqrtt0]);
@@ -2803,7 +2831,7 @@ int main(int argc, char** argv) {
             //sqrtt0_wp25_C
             for (int im = 0; im < 3; im++) {
                 int val_sea = 1;
-                double dm = (miso[im][j] - amusim[im][j]);
+                double dm = (miso_w0[im][j] - amusim[im][j]);
                 double dt = data[id_deriv_sqrtt0(1, im, val_sea)][j];
                 if (im == 2 && val_sea == 1) {
                     dt = get_linear_deriv_sqrtt0c(data, amuiso, previous_a, j);
