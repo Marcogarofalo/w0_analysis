@@ -82,7 +82,7 @@ deriv/sqrtt0_flow_E112_LMA.dat_jack20.dat
 deriv/zero_20.dat
 deriv/zero_20.dat
 deriv/zero_20.dat
-deriv/der_rewlOS_flow_E112_LMA.dat_jack20.dat
+deriv/der_sqrtt0_rewlOS_flow_E112_LMA.dat_jack20.dat
 deriv/mul_sqrtt0_dsqrtt0_dmu_strange_small_volume_const_jack20.dat
 deriv/mul_sqrtt0_dsqrtt0_dmu_charm_small_volume_const_jack20.dat
 ../../data_l_20/E112/m_cr/delta_m0.dat
