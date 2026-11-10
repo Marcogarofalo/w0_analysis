@@ -43,9 +43,9 @@ deriv/mul_w0_dw0_dmu_charm_small_volume_const_jack20.dat
 onlinemeas_D96.dat
 D96
 ../../data_l_20/D96/m_cr/delta_m0.dat
+deriv/der_w0_m0_flow_D96.dat_P5_mu5.4000e-04.bin_jack20.dat
 deriv/der_w0_m0_flow_D96.dat_P5_mu1.3576e-02.bin_jack20.dat
 deriv/der_w0_m0_flow_D96.dat_P5_mu1.6490e-01.bin_jack20.dat
-deriv/der_w0_m0_flow_D96.dat_P5_mu5.4000e-04.bin_jack20.dat
 ## strange and charm sea derivatives
 deriv/der_rewsOS_flow_D96.dat_jack20.dat
 deriv/der_rewcOS_flow_D96.dat_jack20.dat
@@ -93,3 +93,5 @@ deriv/P1_fit_mul_over_sqrtt0_dsqrtt0_dmuc_a2_5pt_jack20.dat
 #
 deriv/w0_flow_D128.dat_jack20.dat
 deriv/sqrtt0_flow_D128.dat_jack20.dat
+skip
+skip
